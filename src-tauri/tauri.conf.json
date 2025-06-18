@@ -5,14 +5,13 @@
   "identifier": "com.helpful-computer.app",
   "build": {
     "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
+    "devUrl": "http://localhost:3000"
   },
   "app": {
     "windows": [
       {
-        "title": "helpful-computer",
+        "title": "Helpful Computer",
         "width": 800,
         "height": 600
       }
