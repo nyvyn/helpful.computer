@@ -12,7 +12,7 @@ export default function Dashboard() {
     return (
         <div className="flex w-screen h-screen bg-black">
             <div className="relative flex items-center justify-center flex-1">
-                <AudioVisualizer listening={listening} speaking={speaking} />
+                <AudioVisualizer listening={listening} speaking={speaking}/>
                 <button
                     onClick={toggleListening}
                     className="
@@ -31,7 +31,7 @@ export default function Dashboard() {
             </div>
 
             <div className="flex-1">
-                <InteractiveCanvas />
+                <InteractiveCanvas/>
             </div>
         </div>
     );
