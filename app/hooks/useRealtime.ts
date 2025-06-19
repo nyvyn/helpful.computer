@@ -1,7 +1,7 @@
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
-import canvasTool from "../tools/canvasTool";
-import { generateEphemeralKey } from "../lib/generateEphemeralKey.ts";
+import canvasTool from "../lib/tools/canvasTool";
+import { generateEphemeralKey } from "../lib/openai/generateEphemeralKey.ts";
 
 export function useRealtime() {
     const [errored, setErrored] = useState<boolean | string>(false);
