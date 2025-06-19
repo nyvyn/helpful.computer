@@ -26,14 +26,13 @@ export function useRealtime() {
             },
         });
 
-        const canvasAgent = new RealtimeAgent({name: "Canvas", tools: [canvasTool]});
         const assistantAgent = new RealtimeAgent({name: "Assistant"});
-        assistantAgent.handoffs = [canvasAgent];
+        const canvasAgent = new RealtimeAgent({name: "Canvas", tools: [canvasTool]});
+
         canvasAgent.handoffs = [assistantAgent];
+        assistantAgent.handoffs = [canvasAgent];
 
-        const agent = assistantAgent;
-
-        const session = new RealtimeSession(agent, {
+        const session = new RealtimeSession(assistantAgent, {
             model: "gpt-4o-realtime-preview-2025-06-03"
         });
         sessionRef.current = session;
