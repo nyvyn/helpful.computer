@@ -25,9 +25,7 @@ export default function HomePage() {
     const {listening, speaking, toggleListening} = useRealtime();
 
     return (
-        <div
-            className="flex items-center justify-center min-h-screen min-w-screen bg-black"
-        >
+        <div className="flex min-h-screen min-w-screen bg-black">
             <div className="flex gap-4">
                 <AudioVisualizer
                     listening={listening}
