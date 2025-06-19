@@ -27,7 +27,7 @@ export default function HomePage() {
         });
     }, []);
 
-    const {listening, speaking, toggleListening} = useRealtime(clientSecret!);
+    const {listening, speaking, toggleListening} = useRealtime({ephemeralKey: clientSecret!});
 
     return (
         <div
