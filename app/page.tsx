@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { generateEphemeralKey } from "./lib/generateEphemeralKey";
 
 import { checkMicrophonePermission, requestMicrophonePermission } from "tauri-plugin-macos-permissions-api";
 import { MicOffIcon } from "./components/icons/MicOffIcon.tsx";
@@ -10,10 +11,17 @@ import { useRealtime } from "./hooks/useRealtime.ts";
 
 export default function HomePage() {
 
-    const clientSecret = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-    if (!clientSecret) {
-      return <p className="text-white">Missing NEXT_PUBLIC_OPENAI_API_KEY</p>;
-    }
+    /* Retrieve a short-lived client key from the backend */
+    const [ephemeralKey, setEphemeralKey] = useState<string>("");
+    const [keyError, setKeyError] = useState<string | null>(null);
+
+    useEffect(() => {
+        generateEphemeralKey()
+            .then(setEphemeralKey)
+            .catch(err =>
+                setKeyError(err instanceof Error ? err.message : String(err))
+            );
+    }, []);
 
     useEffect(() => {
         checkMicrophonePermission().then(checkMicrophonePermission => {
@@ -27,7 +35,14 @@ export default function HomePage() {
         });
     }, []);
 
-    const {listening, speaking, toggleListening} = useRealtime({ephemeralKey: clientSecret!});
+    const {listening, speaking, toggleListening} = useRealtime({ephemeralKey});
+
+    if (keyError) {
+        return <p className="text-white">Failed to get key: {keyError}</p>;
+    }
+    if (!ephemeralKey) {
+        return <p className="text-white">Generating credentials…</p>;
+    }
 
     return (
         <div
