@@ -1,7 +1,9 @@
+import { Agent } from "@openai/agents";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
 import canvasTool from "../lib/tools/canvasTool";
 import { generateEphemeralKey } from "../lib/openai/generateEphemeralKey.ts";
+import { canvasInstructions } from "../lib/tools/prompts.ts";
 
 export function useRealtime() {
     const [errored, setErrored] = useState<boolean | string>(false);
@@ -13,7 +15,12 @@ export function useRealtime() {
     /* create once */
     useEffect(() => {
         const assistantAgent = new RealtimeAgent({name: "Assistant"});
-        const canvasAgent = new RealtimeAgent({ name: "Canvas", tools: [canvasTool] });
+        const canvasAgent = new Agent({
+            name: "Canvas",
+            model: "gpt-4.1",
+            tools: [canvasTool],
+            instructions: canvasInstructions,
+        });
 
         canvasAgent.handoffs = [assistantAgent];
         assistantAgent.handoffs = [canvasAgent];
