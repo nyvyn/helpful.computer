@@ -6,7 +6,7 @@ import { MicOffIcon }    from "./icons/MicOffIcon.tsx";
 import { MicOnIcon }     from "./icons/MicOnIcon.tsx";
 import { useRealtime }   from "../hooks/useRealtime.ts";
 
-export default function HomeUI() {
+export default function Dashboard() {
   const { listening, speaking, toggleListening } = useRealtime();
 
   return (

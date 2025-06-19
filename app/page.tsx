@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 import { checkMicrophonePermission, requestMicrophonePermission } from "tauri-plugin-macos-permissions-api";
-import HomeUI from "./components/HomeUI";
+import Dashboard from "./components/Dashboard.tsx";
 
 export default function HomePage() {
     useEffect(() => {
@@ -18,5 +18,5 @@ export default function HomePage() {
         });
     }, []);
 
-    return <HomeUI />;
+    return <Dashboard />;
 }
