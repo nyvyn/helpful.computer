@@ -10,10 +10,13 @@ export default function Dashboard() {
     const {listening, speaking, toggleListening} = useRealtime();
 
     return (
-        <div className="flex min-h-screen min-w-screen bg-black">
-            <div className="flex gap-4">
-                <AudioVisualizer listening={listening} speaking={speaking}/>
-                <InteractiveCanvas/>
+        <div className="flex w-screen h-screen bg-black">
+            <div className="flex items-center justify-center flex-1">
+                <AudioVisualizer listening={listening} speaking={speaking} />
+            </div>
+
+            <div className="flex-1">
+                <InteractiveCanvas />
             </div>
 
             {/* toggle-listening button */}
