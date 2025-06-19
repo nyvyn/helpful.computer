@@ -5,25 +5,38 @@ export default function AICanvas() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
-        const ctx = canvasRef.current?.getContext("2d");
-        if (ctx) {
-            (globalThis as any).__aiCanvasCtx = ctx;
-            ctx.fillStyle = "black";
-            ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+      if (ctx) (globalThis as any).__aiCanvasCtx = ctx;
+
+      const resize = () => {
+        const { clientWidth, clientHeight } = canvas;
+        if (canvas.width !== clientWidth || canvas.height !== clientHeight) {
+          canvas.width  = clientWidth;
+          canvas.height = clientHeight;
         }
-        return () => {
-            if ((globalThis as any).__aiCanvasCtx === ctx) {
-                delete (globalThis as any).__aiCanvasCtx;
-            }
-        };
+        if (ctx) {
+          ctx.fillStyle = "black";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+      };
+
+      resize();                                 // initial sizing
+      const ro = new ResizeObserver(resize);    // keep in sync
+      ro.observe(canvas);
+
+      return () => {
+        ro.disconnect();
+        if ((globalThis as any).__aiCanvasCtx === ctx) delete (globalThis as any).__aiCanvasCtx;
+      };
     }, []);
 
     return (
         <canvas
             ref={canvasRef}
-            width={400}
-            height={400}
-            className="border border-gray-700"
+            className="w-full h-full border border-gray-700"
         />
     );
 }
