@@ -2,8 +2,8 @@
 
 import { useRealtime } from "../hooks/useRealtime.ts";
 import InteractiveCanvas from "./canvas/InteractiveCanvas.tsx";
-import ToggleListeningButton from "./ToggleListeningButton.tsx";
-import AudioVisualizer from "./visualizer/AudioVisualizer";
+import ToggleListeningButton from "./speech/ToggleListeningButton.tsx";
+import AudioVisualizer from "./speech/AudioVisualizer";
 
 export default function Dashboard() {
     const {listening, speaking, toggleListening} = useRealtime();

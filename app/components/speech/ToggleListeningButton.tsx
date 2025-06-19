@@ -1,7 +1,7 @@
 "use client";
 
-import { MicOffIcon } from "./icons/MicOffIcon.tsx";
-import { MicOnIcon }  from "./icons/MicOnIcon.tsx";
+import { MicOffIcon } from "../icons/MicOffIcon.tsx";
+import { MicOnIcon }  from "../icons/MicOnIcon.tsx";
 
 interface Props {
   listening: boolean;
