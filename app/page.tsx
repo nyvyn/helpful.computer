@@ -6,12 +6,12 @@ import { checkMicrophonePermission, requestMicrophonePermission } from "tauri-pl
 import { MicOffIcon } from "./components/icons/MicOffIcon.tsx";
 import { MicOnIcon } from "./components/icons/MicOnIcon.tsx";
 import AudioVisualizer from "./components/visualizer/AudioVisualizer";
-import { useDetection } from "./hooks/useDetection";
 import { useRealtime } from "./hooks/useRealtime.ts";
-import { useSynthesis } from "./hooks/useSynthesis.ts";
-import { useTranscription } from "./hooks/useTranscription.ts";
 
 export default function HomePage() {
+
+    const clientSecret = process.env.OPENAI_API_KEY;
+    if (!clientSecret) { throw new Error("OPENAI_API_KEY not set"); }
 
     useEffect(() => {
         checkMicrophonePermission().then(checkMicrophonePermission => {
@@ -20,12 +20,12 @@ export default function HomePage() {
                     if (!requestMicrophonePermission) {
                         alert("Microphone permission denied");
                     }
-                })
+                });
             }
         });
     }, []);
 
-    const { listening, speaking, mute } = useRealtime(clientSecret);
+    const {listening, speaking, toggleListening} = useRealtime(clientSecret!);
 
     return (
         <div
@@ -38,7 +38,7 @@ export default function HomePage() {
 
             {/* toggle-listening button */}
             <button
-                onClick={mute}
+                onClick={toggleListening}
                 className="
                   absolute bottom-4 right-4
                   flex items-center justify-center

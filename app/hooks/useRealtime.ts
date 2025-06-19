@@ -22,22 +22,21 @@ export function useRealtime(ephemeralKey: string) {
         sessionRef.current = session;
 
         /* 2. Wire state updates */
-        session.on("listening", () => setListening(true));
-        session.on("silent", () => setListening(false));
-        session.on("speaking", () => setSpeaking(true));
-        session.on("doneSpeaking", () => setSpeaking(false));
+        session.on("audio_start", () => setSpeaking(true));
+        session.on("audio_stopped", () => setSpeaking(false));
         session.on("error", (e) => setErrored(String(e)));
-
-        /* 3. Connect with the client-secret generated on your backend */
-        session.connect({apiKey: ephemeralKey}).catch(setErrored);
-
-        return () => void session.close();
     }, [ephemeralKey]);
 
     /* commands that UI can call */
-    const startListening = () => sessionRef.current?.mute(false);
-    const stopListening = () => sessionRef.current?.mute(true);
-    const mute = () => listening ? stopListening() : startListening();
+    const connect = () => {
+        sessionRef.current?.connect({apiKey: ephemeralKey}).catch(setErrored);
+        setListening(true);
+    }
+    const disconnect = () => {
+        sessionRef.current?.close();
+        setListening(false);
+    }
+    const toggleListening = () => listening ? disconnect() : connect();
 
-    return {errored, listening, speaking, mute};
+    return {errored, listening, speaking, toggleListening};
 }
