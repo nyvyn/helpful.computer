@@ -1,4 +1,5 @@
-import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
+import { RealtimeAgent, RealtimeSession, tool } from "@openai/agents-realtime";
+import { z } from "zod";
 import { useEffect, useRef, useState } from "react";
 import { generateEphemeralKey } from "../lib/generateEphemeralKey.ts";
 
@@ -11,7 +12,26 @@ export function useRealtime() {
 
     /* create once */
     useEffect(() => {
-        const agent = new RealtimeAgent({name: "Assistant"});
+        const canvasTool = tool({
+            name: "canvas",
+            description: "Execute JavaScript drawing commands on the shared canvas. Provide code that uses a CanvasRenderingContext2D named `ctx`.",
+            parameters: z.object({
+                script: z.string(),
+            }),
+            execute: async ({ script }) => {
+                const ctx = (globalThis as any).__aiCanvasCtx as CanvasRenderingContext2D | undefined;
+                if (!ctx) throw new Error("Canvas not ready");
+                new Function("ctx", script)(ctx);
+                return "ok";
+            },
+        });
+
+        const canvasAgent = new RealtimeAgent({ name: "Canvas", tools: [canvasTool] });
+        const assistantAgent = new RealtimeAgent({ name: "Assistant" });
+        assistantAgent.handoffs = [canvasAgent];
+        canvasAgent.handoffs = [assistantAgent];
+
+        const agent = assistantAgent;
 
         const session = new RealtimeSession(agent, {
             model: "gpt-4o-realtime-preview-2025-06-03"

@@ -6,6 +6,7 @@ import { checkMicrophonePermission, requestMicrophonePermission } from "tauri-pl
 import { MicOffIcon } from "./components/icons/MicOffIcon.tsx";
 import { MicOnIcon } from "./components/icons/MicOnIcon.tsx";
 import AudioVisualizer from "./components/visualizer/AudioVisualizer";
+import AICanvas from "./components/canvas/AICanvas";
 import { useRealtime } from "./hooks/useRealtime.ts";
 
 export default function HomePage() {
@@ -27,10 +28,13 @@ export default function HomePage() {
         <div
             className="flex items-center justify-center min-h-screen min-w-screen bg-black"
         >
-            <AudioVisualizer
-                listening={listening}
-                speaking={speaking}
-            />
+            <div className="flex gap-4">
+                <AudioVisualizer
+                    listening={listening}
+                    speaking={speaking}
+                />
+                <AICanvas />
+            </div>
 
             {/* toggle-listening button */}
             <button
