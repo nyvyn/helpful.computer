@@ -1,6 +1,6 @@
 import { RealtimeAgent, RealtimeSession, tool } from "@openai/agents-realtime";
-import { z } from "zod";
 import { useEffect, useRef, useState } from "react";
+import { z } from "zod";
 import { generateEphemeralKey } from "../lib/generateEphemeralKey.ts";
 
 export function useRealtime() {
@@ -18,7 +18,7 @@ export function useRealtime() {
             parameters: z.object({
                 script: z.string(),
             }),
-            execute: async ({ script }) => {
+            execute: async ({script}) => {
                 const ctx = (globalThis as any).__aiCanvasCtx as CanvasRenderingContext2D | undefined;
                 if (!ctx) throw new Error("Canvas not ready");
                 new Function("ctx", script)(ctx);
@@ -26,8 +26,8 @@ export function useRealtime() {
             },
         });
 
-        const canvasAgent = new RealtimeAgent({ name: "Canvas", tools: [canvasTool] });
-        const assistantAgent = new RealtimeAgent({ name: "Assistant" });
+        const canvasAgent = new RealtimeAgent({name: "Canvas", tools: [canvasTool]});
+        const assistantAgent = new RealtimeAgent({name: "Assistant"});
         assistantAgent.handoffs = [canvasAgent];
         canvasAgent.handoffs = [assistantAgent];
 
@@ -49,13 +49,13 @@ export function useRealtime() {
         generateEphemeralKey().then(ephemeralKey => {
             sessionRef.current?.connect({apiKey: ephemeralKey.client_secret.value}).then(() => {
                 setListening(true);
-                console.log("Connected: ", sessionRef.current?.transport)
+                console.log("Connected: ", sessionRef.current?.transport);
             }).catch(setErrored);
         });
     };
     const disconnect = () => {
         sessionRef.current?.close();
-        console.log("Disconnected: ", sessionRef.current?.transport)
+        console.log("Disconnected: ", sessionRef.current?.transport);
         setListening(false);
     };
     const toggleListening = () => listening ? disconnect() : connect();
