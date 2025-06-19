@@ -10,7 +10,7 @@
     "lint": "next lint",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "test": "vitest run"
+    "test": "vitest"
   },
   "dependencies": {
     "@openai/agents": "^0.0.8",
