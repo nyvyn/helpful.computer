@@ -10,8 +10,10 @@ import { useRealtime } from "./hooks/useRealtime.ts";
 
 export default function HomePage() {
 
-    const clientSecret = process.env.OPENAI_API_KEY;
-    if (!clientSecret) { throw new Error("OPENAI_API_KEY not set"); }
+    const clientSecret = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    if (!clientSecret) {
+      return <p className="text-white">Missing NEXT_PUBLIC_OPENAI_API_KEY</p>;
+    }
 
     useEffect(() => {
         checkMicrophonePermission().then(checkMicrophonePermission => {
