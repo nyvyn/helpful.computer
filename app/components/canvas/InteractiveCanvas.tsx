@@ -6,6 +6,16 @@ import type {
   ExcalidrawProps,
 } from "@excalidraw/excalidraw";
 
+const Excalidraw = dynamic(
+  () =>
+    import("@excalidraw/excalidraw").then((mod) =>
+      React.forwardRef<ExcalidrawImperativeAPI, ExcalidrawProps>(
+        (props, ref) => <mod.Excalidraw ref={ref} {...props} />,
+      ),
+    ),
+  { ssr: false },
+);
+
 export default function InteractiveCanvas() {
     const excalRef = useRef<ExcalidrawImperativeAPI>(null);
 
