@@ -5,9 +5,9 @@ import { z } from "zod";
 
 /* Returns a Tool instance bound to the current Excalidraw API */
 export default function useCanvasTool() {
-    const {api} = useContext(ExcalidrawContext)!;
+    const excalidraw = useContext(ExcalidrawContext);
 
-    console.log(api);
+    console.log("Excalidraw", excalidraw);
 
     return useMemo(
         () =>
@@ -17,14 +17,14 @@ export default function useCanvasTool() {
                     "Execute JavaScript commands using the Excalidraw API. Provide code that receives an `api` argument.",
                 parameters: z.object({script: z.string()}),
                 execute: async ({script}) => {
-                    if (!api) {
+                    if (!excalidraw?.api) {
                         console.log("The canvas was not correctly initialized.");
                         throw new Error("Canvas was not correctly initialized.");
                     }
-                    new Function("api", script)(api);
+                    new Function("api", script)(excalidraw.api);
                     return "ok";
                 },
             }),
-        [api],           // recreated whenever the api reference changes
+        [excalidraw],           // recreated whenever the api reference changes
     );
 }
