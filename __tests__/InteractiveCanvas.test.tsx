@@ -19,7 +19,7 @@ describe('InteractiveCanvas', () => {
 });
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import InteractiveCanvas from "../components/InteractiveCanvas";
+import InteractiveCanvas from "../app/components/canvas/InteractiveCanvas";
 
 describe("InteractiveCanvas", () => {
   it("renders without crashing", () => {
