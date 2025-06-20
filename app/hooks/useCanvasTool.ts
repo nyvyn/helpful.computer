@@ -3,7 +3,7 @@ import { tool } from "@openai/agents-realtime";
 import { z } from "zod";
 import { ExcalidrawContext } from "@/components/context/ExcalidrawContext";
 
-/* Devuelve una instancia de Tool enlazada a la api actual */
+/* Returns a Tool instance bound to the current Excalidraw API */
 export default function useCanvasTool() {
   const { api } = useContext(ExcalidrawContext);
 
@@ -20,6 +20,6 @@ export default function useCanvasTool() {
           return "ok";
         },
       }),
-    [api],           // se recrea cuando cambia la api
+    [api],           // recreated whenever the api reference changes
   );
 }
