@@ -1,6 +1,9 @@
+import { Agent } from "@openai/agents";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
-import { generateEphemeralKey } from "../lib/generateEphemeralKey.ts";
+import canvasTool from "../lib/tools/canvasTool";
+import { generateEphemeralKey } from "../lib/openai/generateEphemeralKey.ts";
+import { canvasInstructions } from "../lib/tools/prompts.ts";
 
 export function useRealtime() {
     const [errored, setErrored] = useState<boolean | string>(false);
@@ -11,9 +14,18 @@ export function useRealtime() {
 
     /* create once */
     useEffect(() => {
-        const agent = new RealtimeAgent({name: "Assistant"});
+        const assistantAgent = new RealtimeAgent({name: "Assistant"});
+        const canvasAgent = new Agent({
+            name: "Canvas",
+            model: "gpt-4.1",
+            tools: [canvasTool],
+            instructions: canvasInstructions,
+        });
 
-        const session = new RealtimeSession(agent, {
+        canvasAgent.handoffs = [assistantAgent];
+        assistantAgent.handoffs = [canvasAgent];
+
+        const session = new RealtimeSession(assistantAgent, {
             model: "gpt-4o-realtime-preview-2025-06-03"
         });
         sessionRef.current = session;
@@ -29,13 +41,13 @@ export function useRealtime() {
         generateEphemeralKey().then(ephemeralKey => {
             sessionRef.current?.connect({apiKey: ephemeralKey.client_secret.value}).then(() => {
                 setListening(true);
-                console.log("Connected: ", sessionRef.current?.transport)
+                console.log("Connected: ", sessionRef.current?.transport);
             }).catch(setErrored);
         });
     };
     const disconnect = () => {
         sessionRef.current?.close();
-        console.log("Disconnected: ", sessionRef.current?.transport)
+        console.log("Disconnected: ", sessionRef.current?.transport);
         setListening(false);
     };
     const toggleListening = () => listening ? disconnect() : connect();
