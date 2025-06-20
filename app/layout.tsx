@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { ExcalidrawProvider } from "@/components/context/ExcalidrawContext";
 
 import "./globals.css";
 
@@ -11,7 +10,7 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body>
-          <ExcalidrawProvider>{children}</ExcalidrawProvider>
+        {children}
         </body>
         </html>
     );

@@ -13,7 +13,7 @@ import type {
 const Excalidraw = dynamic(
     () => import("@excalidraw/excalidraw").then((m) => m.Excalidraw),
     { ssr: false }
-) as unknown as ForwardRefExoticComponent<
+) as ForwardRefExoticComponent<
     ExcalidrawProps & RefAttributes<ExcalidrawImperativeAPI>
 >;
 

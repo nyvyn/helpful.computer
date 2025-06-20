@@ -3,11 +3,11 @@
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import dynamic from "next/dynamic";
 import React, { useEffect, useRef } from "react";
-import { ExcalidrawContext } from "@/components/context/ExcalidrawContext";
 import { useContext } from "react";
+import { ExcalidrawContext } from "@/components/context/ExcalidrawContext.tsx";
 
 const Excalidraw = dynamic(
-    async () => (await import("../excalidraw/ExcalidrawWrapper")).default,
+    async () => (await import("@/components/excalidraw/ExcalidrawWrapper")).default,
     {ssr: false},
 );
 

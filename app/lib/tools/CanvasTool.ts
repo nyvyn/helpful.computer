@@ -1,8 +1,9 @@
+/*
+// Este archivo ya no se usa. La herramienta canvas ahora se crea dinámicamente con useCanvasTool.
 import { tool } from "@openai/agents-realtime";
 import { z } from "zod";
-import { getExcalidrawApi } from "@/lib/excalidrawStore";
 
-const canvasTool = tool({
+const CanvasTool = tool({
   name: "canvas",
   description:
     "Execute JavaScript commands using the Excalidraw API. Provide code that receives an `api` argument.",
@@ -10,11 +11,12 @@ const canvasTool = tool({
     script: z.string(),
   }),
   execute: async ({ script }) => {
-    const api = getExcalidrawApi();
-    if (!api) throw new Error("Canvas not ready");
+
+    if (!api) throw new Error("Canvas was not correctly initialized.");
     new Function("api", script)(api);
     return "ok";
   },
 });
 
-export default canvasTool;
+export default CanvasTool;
+*/
