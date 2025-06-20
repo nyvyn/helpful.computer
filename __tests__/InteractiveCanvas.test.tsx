@@ -49,3 +49,7 @@ describe("InteractiveCanvas", () => {
     expect(onDraw).not.toHaveBeenCalled();
   });
 });
+vi.mock("next/dynamic", () => ({
+  default: (loader: any) => loader(),
+}));
+//  (use `jest.mock` instead of `vi.mock` if you’re on Jest)

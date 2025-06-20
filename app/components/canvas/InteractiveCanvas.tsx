@@ -1,6 +1,10 @@
 "use client";
 import React, { useEffect, useRef } from "react";
-import { Excalidraw, type ExcalidrawImperativeAPI } from "@excalidraw/excalidraw";
+import dynamic from "next/dynamic";
+import type {
+  ExcalidrawImperativeAPI,
+  ExcalidrawProps,
+} from "@excalidraw/excalidraw";
 
 export default function InteractiveCanvas() {
     const excalRef = useRef<ExcalidrawImperativeAPI>(null);
