@@ -1,15 +1,11 @@
 "use client";
-import { ExcalidrawImperativeAPI, ExcalidrawProps } from "@excalidraw/excalidraw/types";
+
+import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import dynamic from "next/dynamic";
 import React, { useEffect, useRef } from "react";
 
 const Excalidraw = dynamic(
-    () =>
-        import("@excalidraw/excalidraw").then((mod) =>
-            React.forwardRef<ExcalidrawImperativeAPI, ExcalidrawProps>(
-                (props, ref) => <mod.Excalidraw ref={ref} {...props} />,
-            ),
-        ),
+    async () => (await import("../excalidraw/ExcalidrawWrapper")).default,
     {ssr: false},
 );
 
