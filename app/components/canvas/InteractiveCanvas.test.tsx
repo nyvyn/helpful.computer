@@ -1,4 +1,18 @@
 import React from "react";
+
+/* mock next/dynamic so it returns a stub React component */
+vi.mock("next/dynamic", () => ({
+  default: () =>
+    // stub Excalidraw component
+    ({ onDraw, ...rest }: any) => (
+      <canvas
+        data-testid="interactive-canvas"
+        onMouseMove={() => onDraw?.()}
+        {...rest}
+      />
+    ),
+}));
+
 import { render, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import InteractiveCanvas from "./InteractiveCanvas";
@@ -31,6 +45,3 @@ describe("InteractiveCanvas", () => {
     expect(onDraw).not.toHaveBeenCalled();
   });
 });
-vi.mock("next/dynamic", () => ({
-  default: (loader: never) => loader(),
-}));
