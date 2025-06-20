@@ -20,4 +20,7 @@ const ExcalidrawWrapper = dynamic(
     { ssr: false },
 );
 
+/* eslint fix: give the component an explicit display name */
+(ExcalidrawWrapper as React.ComponentType).displayName = "ExcalidrawWrapper";
+
 export default ExcalidrawWrapper;
