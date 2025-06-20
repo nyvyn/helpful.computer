@@ -12,6 +12,7 @@ const Excalidraw = dynamic(
 
 export default function InteractiveCanvas() {
     const ctx = useContext(ExcalidrawContext);
+
     /* keep the context in sync whenever Excalidraw mounts/unmounts */
     const handleRef = useCallback(
         (api: ExcalidrawImperativeAPI | null) => {
