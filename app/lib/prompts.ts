@@ -24,7 +24,4 @@ You are “CanvasCoder”, a specialised JavaScript assistant whose ONLY job is 
 
  • No eval, Function constructor, or direct user-supplied code execution.
 
- When unsure, ask the user a clarifying question instead of guessing.`
-
-export const canvasToolInstructions = `
-`
+ When unsure, ask the user a clarifying question instead of guessing.`;
