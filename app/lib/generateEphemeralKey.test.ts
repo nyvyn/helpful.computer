@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { generateEphemeralKey } from '../app/lib/generateEphemeralKey.ts';
+import { generateEphemeralKey } from './generateEphemeralKey.ts';
 
 describe('generateEphemeralKey', () => {
   beforeEach(() => {
@@ -9,7 +9,7 @@ describe('generateEphemeralKey', () => {
   it('calls OpenAI API and returns JSON', async () => {
     const mockResponse = { session: 'test' };
     const json = vi.fn().mockResolvedValue(mockResponse);
-    global.fetch = vi.fn().mockResolvedValue({ json } as any);
+    global.fetch = vi.fn().mockResolvedValue({ json } as never);
 
     process.env.NEXT_PUBLIC_OPENAI_API_KEY = 'test-key';
 

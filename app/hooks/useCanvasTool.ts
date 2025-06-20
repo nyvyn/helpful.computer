@@ -5,7 +5,7 @@ import { ExcalidrawContext } from "@/components/context/ExcalidrawContext";
 
 /* Returns a Tool instance bound to the current Excalidraw API */
 export default function useCanvasTool() {
-  const { api } = useContext(ExcalidrawContext);
+  const { api } = useContext(ExcalidrawContext)!;
 
   return useMemo(
     () =>

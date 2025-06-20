@@ -1,25 +1,6 @@
-import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
-
-vi.mock('@excalidraw/excalidraw', () => ({
-  Excalidraw: React.forwardRef((_, ref) => <div ref={ref} className="excalidraw"></div>)
-}));
-
-import InteractiveCanvas from '../app/components/canvas/InteractiveCanvas.tsx';
-
-describe('InteractiveCanvas', () => {
-  it('exposes the Excalidraw API on mount', () => {
-    const { container } = render(<InteractiveCanvas />);
-    const div = container.firstElementChild as HTMLElement;
-    // Excalidraw renders a div with class excalidraw
-    expect(div.querySelector('.excalidraw')).not.toBeNull();
-    expect((globalThis as any).__excalidrawAPI).toBeTruthy();
-  });
-});
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-import InteractiveCanvas from "../app/components/canvas/InteractiveCanvas";
+import InteractiveCanvas from "./InteractiveCanvas.tsx";
 
 describe("InteractiveCanvas", () => {
   it("renders without crashing", () => {
@@ -52,4 +33,3 @@ describe("InteractiveCanvas", () => {
 vi.mock("next/dynamic", () => ({
   default: (loader: any) => loader(),
 }));
-//  (use `jest.mock` instead of `vi.mock` if you’re on Jest)
