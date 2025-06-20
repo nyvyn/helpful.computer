@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { generateEphemeralKey } from '../app/lib/generateEphemeralKey.ts';
+import { generateEphemeralKey } from '../app/lib/openai/generateEphemeralKey.ts';
 
 describe('generateEphemeralKey', () => {
   beforeEach(() => {

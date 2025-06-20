@@ -4,16 +4,14 @@ import { z } from "zod";
 const canvasTool = tool({
   name: "canvas",
   description:
-    "Execute JavaScript drawing commands on the shared canvas. Provide code that uses a CanvasRenderingContext2D named `ctx`.",
+    "Execute JavaScript commands using the Excalidraw API. Provide code that receives an `api` argument.",
   parameters: z.object({
     script: z.string(),
   }),
   execute: async ({ script }) => {
-    const ctx = (globalThis as any).__aiCanvasCtx as
-      | CanvasRenderingContext2D
-      | undefined;
-    if (!ctx) throw new Error("Canvas not ready");
-    new Function("ctx", script)(ctx);
+    const api = (globalThis as any).__excalidrawAPI as any;
+    if (!api) throw new Error("Canvas not ready");
+    new Function("api", script)(api);
     return "ok";
   },
 });
