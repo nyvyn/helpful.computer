@@ -1,6 +1,7 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import InteractiveCanvas from "./InteractiveCanvas.tsx";
+import { vitest } from "vitest";
 
 describe("InteractiveCanvas", () => {
   it("renders without crashing", () => {
@@ -21,7 +22,7 @@ describe("InteractiveCanvas", () => {
   });
 
   it("does not call onDraw if not drawing", () => {
-    const onDraw = jest.fn();
+    const onDraw = vitest.fn();
     const { getByTestId } = render(<InteractiveCanvas onDraw={onDraw} />);
     const canvas = getByTestId("interactive-canvas");
 
@@ -31,5 +32,5 @@ describe("InteractiveCanvas", () => {
   });
 });
 vi.mock("next/dynamic", () => ({
-  default: (loader: any) => loader(),
+  default: (loader: never) => loader(),
 }));
