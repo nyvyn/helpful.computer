@@ -1,19 +1,16 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import { ExcalidrawImperativeAPI, ExcalidrawProps } from "@excalidraw/excalidraw/types";
 import dynamic from "next/dynamic";
-import type {
-  ExcalidrawImperativeAPI,
-  ExcalidrawProps,
-} from "@excalidraw/excalidraw";
+import React, { useEffect, useRef } from "react";
 
 const Excalidraw = dynamic(
-  () =>
-    import("@excalidraw/excalidraw").then((mod) =>
-      React.forwardRef<ExcalidrawImperativeAPI, ExcalidrawProps>(
-        (props, ref) => <mod.Excalidraw ref={ref} {...props} />,
-      ),
-    ),
-  { ssr: false },
+    () =>
+        import("@excalidraw/excalidraw").then((mod) =>
+            React.forwardRef<ExcalidrawImperativeAPI, ExcalidrawProps>(
+                (props, ref) => <mod.Excalidraw ref={ref} {...props} />,
+            ),
+        ),
+    {ssr: false},
 );
 
 export default function InteractiveCanvas() {
@@ -29,7 +26,7 @@ export default function InteractiveCanvas() {
 
     return (
         <div className="w-full h-full border border-gray-700">
-            <Excalidraw ref={excalRef} />
+            <Excalidraw ref={excalRef}/>
         </div>
     );
 }
