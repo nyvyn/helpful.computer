@@ -1,5 +1,6 @@
 import { tool } from "@openai/agents-realtime";
 import { z } from "zod";
+import { getExcalidrawApi } from "@/lib/excalidrawStore";
 
 const canvasTool = tool({
   name: "canvas",
@@ -9,7 +10,7 @@ const canvasTool = tool({
     script: z.string(),
   }),
   execute: async ({ script }) => {
-    const api = (globalThis as any).__excalidrawAPI as any;
+    const api = getExcalidrawApi();
     if (!api) throw new Error("Canvas not ready");
     new Function("api", script)(api);
     return "ok";
