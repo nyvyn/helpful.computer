@@ -3,7 +3,8 @@
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import dynamic from "next/dynamic";
 import React, { useEffect, useRef } from "react";
-import { setExcalidrawApi } from "@/lib/excalidrawStore";
+import { ExcalidrawContext } from "@/components/context/ExcalidrawContext";
+import { useContext } from "react";
 
 const Excalidraw = dynamic(
     async () => (await import("../excalidraw/ExcalidrawWrapper")).default,
@@ -11,16 +12,17 @@ const Excalidraw = dynamic(
 );
 
 export default function InteractiveCanvas() {
-    const excalRef = useRef<ExcalidrawImperativeAPI>(null);
+  const excalRef = useRef<ExcalidrawImperativeAPI>(null);
+  const ctx = useContext(ExcalidrawContext);
 
-    useEffect(() => {
-      setExcalidrawApi(excalRef.current);
-      return () => setExcalidrawApi(null);
-    }, []);
+  useEffect(() => {
+    ctx?.setApi(excalRef.current);
+    return () => ctx?.setApi(null);
+  }, [ctx]);
 
-    return (
-        <div className="w-full h-full border border-gray-700">
-            <Excalidraw ref={excalRef}/>
-        </div>
-    );
+  return (
+      <div className="w-full h-full border border-gray-700">
+          <Excalidraw ref={excalRef}/>
+      </div>
+  );
 }
