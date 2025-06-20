@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { forwardRef, ForwardRefExoticComponent, RefAttributes } from "react";
+import { forwardRef } from "react";
 import "@excalidraw/excalidraw/index.css";
 
 import type {
@@ -9,19 +9,15 @@ import type {
     ExcalidrawProps,
 } from "@excalidraw/excalidraw/types";
 
-/* --- 1.  dynamic() + explicit ref typing -------------------------------- */
-const Excalidraw = dynamic(
-    () => import("@excalidraw/excalidraw").then((m) => m.Excalidraw),
-    { ssr: false }
-) as ForwardRefExoticComponent<
-    ExcalidrawProps & RefAttributes<ExcalidrawImperativeAPI>
->;
+/* dynamic wrapper that forwards the ref to the real Excalidraw component */
+const ExcalidrawWrapper = dynamic(
+    () =>
+        import("@excalidraw/excalidraw").then((mod) =>
+            forwardRef<ExcalidrawImperativeAPI, ExcalidrawProps>(
+                (props, ref) => <mod.Excalidraw {...props} ref={ref} />,
+            ),
+        ),
+    { ssr: false },
+);
 
-/* --- 2.  Wrapper that actually exposes the ref -------------------------- */
-const ExcalidrawWrapper = forwardRef<
-    ExcalidrawImperativeAPI,
-    ExcalidrawProps
->((props, ref) => <Excalidraw {...props} ref={ref} />);
-
-ExcalidrawWrapper.displayName = "ExcalidrawWrapper";
 export default ExcalidrawWrapper;
