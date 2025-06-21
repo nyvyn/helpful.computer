@@ -1,4 +1,5 @@
 import { ExcalidrawContext } from "@/components/context/ExcalidrawContext.tsx";
+import { canvasToolInstructions } from "@/lib/prompts.ts";
 import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
 import { tool } from "@openai/agents-realtime";
 import { useContext, useMemo } from "react";
@@ -14,12 +15,7 @@ export default function useCanvasTool() {
         () =>
             tool({
                 name: "canvas",
-                description:
-                    "Draw on the Excalidraw canvas.  Pass a single argument `elements`, \
-which must be a JSON-encoded string that represents an **array of \
-Excalidraw element objects** (same format produced by Excalidraw’s export \
-feature).  The current scene will be completely replaced with these \
-elements.",
+                description: canvasToolInstructions,
                 parameters: z.object({elements: z.string()}),
                 execute: async ({elements}) => {
                     console.log("Drawing elements", elements);
