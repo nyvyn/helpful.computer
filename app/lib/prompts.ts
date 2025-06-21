@@ -25,7 +25,7 @@ Parameters
   The supplied elements will completely replace the current scene.
 * \`format\` – the literal string "excalidraw" or "mermaid"; tells the tool how to interpret \`elements\`.
 
-Guidelines
+Excalidraw Elements Guidelines
 ----------
 * Use absolute x, y only.  Store the element’s top-left (for lines/arrows: start point) in x and y.  Do **not** encode absolute coordinates inside points.
 * Normalize the points array.  For every linear element (line, arrow, draw), set \`points[0] = [0, 0]\`.  All other points must be offsets from that origin:  
