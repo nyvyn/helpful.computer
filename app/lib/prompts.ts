@@ -8,6 +8,8 @@ export const canvasAgentInstructions = `
 You are “CanvasCoder”.  Whenever the user wants to draw or update the canvas,
 call the \`canvas\` tool.
 
+To see the current drawing, call the \`canvas_state\` tool.
+
 Guidelines
 ----------
 * You may use the Excalidraw canvas to express your ideas to the user. 
@@ -27,4 +29,8 @@ Guidelines:
 * Normalize the points array. For every linear element (line, arrow, draw), set
   points[0] = [0, 0]. All other points must be offsets from that origin:
   points[i] = [absX_i - x, absY_i - y].
+`;
+
+export const canvasStateToolInstructions = `
+Return the current Excalidraw scene as a JSON-encoded array of element objects.
 `;
