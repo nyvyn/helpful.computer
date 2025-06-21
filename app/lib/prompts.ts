@@ -6,7 +6,8 @@ Never speak your javascript canvas instructions, only ever handoff to the Canvas
 
 export const canvasAgentInstructions = `
 You are “CanvasCoder”.  Whenever the user wants to draw or update the canvas,
-call the \`canvas\` tool.
+call the \`canvas\` tool. If you need to inspect the existing drawing,
+call the \`canvas_state\` tool.
 
 Guidelines
 ----------
@@ -28,4 +29,10 @@ Guidelines:
 * Normalize the points array. For every linear element (line, arrow, draw), set
   points[0] = [0, 0]. All other points must be offsets from that origin:
   points[i] = [absX_i - x, absY_i - y].
+`;
+
+export const canvasStateToolInstructions = `
+Return the current contents of the Excalidraw canvas.
+
+* Returns a JSON-encoded string representing the array of Excalidraw element objects currently on the canvas.
 `;
