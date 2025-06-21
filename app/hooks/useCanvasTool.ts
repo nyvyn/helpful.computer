@@ -19,9 +19,12 @@ export default function useCanvasTool() {
                 name: "canvas",
                 description: canvasToolInstructions,
                 parameters: z.object({
-                    elements: z.string().optional(),
-                    mermaid: z.string().optional(),
-                }),
+                    elements: z.string().nullish(),
+                    mermaid: z.string().nullish(),
+                }).refine(
+                    ({ elements, mermaid }) => !!elements || !!mermaid,
+                    { message: "elements or mermaid required" }
+                ),
                 execute: async ({ elements, mermaid }) => {
                     if (!elements && !mermaid) {
                         throw new Error("elements or mermaid required");
