@@ -15,7 +15,11 @@ export default function useCanvasTool() {
             tool({
                 name: "canvas",
                 description:
-                    "Execute JavaScript commands using the Excalidraw API. Provide code that receives an `api` argument.",
+                    "Draw on the Excalidraw canvas.  Pass a single argument `elements`, \
+which must be a JSON-encoded string that represents an **array of \
+Excalidraw element objects** (same format produced by Excalidraw’s export \
+feature).  The current scene will be completely replaced with these \
+elements.",
                 parameters: z.object({elements: z.string()}),
                 execute: async ({elements}) => {
                     console.log("Drawing elements", elements);
