@@ -24,6 +24,7 @@ Parameters
   • If \`format\` = "mermaid": the Mermaid diagram definition as a string.  
   The supplied elements will completely replace the current scene.
 * \`format\` – the literal string "excalidraw" or "mermaid"; tells the tool how to interpret \`elements\`.
+Note: "excalidraw" should be used for general drawing, and "mermaid" should be used for diagrams.
 
 Excalidraw Elements Guidelines
 ----------
