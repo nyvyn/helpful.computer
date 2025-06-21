@@ -10,14 +10,14 @@ export default function Dashboard() {
     const {listening, speaking, toggleListening} = useRealtime();
 
     const minSidebar = 100;          // px
-    const maxSidebar = 350;          // px
-    const [sidebarWidth, setSidebarWidth] = useState(maxSidebar);
+    const defaultSidebar = 350;      // ancho inicial, no límite duro
+    const [sidebarWidth, setSidebarWidth] = useState(defaultSidebar);
     const resizing = useRef(false);
 
     useEffect(() => {
       const onMouseMove = (e: MouseEvent) => {
         if (!resizing.current) return;
-        setSidebarWidth(Math.max(minSidebar, Math.min(maxSidebar, e.clientX)));
+        setSidebarWidth(Math.max(minSidebar, e.clientX));
       };
       const stop = () => (resizing.current = false);
 
@@ -32,7 +32,7 @@ export default function Dashboard() {
     return (
         <div className="flex w-screen h-screen bg-black">
             <div
-              className="relative flex items-center justify-center flex-none max-w-[350px]"
+              className="relative flex items-center justify-center flex-none"
               style={{ width: `${sidebarWidth}px` }}
             >
                 <AudioVisualizer listening={listening} speaking={speaking} />
