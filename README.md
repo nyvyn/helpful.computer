@@ -7,6 +7,7 @@
 - Works as a desktop application via Tauri.
 - Streams your microphone audio to OpenAI's `gpt-4o-realtime` model.
 - Speaks responses aloud while also showing a visual audio indicator.
+- Includes an Excalidraw canvas controlled by the AI agent.
 
 ## Getting Started
 
@@ -24,6 +25,10 @@ npm run tauri:dev
 ### Environment variables
 
 Set `NEXT_PUBLIC_OPENAI_API_KEY` in your shell or `.env` file. This key is used to generate ephemeral session tokens for OpenAI.
+
+### Running tests
+
+Use `npm test` to execute the Vitest suite.
 
 ## Recommended IDE Setup
 

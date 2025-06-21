@@ -18,5 +18,7 @@ export default function HomePage() {
         });
     }, []);
 
-    return <Dashboard/>;
+    return (
+        <Dashboard/>
+    );
 }
