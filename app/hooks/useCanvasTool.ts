@@ -3,8 +3,7 @@
 
 import { ExcalidrawContext } from "@/components/context/ExcalidrawContext.tsx";
 import { canvasToolInstructions } from "@/lib/prompts.ts";
-import { isLinearElement } from "@excalidraw/excalidraw";
-import { LinearElementEditor } from "@excalidraw/excalidraw/element/linearElementEditor";
+import { isLinearElement, LinearElementEditor } from "@excalidraw/excalidraw";
 import { tool } from "@openai/agents-realtime";
 import { useContext, useMemo } from "react";
 import { z } from "zod";
