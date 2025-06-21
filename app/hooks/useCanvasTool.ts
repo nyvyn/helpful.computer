@@ -25,12 +25,11 @@ export default function useCanvasTool() {
                         console.log("The canvas was not correctly initialized.");
                         throw new Error("Canvas was not correctly initialized.");
                     }
-                    const { convertToExcalidrawElements } =
-                      await import("@excalidraw/excalidraw");
-                    const scene = convertToExcalidrawElements(
+                    const { convertToExcalidrawElements } = await import("@excalidraw/excalidraw");
+                    const converted = convertToExcalidrawElements(
                       JSON.parse(elements),
                     );
-                    excalidraw.api.updateScene({elements: scene});
+                    excalidraw.api.updateScene({elements: converted});
                     return "ok";
                 },
             }),

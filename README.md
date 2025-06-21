@@ -7,6 +7,8 @@
 - Works as a desktop application via Tauri.
 - Streams your microphone audio to OpenAI's `gpt-4o-realtime` model.
 - Speaks responses aloud while also showing a visual audio indicator.
+- The audio-visualizer sidebar starts at 350 px and can be resized by dragging
+  the vertical divider, letting you allocate more or less space to the canvas.
 - Includes an Excalidraw canvas controlled by the AI agent.
 
 ## Getting Started
