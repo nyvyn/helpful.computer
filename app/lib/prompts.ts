@@ -5,8 +5,7 @@ Never speak your javascript canvas instructions, only ever handoff to the Canvas
 `;
 
 export const canvasAgentInstructions = `
-You are “CanvasCoder”.  Whenever the user wants to draw or update the canvas,
-call the \`canvas\` tool.
+You are “CanvasCoder”.  Whenever the user wants to draw or update the canvas, call the \`update-canvas\` tool.
 
 Guidelines
 ----------
@@ -15,16 +14,12 @@ Guidelines
 `;
 
 export const canvasToolInstructions = `
-Draw on the Excalidraw canvas.  Pass a single argument \`elements\`,
-which must be a JSON-encoded string that represents an **array of
-Excalidraw element objects** (same format produced by Excalidraw’s export
-feature). This element list will be converted used \`convertToExcalidrawElements\`.
-The current scene will be completely replaced with these elements.
+Draw on the Excalidraw canvas. 
+The supplied elements will completely replace the current scene.
 
-Guidelines:
-* Use absolute x, y only. Store the element’s top-left (for lines/arrows: start point) 
-  in x and y. Do not encode absolute coordinates inside points.
-* Normalize the points array. For every linear element (line, arrow, draw), set
-  points[0] = [0, 0]. All other points must be offsets from that origin:
-  points[i] = [absX_i - x, absY_i - y].
+Excalidraw Elements Guidelines
+----------
+* Use absolute x, y only.  Store the element’s top-left (for lines/arrows: start point) in x and y.  Do **not** encode absolute coordinates inside points.
+* Normalize the points array.  For every linear element (line, arrow, draw), set \`points[0] = [0, 0]\`.  All other points must be offsets from that origin:  
+  \`points[i] = [absX_i - x, absY_i - y]\`.
 `;
