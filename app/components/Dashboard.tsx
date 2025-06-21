@@ -10,7 +10,7 @@ export default function Dashboard() {
 
     return (
         <div className="flex w-screen h-screen bg-black">
-            <div className="relative flex items-center justify-center flex-1">
+            <div className="relative flex items-center justify-center w-full max-w-[200px] flex-none">
                 <AudioVisualizer listening={listening} speaking={speaking} />
 
                 <ToggleListeningButton
