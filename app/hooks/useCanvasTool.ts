@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+'use client';
+
 import { ExcalidrawContext } from "@/components/context/ExcalidrawContext.tsx";
 import { canvasToolInstructions } from "@/lib/prompts.ts";
-import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
 import { tool } from "@openai/agents-realtime";
 import { useContext, useMemo } from "react";
 import { z } from "zod";
@@ -23,7 +25,11 @@ export default function useCanvasTool() {
                         console.log("The canvas was not correctly initialized.");
                         throw new Error("Canvas was not correctly initialized.");
                     }
-                    const scene = convertToExcalidrawElements(JSON.parse(elements));
+                    const { convertToExcalidrawElements } =
+                      await import("@excalidraw/excalidraw");
+                    const scene = convertToExcalidrawElements(
+                      JSON.parse(elements),
+                    );
                     excalidraw.api.updateScene({elements: scene});
                     return "ok";
                 },
