@@ -15,7 +15,7 @@ export default function useCanvasTool() {
             tool({
                 name: "canvas",
                 description:
-                    "Execute JavaScript commands using the Excalidraw API. Provide code that receives an `api` argument.",
+                    "Send a JSON string that represents an array of Excalidraw element objects (as produced by the Excalidraw export format). The string will be parsed and converted with `convertToExcalidrawElements`, and the resulting elements will replace the current scene.",
                 parameters: z.object({script: z.string()}),
                 execute: async ({script}) => {
                     if (!excalidraw?.api) {
