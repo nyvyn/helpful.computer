@@ -3,6 +3,8 @@
 
 import { ExcalidrawContext } from "@/components/context/ExcalidrawContext.tsx";
 import { canvasToolInstructions } from "@/lib/prompts.ts";
+import { isLinearElement } from "@excalidraw/excalidraw";
+import { LinearElementEditor } from "@excalidraw/excalidraw/element/linearElementEditor";
 import { tool } from "@openai/agents-realtime";
 import { useContext, useMemo } from "react";
 import { z } from "zod";
@@ -27,10 +29,14 @@ export default function useCanvasTool() {
                     }
                     const { convertToExcalidrawElements } =
                       await import("@excalidraw/excalidraw");
-                    const scene = convertToExcalidrawElements(
+                    const converted = convertToExcalidrawElements(
                       JSON.parse(elements),
                     );
-                    excalidraw.api.updateScene({elements: scene});
+                    const normalized = converted.map((el) => {
+                        if (isLinearElement(el)) { LinearElementEditor.normalizePoints(el); }
+                        return el;
+                    })
+                    excalidraw.api.updateScene({elements: normalized});
                     return "ok";
                 },
             }),
