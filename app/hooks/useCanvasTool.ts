@@ -15,16 +15,16 @@ export default function useCanvasTool() {
             tool({
                 name: "canvas",
                 description:
-                    "Send a JSON string that represents an array of Excalidraw element objects (as produced by the Excalidraw export format). The string will be parsed and converted with `convertToExcalidrawElements`, and the resulting elements will replace the current scene.",
-                parameters: z.object({script: z.string()}),
-                execute: async ({script}) => {
+                    "Execute JavaScript commands using the Excalidraw API. Provide code that receives an `api` argument.",
+                parameters: z.object({elements: z.string()}),
+                execute: async ({elements}) => {
+                    console.log("Drawing elements", elements);
                     if (!excalidraw?.api) {
                         console.log("The canvas was not correctly initialized.");
                         throw new Error("Canvas was not correctly initialized.");
                     }
-                    const scene = convertToExcalidrawElements(JSON.parse(script));
+                    const scene = convertToExcalidrawElements(JSON.parse(elements));
                     excalidraw.api.updateScene({elements: scene});
-                    new Function("api", script)(excalidraw.api);
                     return "ok";
                 },
             }),
