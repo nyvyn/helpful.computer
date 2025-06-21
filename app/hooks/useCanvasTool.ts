@@ -21,10 +21,11 @@ export default function useCanvasTool() {
                 parameters: z.object({
                     elements: z.string().optional(),
                     mermaid: z.string().optional(),
-                }).refine((args) => args.elements || args.mermaid, {
-                    message: "elements or mermaid required",
                 }),
                 execute: async ({ elements, mermaid }) => {
+                    if (!elements && !mermaid) {
+                        throw new Error("elements or mermaid required");
+                    }
                     console.log("Drawing elements", elements ?? mermaid);
                     if (!excalidraw?.api) {
                         console.log("The canvas was not correctly initialized.");
