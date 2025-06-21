@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useRef, useEffect } from "react";
 import { useRealtime } from "../hooks/useRealtime.ts";
 import InteractiveCanvas from "./canvas/InteractiveCanvas.tsx";
 import ToggleListeningButton from "./speech/ToggleListeningButton.tsx";
@@ -8,9 +9,32 @@ import AudioVisualizer from "./speech/AudioVisualizer";
 export default function Dashboard() {
     const {listening, speaking, toggleListening} = useRealtime();
 
+    const minSidebar = 100;          // px
+    const maxSidebar = 350;          // px
+    const [sidebarWidth, setSidebarWidth] = useState(maxSidebar);
+    const resizing = useRef(false);
+
+    useEffect(() => {
+      const onMouseMove = (e: MouseEvent) => {
+        if (!resizing.current) return;
+        setSidebarWidth(Math.max(minSidebar, Math.min(maxSidebar, e.clientX)));
+      };
+      const stop = () => (resizing.current = false);
+
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", stop);
+      return () => {
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseup", stop);
+      };
+    }, []);
+
     return (
         <div className="flex w-screen h-screen bg-black">
-            <div className="relative flex items-center justify-center w-full max-w-[200px] flex-none">
+            <div
+              className="relative flex items-center justify-center flex-none max-w-[350px]"
+              style={{ width: `${sidebarWidth}px` }}
+            >
                 <AudioVisualizer listening={listening} speaking={speaking} />
 
                 <ToggleListeningButton
@@ -18,7 +42,10 @@ export default function Dashboard() {
                   toggleListening={toggleListening}
                 />
             </div>
-
+            <div
+              className="w-1 cursor-col-resize bg-gray-700"
+              onMouseDown={() => (resizing.current = true)}
+            />
             <div className="flex-1">
                 <InteractiveCanvas/>
             </div>
