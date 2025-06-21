@@ -13,14 +13,19 @@ export default function useCanvasTool() {
     console.log("Excalidraw", excalidraw);
 
     const schema = z.object({
-        elements: z.string(),
-        format: z.enum(["excalidraw", "mermaid"]),
+        elements: z.string().describe(`
+            If "excalidraw": an array of Excalidraw element objects as a JSON-encoded string (in Excalidraw export format).  
+            If "mermaid": a Mermaid diagram as a string; only "flowchart-v2", "sequence", and "classDiagram" are supported.
+        `),
+        format: z.enum(["excalidraw", "mermaid"]).describe(`
+            "excalidraw" should be used for general drawing, and "mermaid" should be used for diagrams.
+        `),
     });
 
     return useMemo(
         () =>
             tool({
-                name: "canvas",
+                name: "update-canvas",
                 description: canvasToolInstructions,
                 parameters: schema,
                 execute: async ({elements, format}: z.infer<typeof schema>) => {
@@ -30,15 +35,15 @@ export default function useCanvasTool() {
                         console.log("The canvas was not correctly initialized.");
                         throw new Error("Canvas was not correctly initialized.");
                     }
+
                     const {convertToExcalidrawElements} = await import("@excalidraw/excalidraw");
+                    const {parseMermaidToExcalidraw} = await import("@excalidraw/mermaid-to-excalidraw");
 
                     let skeleton;
                     if (format === "excalidraw") {
                         skeleton = JSON.parse(elements);
                     } else { // format === 'mermaid'
-                        const {parseMermaidToExcalidraw} = await import("@excalidraw/mermaid-to-excalidraw");
-                        const result = await parseMermaidToExcalidraw(elements);
-                        skeleton = result.elements;
+                        skeleton = (await parseMermaidToExcalidraw(elements)).elements;
                     }
 
                     const converted = convertToExcalidrawElements(skeleton);

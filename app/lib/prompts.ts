@@ -5,8 +5,7 @@ Never speak your javascript canvas instructions, only ever handoff to the Canvas
 `;
 
 export const canvasAgentInstructions = `
-You are “CanvasCoder”.  Whenever the user wants to draw or update the canvas,
-call the \`canvas\` tool.
+You are “CanvasCoder”.  Whenever the user wants to draw or update the canvas, call the \`update-canvas\` tool.
 
 Guidelines
 ----------
@@ -15,16 +14,8 @@ Guidelines
 `;
 
 export const canvasToolInstructions = `
-Draw on the Excalidraw canvas.  Provide **both** \`elements\` and \`format\`.
-
-Parameters
-----------
-* \`elements\` –  
-  • If \`format\` = "excalidraw": JSON-encoded string representing an **array of Excalidraw element objects** (same format produced by Excalidraw’s export feature).  
-  • If \`format\` = "mermaid": the Mermaid diagram definition as a string.  
-  The supplied elements will completely replace the current scene.
-* \`format\` – the literal string "excalidraw" or "mermaid"; tells the tool how to interpret \`elements\`.
-Note: "excalidraw" should be used for general drawing, and "mermaid" should be used for diagrams.
+Draw on the Excalidraw canvas. 
+The supplied elements will completely replace the current scene.
 
 Excalidraw Elements Guidelines
 ----------
