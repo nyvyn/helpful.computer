@@ -1,4 +1,4 @@
-import { ExcalidrawProvider } from "@/components/context/ExcalidrawContext.tsx";
+import { ExcalidrawProvider } from "../components/context/ExcalidrawContext.tsx";
 import { ReactNode } from "react";
 
 import "./globals.css";
