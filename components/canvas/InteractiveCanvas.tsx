@@ -1,7 +1,7 @@
 "use client";
 
-import { ExcalidrawContext } from "@/components/context/ExcalidrawContext";
-import ExcalidrawWrapper from "@/components/excalidraw/ExcalidrawWrapper.tsx";
+import { ExcalidrawContext } from "components/context/ExcalidrawContext";
+import ExcalidrawWrapper from "components/excalidraw/ExcalidrawWrapper.tsx";
 import React, { useContext } from "react";
 
 export default function InteractiveCanvas() {

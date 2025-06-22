@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { useRealtime } from "../hooks/useRealtime.ts";
+import { useRealtime } from "../lib/hooks/useRealtime.ts";
 import InteractiveCanvas from "./canvas/InteractiveCanvas.tsx";
 import ToggleListeningButton from "./speech/ToggleListeningButton.tsx";
 import AudioVisualizer from "./speech/AudioVisualizer";
