@@ -1,7 +1,7 @@
 "use client";
 
-import { ExcalidrawContext } from "../../components/context/ExcalidrawContext.tsx";
-import { canvasToolInstructions } from "../ai/prompts.ts";
+import { ExcalidrawContext } from "../components/context/ExcalidrawContext.tsx";
+import { canvasToolInstructions } from "../lib/ai/prompts.ts";
 import { tool } from "@openai/agents-realtime";
 import { useContext, useMemo } from "react";
 import { z } from "zod";

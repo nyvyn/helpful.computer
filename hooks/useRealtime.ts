@@ -1,6 +1,6 @@
-import useCanvasTool from "lib/hooks/useCanvasTool";
-import { generateEphemeralKey } from "../ai/generateEphemeralKey.ts";
-import { assistantAgentInstructions, canvasAgentInstructions } from "../ai/prompts.ts";
+import useCanvasTool from "hooks/useCanvasTool";
+import { generateEphemeralKey } from "../lib/ai/generateEphemeralKey.ts";
+import { assistantAgentInstructions, canvasAgentInstructions } from "../lib/ai/prompts.ts";
 import { Agent } from "@openai/agents";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
