@@ -5,6 +5,7 @@ import { canvasToolInstructions } from "../lib/ai/prompts.ts";
 import { tool } from "@openai/agents-realtime";
 import { useContext, useMemo } from "react";
 import { z } from "zod";
+import OpenAI from "openai";
 
 /* Returns a Tool instance bound to the current Excalidraw API */
 export default function useCanvasTool() {
@@ -13,13 +14,9 @@ export default function useCanvasTool() {
     console.log("Excalidraw", excalidraw);
 
     const schema = z.object({
-        elements: z.string().describe(`
-            If "excalidraw": an array of Excalidraw element objects as a JSON-encoded string (in Excalidraw export format).  
-            If "mermaid": a Mermaid diagram as a string; only "flowchart-v2", "sequence", and "classDiagram" are supported.
-        `),
-        format: z.enum(["excalidraw", "mermaid"]).describe(`
-            "excalidraw" should be used for general drawing, and "mermaid" should be used for diagrams.
-        `),
+        instructions: z.string().describe(
+            "Instructions describing what should appear on the canvas."
+        ),
     });
 
     return useMemo(
@@ -28,26 +25,45 @@ export default function useCanvasTool() {
                 name: "update-canvas",
                 description: canvasToolInstructions,
                 parameters: schema,
-                execute: async ({elements, format}: z.infer<typeof schema>) => {
-                    console.log("Drawing elements", elements);
-
+                execute: async ({ instructions }: z.infer<typeof schema>) => {
                     if (!excalidraw?.api) {
                         console.log("The canvas was not correctly initialized.");
                         throw new Error("Canvas was not correctly initialized.");
                     }
 
-                    const {convertToExcalidrawElements} = await import("@excalidraw/excalidraw");
-                    const {parseMermaidToExcalidraw} = await import("@excalidraw/mermaid-to-excalidraw");
+                    const openai = new OpenAI({
+                        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+                    });
+
+                    const completion = await openai.chat.completions.create({
+                        model: "gpt-4.1",
+                        messages: [
+                            {
+                                role: "system",
+                                content:
+                                    "Return JSON { format: 'excalidraw'|'mermaid', elements: string } representing the drawing.",
+                            },
+                            { role: "user", content: instructions },
+                        ],
+                    });
+
+                    const message = completion.choices[0].message.content || "";
+                    const { format, elements } = JSON.parse(message);
+
+                    const { convertToExcalidrawElements } = await import("@excalidraw/excalidraw");
+                    const { parseMermaidToExcalidraw } = await import("@excalidraw/mermaid-to-excalidraw");
 
                     let skeleton;
                     if (format === "excalidraw") {
                         skeleton = JSON.parse(elements);
-                    } else { // format === 'mermaid'
-                        skeleton = (await parseMermaidToExcalidraw(elements)).elements;
+                    } else {
+                        skeleton = (
+                            await parseMermaidToExcalidraw(elements)
+                        ).elements;
                     }
 
                     const converted = convertToExcalidrawElements(skeleton);
-                    excalidraw.api.updateScene({elements: converted});
+                    excalidraw.api.updateScene({ elements: converted });
                     return "ok";
                 },
             }),
