@@ -12,7 +12,7 @@ export default function RootLayout({
     return (
         <html lang="en"><body>
         <ExcalidrawProvider>{children}</ExcalidrawProvider>
-        <Toaster />
+        <Toaster position="top-left"/>
         </body></html>
     );
 }
