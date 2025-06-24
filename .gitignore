@@ -17,7 +17,7 @@ lerna-debug.log*
 
 # NextJS
 /.next/
-/.env.local
+/.env
 node_modules
 dist
 dist-ssr
