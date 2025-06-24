@@ -1,7 +1,6 @@
 import useCanvasTool from "hooks/useCanvasTool";
 import { generateEphemeralKey } from "../lib/ai/generateEphemeralKey.ts";
-import { assistantAgentInstructions, canvasAgentInstructions } from "../lib/ai/prompts.ts";
-import { Agent } from "@openai/agents";
+import { assistantAgentInstructions } from "../lib/ai/prompts.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -20,16 +19,8 @@ export function useRealtime() {
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions: assistantAgentInstructions,
-        });
-        const canvasAgent = new Agent({
-            name: "Canvas",
-            model: "gpt-4.1",
             tools: [canvasTool],
-            instructions: canvasAgentInstructions,
         });
-
-        canvasAgent.handoffs = [assistantAgent];
-        assistantAgent.handoffs = [canvasAgent];
 
         const session = new RealtimeSession(assistantAgent, {
             model: "gpt-4o-realtime-preview-2025-06-03"
@@ -40,7 +31,6 @@ export function useRealtime() {
         session.on("audio_start", () => setSpeaking(true));
         session.on("audio_stopped", () => setSpeaking(false));
         session.on("error", (e) => setErrored(String(e)));
-        session.on("agent_handoff", (_, _from, to) => toast(`Handoff to ${to.name}`));
         session.on("agent_tool_start", (_, agent, tool) => toast(`${agent.name} uses ${tool.name}`));
     }, [canvasTool]);
 
