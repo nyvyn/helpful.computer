@@ -4,6 +4,7 @@ import { assistantAgentInstructions, canvasAgentInstructions } from "../lib/ai/p
 import { Agent } from "@openai/agents";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 export function useRealtime() {
     const [errored, setErrored] = useState<boolean | string>(false);
@@ -39,6 +40,8 @@ export function useRealtime() {
         session.on("audio_start", () => setSpeaking(true));
         session.on("audio_stopped", () => setSpeaking(false));
         session.on("error", (e) => setErrored(String(e)));
+        session.on("agent_handoff", (_, _from, to) => toast(`Handoff to ${to.name}`));
+        session.on("agent_tool_start", (_, agent, tool) => toast(`${agent.name} uses ${tool.name}`));
     }, [canvasTool]);
 
     /* commands that UI can call */
