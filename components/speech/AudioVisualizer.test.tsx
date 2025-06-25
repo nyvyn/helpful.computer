@@ -1,7 +1,7 @@
+import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import { render } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it } from "vitest";
-import AudioVisualizer from "./AudioVisualizer.tsx";
 
 describe("AudioVisualizer", () => {
     it("shows idle state when not listening", () => {

@@ -35,13 +35,13 @@
         "app/*"
       ],
       "@/components/*": [
-        "app/components/*"
+        "components/*"
       ],
       "@/hooks/*": [
-        "app/hooks/*"
+        "hooks/*"
       ],
       "@/lib/*": [
-        "app/lib/*"
+        "lib/*"
       ]
     }
   },

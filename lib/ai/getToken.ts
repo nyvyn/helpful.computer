@@ -1,4 +1,6 @@
-export async function generateEphemeralKey() {
+"use server"
+
+export async function getToken(): Promise<string> {
     const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
         method: "POST",
         headers: {
@@ -10,5 +12,6 @@ export async function generateEphemeralKey() {
             voice: "verse",
         }),
     });
-    return await r.json();
+    const session = await r.json();
+    return session.client_secret.value;
 }
