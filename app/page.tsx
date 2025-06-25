@@ -1,9 +1,9 @@
 "use client";
 
+import Dashboard from "@/components/Dashboard.tsx";
 import { useEffect } from "react";
 
 import { checkMicrophonePermission, requestMicrophonePermission } from "tauri-plugin-macos-permissions-api";
-import Dashboard from "../components/Dashboard.tsx";
 
 export default function HomePage() {
     useEffect(() => {

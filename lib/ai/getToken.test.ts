@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { generateEphemeralKey } from "./generateEphemeralKey.ts";
+import { getToken } from "./getToken.ts";
 
-describe("generateEphemeralKey", () => {
+describe("getToken", () => {
     beforeEach(() => {
         vi.restoreAllMocks();
     });
@@ -13,7 +13,7 @@ describe("generateEphemeralKey", () => {
 
         process.env.NEXT_PUBLIC_OPENAI_API_KEY = "test-key";
 
-        const result = await generateEphemeralKey();
+        const result = await getToken();
 
         expect(fetch).toHaveBeenCalledWith("https://api.openai.com/v1/realtime/sessions", expect.objectContaining({
             method: "POST",

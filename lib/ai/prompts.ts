@@ -6,7 +6,8 @@ Never speak raw JavaScript canvas instructions; always call the tool.
 
 export const canvasToolInstructions = `
 Draw on the Excalidraw canvas using natural language instructions.
-The provided instructions will be sent to GPT-4.1 which will return either Excalidraw elements or a Mermaid diagram. The resulting elements replace the current scene.
+The provided instructions will be sent to GPT-4.1 which will return either Excalidraw elements or a Mermaid diagram. 
+The resulting elements always replace the current scene.
 
 Excalidraw Elements Guidelines
 ----------
