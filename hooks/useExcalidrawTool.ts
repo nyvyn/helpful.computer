@@ -2,9 +2,10 @@
 
 import { ExcalidrawContext } from "@/components/excalidraw/ExcalidrawContext.tsx";
 import { canvasToolInstructions } from "@/lib/ai/prompts.ts";
+import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
-import { useContext, useMemo } from "react";
+import { useContext, useEffect, useMemo, useRef } from "react";
 import { z } from "zod";
 
 const schema = z.object({
@@ -16,6 +17,9 @@ const schema = z.object({
 /* Returns a Tool instance bound to the current Excalidraw API */
 export default function useExcalidrawTool() {
     const ctx = useContext(ExcalidrawContext);
+    const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
+
+    useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
 
     return useMemo(
         () => tool({
@@ -25,7 +29,7 @@ export default function useExcalidrawTool() {
             execute: async ({instructions}: z.infer<typeof schema>) => {
                 console.log("Executing tool", instructions);
 
-                if (!ctx?.excalidrawApi) {
+                if (!apiRef.current) {
                     console.log("The canvas was not correctly initialized.");
                     throw new Error("Canvas was not correctly initialized.");
                 }
@@ -62,10 +66,9 @@ export default function useExcalidrawTool() {
                 }
 
                 const converted = convertToExcalidrawElements(skeleton);
-                ctx.excalidrawApi.updateScene({elements: converted});
+                apiRef.current.updateScene({elements: converted});
                 return "ok";
             },
-        }),
-        [ctx?.excalidrawApi],
+        }), [],
     );
 }
