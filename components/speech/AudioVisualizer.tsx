@@ -21,7 +21,10 @@ export default function AudioVisualizer({listening, speaking}: AudioVisualizerPr
                 "listening";
 
     const stateClasses: Record<string, string> = {
-        listening: "bg-none bg-sky-600 shadow-sky-500/50 shadow-lg animate-pulse",
+        listening:
+          "bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 \
+           shadow-pink-500/60 shadow-2xl ring-4 ring-offset-2 ring-pink-400 \
+           animate-pulse",
         speaking: "bg-none bg-green-400 shadow-green-400/50 shadow-lg animate-pulse",
         idle: "bg-none bg-slate-700 opacity-60",
     };
