@@ -29,7 +29,9 @@ export default function ToggleListeningButton({listening, toggleListening}: Prop
                 hover:bg-blue-700 text-white
                 shadow-lg transition"
         >
-            {listening ? <MicIcon className="size-6 rotate-45"/> : <MicIcon className="size-6"/>}
+            <MicIcon
+              className={`size-6 transition-transform ${listening ? "scale-110" : ""}`}
+            />
             <span className="sr-only">
         {listening ? "Stop listening" : "Start listening"}
       </span>
