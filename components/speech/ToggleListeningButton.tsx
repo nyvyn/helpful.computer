@@ -1,5 +1,4 @@
-import { MicOffIcon } from "@/components/icons/MicOffIcon.tsx";
-import { MicOnIcon } from "@/components/icons/MicOnIcon.tsx";
+import { MicIcon } from "@/components/icons/MicIcon.tsx";
 
 interface Props {
     listening: boolean;
@@ -9,11 +8,11 @@ interface Props {
 export default function ToggleListeningButton({listening, toggleListening}: Props) {
 
     const handlePointerDown = () => {
-      if (!listening) toggleListening();   // start listening while pressed
+        if (!listening) toggleListening();   // start listening while pressed
     };
 
     const handlePointerUp = () => {
-      if (listening) toggleListening();    // stop when released
+        if (listening) toggleListening();    // stop when released
     };
 
     return (
@@ -22,14 +21,15 @@ export default function ToggleListeningButton({listening, toggleListening}: Prop
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}     // also stop if user drags out
             className="
-        absolute bottom-4 right-4
-        flex items-center justify-center
-        h-12 w-12 rounded-full
-        bg-blue-600 disabled:bg-blue-400
-        hover:bg-blue-700 text-white
-        shadow-lg transition"
+                cursor-pointer
+                absolute bottom-4 right-4
+                flex items-center justify-center
+                h-12 w-12 rounded-full
+                bg-blue-600 disabled:bg-blue-400
+                hover:bg-blue-700 text-white
+                shadow-lg transition"
         >
-            {listening ? <MicOnIcon className="size-6"/> : <MicOffIcon className="size-6"/>}
+            {listening ? <MicIcon className="size-6 rotate-45"/> : <MicIcon className="size-6"/>}
             <span className="sr-only">
         {listening ? "Stop listening" : "Start listening"}
       </span>

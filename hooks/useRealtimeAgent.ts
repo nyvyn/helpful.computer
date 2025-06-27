@@ -39,7 +39,7 @@ export function useRealtimeAgent() {
 
         getToken().then(token => {
             sessionRef.current?.connect({apiKey: token}).then(() => {
-                setListening(true);
+                setListening(false);
                 console.log("Connected: ", sessionRef.current?.transport);
             }).catch(setErrored);
         });
@@ -50,12 +50,12 @@ export function useRealtimeAgent() {
     /* commands that UI can call */
     const mute = () => {
         sessionRef.current?.mute(true);
-        sessionRef.current?.interrupt();
         console.log("Muted: ", sessionRef.current?.transport);
         setListening(false);
     };
     const unmute = () => {
         sessionRef.current?.mute(false);
+        sessionRef.current?.interrupt();
         console.log("Unmuted: ", sessionRef.current?.transport);
         setListening(true);
     };
