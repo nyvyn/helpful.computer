@@ -6,9 +6,10 @@ import React from "react";
 interface AudioVisualizerProps {
     listening: boolean;
     speaking: boolean;
+    working: boolean;
 }
 
-export default function AudioVisualizer({listening, speaking}: AudioVisualizerProps) {
+export default function AudioVisualizer({listening, speaking, working}: AudioVisualizerProps) {
     // Default classes for the visualizer
     const baseClasses =
         "size-40 rounded-full blur-sm " + // Using blur-sm as in your latest version
@@ -18,14 +19,18 @@ export default function AudioVisualizer({listening, speaking}: AudioVisualizerPr
     const state =
         !listening ? "idle" :
             speaking ? "speaking" :
-                "listening";
+                working ? "working" :
+                    "listening";
 
     const stateClasses: Record<string, string> = {
         listening:
-          "bg-gradient-to-r from-fuchsia-400 via-rose-400 to-orange-400 \
-           shadow-rose-300/70 shadow-[0_0_20px_8px] ring-8 ring-offset-2 ring-rose-300 \
-           animate-pulse",
+            "bg-gradient-to-r from-fuchsia-400 via-rose-400 to-orange-400 \
+             shadow-rose-300/70 shadow-[0_0_20px_8px] ring-8 ring-offset-2 ring-rose-300 \
+             animate-pulse",
         speaking: "bg-none bg-green-400 shadow-green-400/50 shadow-lg animate-pulse",
+        working: "bg-gradient-to-r from-fuchsia-400 via-rose-400 to-orange-400 \
+           shadow-rose-300/70 shadow-[0_0_20px_8px] ring-8 ring-offset-2 ring-rose-300 \
+           animate-rotate",
         idle: "bg-none bg-slate-700 opacity-60",
     };
 
