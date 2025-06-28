@@ -1,4 +1,4 @@
-import useExcalidrawTool from "@/hooks/useExcalidrawTool.ts";
+import useExcalidrawTools from "@/hooks/useExcalidrawTools.ts";
 import { getToken } from "@/lib/ai/getToken.ts";
 import { assistantAgentInstructions } from "@/lib/ai/prompts.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
@@ -13,7 +13,7 @@ export function useRealtimeAgent() {
 
     const session = useRef<RealtimeSession | null>(null);
 
-    const excalidrawTool = useExcalidrawTool();
+    const tools = useExcalidrawTools();
 
     /* create once */
     useEffect(() => {
@@ -24,7 +24,7 @@ export function useRealtimeAgent() {
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions: assistantAgentInstructions,
-            tools: [excalidrawTool],
+            tools,
         });
 
         session.current = new RealtimeSession(assistantAgent, {
@@ -41,13 +41,13 @@ export function useRealtimeAgent() {
         session.current.on("audio_start", () => setSpeaking(true));
         session.current.on("audio_stopped", () => setSpeaking(false));
         session.current.on("error", (e) => setErrored(String(e)));
-        session.current.on("agent_tool_end", (_, agent, tool) => {
+        session.current.on("agent_tool_end", (_, agent) => {
             setWorking(false);
-            toast(`${agent.name} - ${tool.name}`);
+            toast(`Returning to ${agent.name}`);
         });
-        session.current.on("agent_tool_start", (_, agent, tool) => {
+        session.current.on("agent_tool_start", (_, _agent, tool) => {
             setWorking(true);
-            toast(`${agent.name} - ${tool.name}`);
+            toast(`Using ${tool.name}`);
         });
 
         getToken().then(token => {
@@ -59,7 +59,7 @@ export function useRealtimeAgent() {
         });
 
         return () => session.current?.close();
-    }, [excalidrawTool]);
+    }, [tools]);
 
     /* commands that UI can call */
     const mute = () => {
