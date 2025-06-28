@@ -1,7 +1,6 @@
 "use client";
 
 import { ExcalidrawContext } from "@/components/excalidraw/ExcalidrawContext.tsx";
-import { excalidrawToolInstructions } from "@/lib/ai/prompts.ts";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
@@ -23,7 +22,10 @@ export default function useExcalidrawTools() {
 
     const drawCanvas = useMemo(() => tool({
         name: "Draw Canvas",
-        description: excalidrawToolInstructions,
+        description:
+            "Draw on the Excalidraw canvas using natural language instructions.\n" +
+            "The provided instructions will be sent to a language model which will return either Excalidraw elements or a Mermaid diagram.\n" +
+            "The resulting elements always replace the current scene.",
         parameters: schema,
         strict: true,
         execute: async ({ instructions }: z.infer<typeof schema>) => {
@@ -34,13 +36,19 @@ export default function useExcalidrawTools() {
                 });
 
                 const completion = await openai.chat.completions.create({
-                    model: "gpt-4.1-mini",
+                    model: "gpt-4.1",
                     messages: [
                         {
                             role: "system",
                             content:
-                                excalidrawToolInstructions +
-                                " Respond with JSON: { format: 'excalidraw' | 'mermaid', elements: string }.",
+                                "Excalidraw Elements Guidelines\n----------\n" +
+                                "* Use absolute x, y only.\n" +
+                                "Store the element’s top-left (for lines/arrows: start point) in x and y.\n" +
+                                "Do **not** encode absolute coordinates inside points.\n" +
+                                "Normalize the points array.\n" +
+                                "For every linear element (line, arrow, draw), set \`points[0] = [0, 0]\`.\n" +
+                                "All other points must be offsets from that origin: \`points[i] = [absX_i - x, absY_i - y]\`.\n" +
+                                "Respond with JSON: { format: 'excalidraw' | 'mermaid', elements: string }.",
                         },
                         { role: "user", content: instructions },
                     ],
@@ -74,7 +82,7 @@ export default function useExcalidrawTools() {
         name: "Read Canvas",
         description:
             "Returns the current elements on the drawing canvas as JSON (Excalidraw format).",
-        parameters: z.object({}).strict(),           // no arguments
+        parameters: z.object({}).strict(),
         strict: true,
         execute: async () => {
             if (!apiRef.current) return "Canvas not ready";
