@@ -1,4 +1,5 @@
 import { MicIcon } from "@/components/icons/MicIcon.tsx";
+import { useRef } from "react";
 
 interface Props {
     listening: boolean;
@@ -7,19 +8,34 @@ interface Props {
 
 export default function ToggleListeningButton({listening, toggleListening}: Props) {
 
+    const LONG_PRESS_MS = 600; // tap-vs-hold threshold
+    const timerId = useRef<NodeJS.Timeout | null>(null);
+    const wasLongPress = useRef(false);
+
     const handlePointerDown = () => {
-        if (!listening) toggleListening();   // start listening while pressed
+        wasLongPress.current = false;
+        timerId.current = setTimeout(() => {
+            wasLongPress.current = true;
+            if (!listening) toggleListening();          // start push-to-talk
+        }, LONG_PRESS_MS);
     };
 
-    const handlePointerUp = () => {
-        if (listening) toggleListening();    // stop when released
+    const stopLongPress = () => {
+        if (timerId.current) clearTimeout(timerId.current);
+        timerId.current = null;
+        if (wasLongPress.current && listening) toggleListening(); // finish push-to-talk
+    };
+
+    const handleClick = () => {
+        if (!wasLongPress.current) toggleListening(); // simple toggle
     };
 
     return (
         <button
             onPointerDown={handlePointerDown}
-            onPointerUp={handlePointerUp}
-            onPointerLeave={handlePointerUp}     // also stop if user drags out
+            onPointerUp={stopLongPress}
+            onPointerLeave={stopLongPress}
+            onClick={handleClick}
             className="
                 cursor-pointer
                 absolute bottom-4 right-4
@@ -29,10 +45,12 @@ export default function ToggleListeningButton({listening, toggleListening}: Prop
                 hover:bg-blue-700 text-white
                 shadow-lg transition"
         >
-            {listening ? <MicIcon className="size-6 rotate-45"/> : <MicIcon className="size-6"/>}
+            <MicIcon
+                className={`size-6 transition-transform ${listening ? "scale-110" : ""}`}
+            />
             <span className="sr-only">
-        {listening ? "Stop listening" : "Start listening"}
-      </span>
+                {listening ? "Stop listening" : "Start listening"}
+            </span>
         </button>
     );
 }
