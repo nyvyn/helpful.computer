@@ -13,5 +13,11 @@ export async function getToken(): Promise<string> {
         }),
     });
     const session = await r.json();
-    return session.client_secret.value;
+    const secret =
+        typeof session.client_secret === "string"
+            ? session.client_secret
+            : session.client_secret?.value;
+
+    if (!secret) throw new Error("client_secret missing from OpenAI response");
+    return secret;
 }
