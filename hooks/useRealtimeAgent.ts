@@ -1,6 +1,5 @@
 import useExcalidrawTools from "@/hooks/useExcalidrawTools.ts";
 import { getToken } from "@/lib/ai/getToken.ts";
-import { assistantAgentInstructions } from "@/lib/ai/prompts.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -23,7 +22,8 @@ export function useRealtimeAgent() {
         /* 1. Create the agent and session */
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
-            instructions: assistantAgentInstructions,
+            instructions:
+                "Use Excalidraw for any drawing-related tasks.",
             tools,
         });
 
@@ -31,9 +31,7 @@ export function useRealtimeAgent() {
             model: "gpt-4o-realtime-preview-2025-06-03",
             tracingDisabled: true,
             config: {
-                voice: "ash",
-                inputAudioFormat: "pcm16",
-                outputAudioFormat: "pcm16",
+                voice: "ash"
             }
         });
 
