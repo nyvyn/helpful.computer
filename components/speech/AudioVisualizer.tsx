@@ -28,9 +28,10 @@ export default function AudioVisualizer({listening, speaking, working}: AudioVis
              shadow-rose-300/70 shadow-[0_0_20px_8px] ring-8 ring-offset-2 ring-rose-300 \
              animate-pulse",
         speaking: "bg-none bg-green-400 shadow-green-400/50 shadow-lg animate-pulse",
-        working: "bg-gradient-to-r from-fuchsia-400 via-rose-400 to-orange-400 \
-           shadow-rose-300/70 shadow-[0_0_20px_8px] ring-8 ring-offset-2 ring-rose-300 \
-           animate-rotate",
+        working:
+            "bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 \
+             shadow-blue-500/60 shadow-[0_0_25px_10px] ring-8 ring-offset-2 ring-blue-400 \
+             animate-spin",
         idle: "bg-none bg-slate-700 opacity-60",
     };
 
