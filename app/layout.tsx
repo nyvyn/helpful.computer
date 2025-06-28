@@ -1,4 +1,5 @@
 import { ExcalidrawProvider } from "@/components/excalidraw/ExcalidrawContext.tsx";
+import { StrudelProvider } from "@/components/strudel/StrudelContext.tsx";
 import { ReactNode } from "react";
 import { Toaster } from "sonner";
 
@@ -12,7 +13,11 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body>
-        <ExcalidrawProvider>{children}</ExcalidrawProvider>
+        <ExcalidrawProvider>
+        <StrudelProvider>
+            {children}
+        </StrudelProvider>
+        </ExcalidrawProvider>
         <Toaster position="top-left"/>
         </body>
         </html>

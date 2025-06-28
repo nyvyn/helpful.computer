@@ -15,6 +15,7 @@
   "dependencies": {
     "@excalidraw/excalidraw": "^0.18.0",
     "@openai/agents": "^0.0.8",
+    "@strudel/repl": "^1.2.3",
     "@tauri-apps/api": "^2.5.0",
     "@tauri-apps/plugin-fs": "^2.3.0",
     "@tauri-apps/plugin-opener": "^2.2.6",

@@ -1,4 +1,5 @@
 import useExcalidrawTools from "@/hooks/useExcalidrawTools.ts";
+import useStrudelTools from "@/hooks/useStrudelTools.ts";
 import { getToken } from "@/lib/ai/getToken.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
@@ -9,10 +10,13 @@ export function useRealtimeAgent() {
     const [listening, setListening] = useState(false);
     const [speaking, setSpeaking] = useState(false);
     const [working, setWorking] = useState(false);
+    const [lastTool, setLastTool] = useState<string | null>(null);
 
     const session = useRef<RealtimeSession | null>(null);
 
-    const tools = useExcalidrawTools();
+    const excalidrawTools = useExcalidrawTools();
+    const strudelTools = useStrudelTools();
+    const tools = [...excalidrawTools, ...strudelTools];
 
     /* create once */
     useEffect(() => {
@@ -23,7 +27,7 @@ export function useRealtimeAgent() {
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions:
-                "Use Excalidraw for any drawing-related tasks.",
+                "Use Excalidraw for drawing tasks and the Strudel Execute tool for music.",
             tools,
         });
 
@@ -45,6 +49,7 @@ export function useRealtimeAgent() {
         });
         session.current.on("agent_tool_start", (_, _agent, tool) => {
             setWorking(true);
+            setLastTool(tool.name);
             toast(`Using ${tool.name}`);
         });
 
@@ -73,5 +78,5 @@ export function useRealtimeAgent() {
     };
     const toggleListening = () => listening ? mute() : unmute();
 
-    return {errored, listening, speaking, toggleListening, working};
+    return {errored, listening, speaking, toggleListening, working, lastTool};
 }
