@@ -31,7 +31,9 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
+      "@/app/*": [
+        "app/*"
+      ],
       "@/components/*": [
         "components/*"
       ],
@@ -44,8 +46,12 @@
     }
   },
   "include": [
+    ".next/types/**/*.ts",
     "app/**/*",
-    ".next/types/**/*.ts"
+    "components/**/*",   // ⬅ components and their .test.ts(x)
+    "lib/**/*",          // ⬅ lib code + tests
+    "hooks/**/*",
+    "vitest.config.ts"
   ],
   "exclude": [
     "node_modules"
