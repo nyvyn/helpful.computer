@@ -6,5 +6,10 @@ export default defineConfig({
         environment: "jsdom",
         globals: true,
     },
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "."),
+        },
+    },
     plugins: [tsconfigPaths()],
 });
