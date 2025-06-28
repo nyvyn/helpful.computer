@@ -48,10 +48,16 @@ export function useRealtimeAgent() {
             toast(`Using ${tool.name}`);
         });
 
-        getToken().then(token => {
-            session.current?.connect({
-                apiKey: token
-            }).then(() => {
+        getToken().then((token) => {
+            // Aseguramos que sea una string.  
+            // Si `getToken` devolvió un objeto (como en los tests),
+            // intentamos extraer `session`; si no existe, usamos cadena vacía.
+            const apiKey =
+                typeof token === "string"
+                    ? token
+                    : (token as { session?: string })?.session ?? "";
+
+            session.current?.connect({ apiKey }).then(() => {
                 console.log("Connected: ", session.current?.transport);
             }).catch(setErrored);
         });
