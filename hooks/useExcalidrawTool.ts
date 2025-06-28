@@ -1,7 +1,7 @@
 "use client";
 
 import { ExcalidrawContext } from "@/components/excalidraw/ExcalidrawContext.tsx";
-import { canvasToolInstructions } from "@/lib/ai/prompts.ts";
+import { excalidrawToolInstructions } from "@/lib/ai/prompts.ts";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
@@ -23,17 +23,11 @@ export default function useExcalidrawTool() {
 
     return useMemo(
         () => tool({
-            name: "update-canvas",
-            description: canvasToolInstructions,
+            name: "Excalidraw",
+            description: excalidrawToolInstructions,
             parameters: schema,
             execute: async ({ instructions }: z.infer<typeof schema>) => {
               try {
-                console.log("Executing tool", instructions);
-
-                if (!apiRef.current) {
-                  throw new Error("Canvas was not correctly initialized.");
-                }
-
                 const openai = new OpenAI({
                   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
                   dangerouslyAllowBrowser: true,
@@ -45,7 +39,7 @@ export default function useExcalidrawTool() {
                     {
                       role: "system",
                       content:
-                        canvasToolInstructions +
+                        excalidrawToolInstructions +
                         " Respond with JSON: { format: 'excalidraw' | 'mermaid', elements: string }.",
                     },
                     { role: "user", content: instructions },
@@ -66,7 +60,7 @@ export default function useExcalidrawTool() {
                     : (await parseMermaidToExcalidraw(elements)).elements;
 
                 const converted = convertToExcalidrawElements(skeleton);
-                apiRef.current.updateScene({ elements: converted });
+                apiRef.current?.updateScene({ elements: converted });
 
                 return "ok";
               } catch (err) {

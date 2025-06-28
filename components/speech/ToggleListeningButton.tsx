@@ -8,26 +8,26 @@ interface Props {
 
 export default function ToggleListeningButton({listening, toggleListening}: Props) {
 
-    const LONG_PRESS_MS = 150;                      // tap-vs-hold threshold
+    const LONG_PRESS_MS = 600; // tap-vs-hold threshold
     const timerId = useRef<NodeJS.Timeout | null>(null);
     const wasLongPress = useRef(false);
 
     const handlePointerDown = () => {
-      wasLongPress.current = false;
-      timerId.current = setTimeout(() => {
-        wasLongPress.current = true;
-        if (!listening) toggleListening();          // start push-to-talk
-      }, LONG_PRESS_MS);
+        wasLongPress.current = false;
+        timerId.current = setTimeout(() => {
+            wasLongPress.current = true;
+            if (!listening) toggleListening();          // start push-to-talk
+        }, LONG_PRESS_MS);
     };
 
     const stopLongPress = () => {
-      if (timerId.current) clearTimeout(timerId.current);
-      timerId.current = null;
-      if (wasLongPress.current && listening) toggleListening(); // finish push-to-talk
+        if (timerId.current) clearTimeout(timerId.current);
+        timerId.current = null;
+        if (wasLongPress.current && listening) toggleListening(); // finish push-to-talk
     };
 
     const handleClick = () => {
-      if (!wasLongPress.current) toggleListening(); // simple toggle
+        if (!wasLongPress.current) toggleListening(); // simple toggle
     };
 
     return (
@@ -46,11 +46,11 @@ export default function ToggleListeningButton({listening, toggleListening}: Prop
                 shadow-lg transition"
         >
             <MicIcon
-              className={`size-6 transition-transform ${listening ? "scale-110" : ""}`}
+                className={`size-6 transition-transform ${listening ? "scale-110" : ""}`}
             />
             <span className="sr-only">
-        {listening ? "Stop listening" : "Start listening"}
-      </span>
+                {listening ? "Stop listening" : "Start listening"}
+            </span>
         </button>
     );
 }

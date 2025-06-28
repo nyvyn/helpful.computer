@@ -17,9 +17,9 @@ export default function AudioVisualizer({listening, speaking, working}: AudioVis
 
     // Compute current visualizer state
     const state =
-        !listening ? "idle" :
-            speaking ? "speaking" :
-                working ? "working" :
+        speaking ? "speaking" :
+            working ? "working" :
+                !listening ? "idle" :
                     "listening";
 
     const stateClasses: Record<string, string> = {
@@ -36,8 +36,6 @@ export default function AudioVisualizer({listening, speaking, working}: AudioVis
     };
 
     return (
-        <div
-            className={clsx(baseClasses, stateClasses[state])}
-        />
+        <div className={clsx(baseClasses, stateClasses[state])}/>
     );
 }

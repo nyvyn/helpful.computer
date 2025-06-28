@@ -9,57 +9,71 @@ export function useRealtimeAgent() {
     const [errored, setErrored] = useState<boolean | string>(false);
     const [listening, setListening] = useState(false);
     const [speaking, setSpeaking] = useState(false);
+    const [working, setWorking] = useState(false);
 
-    const sessionRef = useRef<RealtimeSession | null>(null);
+    const session = useRef<RealtimeSession | null>(null);
 
-    const canvasTool = useExcalidrawTool();
+    const excalidrawTool = useExcalidrawTool();
 
     /* create once */
     useEffect(() => {
         // Only create a single session
-        if (sessionRef.current) return;
+        if (session.current) return;
 
         /* 1. Create the agent and session */
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions: assistantAgentInstructions,
-            tools: [canvasTool],
+            tools: [excalidrawTool],
         });
 
-        const session = new RealtimeSession(assistantAgent, {
-            model: "gpt-4o-realtime-preview-2025-06-03"
+        session.current = new RealtimeSession(assistantAgent, {
+            model: "gpt-4o-realtime-preview-2025-06-03",
+            tracingDisabled: true,
+            config: {
+                voice: "ash",
+                inputAudioFormat: "pcm16",
+                outputAudioFormat: "pcm16",
+            }
         });
-        sessionRef.current = session;
 
         /* 2. Wire state updates */
-        session.on("audio_start", () => setSpeaking(true));
-        session.on("audio_stopped", () => setSpeaking(false));
-        session.on("error", (e) => setErrored(String(e)));
-        session.on("agent_tool_start", (_, agent, tool) => toast(`${agent.name} uses ${tool.name}`));
+        session.current.on("audio_start", () => setSpeaking(true));
+        session.current.on("audio_stopped", () => setSpeaking(false));
+        session.current.on("error", (e) => setErrored(String(e)));
+        session.current.on("agent_tool_end", (_, agent, tool) => {
+            setWorking(false);
+            toast(`${agent.name} - ${tool.name}`);
+        });
+        session.current.on("agent_tool_start", (_, agent, tool) => {
+            setWorking(true);
+            toast(`${agent.name} - ${tool.name}`);
+        });
 
         getToken().then(token => {
-            sessionRef.current?.connect({apiKey: token}).then(() => {
-                setListening(false);
-                console.log("Connected: ", sessionRef.current?.transport);
+            session.current?.connect({
+                apiKey: token
+            }).then(() => {
+                console.log("Connected: ", session.current?.transport);
             }).catch(setErrored);
         });
 
-        return () => sessionRef.current?.close();
-    }, [canvasTool]);
+        return () => session.current?.close();
+    }, [excalidrawTool]);
 
     /* commands that UI can call */
     const mute = () => {
-        sessionRef.current?.mute(true);
-        console.log("Muted: ", sessionRef.current?.transport);
+        session.current?.mute(true);
+        console.log("Muted: ", session.current?.transport);
         setListening(false);
     };
     const unmute = () => {
-        sessionRef.current?.mute(false);
-        sessionRef.current?.interrupt();
-        console.log("Unmuted: ", sessionRef.current?.transport);
+        session.current?.mute(false);
+        session.current?.interrupt();
+        console.log("Unmuted: ", session.current?.transport);
         setListening(true);
     };
     const toggleListening = () => listening ? mute() : unmute();
 
-    return {errored, listening, speaking, toggleListening};
+    return {errored, listening, speaking, toggleListening, working};
 }

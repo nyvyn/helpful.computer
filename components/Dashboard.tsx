@@ -7,7 +7,7 @@ import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Dashboard() {
-    const {listening, speaking, toggleListening} = useRealtimeAgent();
+    const {listening, speaking, toggleListening, working} = useRealtimeAgent();
 
     const minSidebar = 100;
     const defaultSidebar = 350;
@@ -35,7 +35,7 @@ export default function Dashboard() {
                 className="relative flex items-center justify-center flex-none"
                 style={{width: `${sidebarWidth}px`}}
             >
-                <AudioVisualizer listening={listening} speaking={speaking}/>
+                <AudioVisualizer listening={listening} speaking={speaking} working={working}/>
 
                 <ToggleListeningButton
                     listening={listening}
