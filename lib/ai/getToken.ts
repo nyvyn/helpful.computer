@@ -1,6 +1,6 @@
 "use server"
 
-export async function getToken(): Promise<string> {
+export async function getToken(): Promise<unknown> {
     const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
         method: "POST",
         headers: {
@@ -13,5 +13,5 @@ export async function getToken(): Promise<string> {
         }),
     });
     const session = await r.json();
-    return session.client_secret.value;
+    return session;
 }
