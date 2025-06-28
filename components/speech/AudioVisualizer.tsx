@@ -24,7 +24,7 @@ export default function AudioVisualizer({listening, speaking, working}: AudioVis
 
     const stateClasses: Record<string, string> = {
         listening:
-            "bg-gradient-to-r from-fuchsia-400 via-rose-400 to-orange-400 \
+            "bg-sky-600 bg-gradient-to-r from-fuchsia-400 via-rose-400 to-orange-400 \
              shadow-rose-300/70 shadow-[0_0_20px_8px] ring-8 ring-offset-2 ring-rose-300 \
              animate-pulse",
         speaking: "bg-none bg-green-400 shadow-green-400/50 shadow-lg animate-pulse",
