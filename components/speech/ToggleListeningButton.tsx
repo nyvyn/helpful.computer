@@ -38,7 +38,7 @@ export default function ToggleListeningButton({listening, toggleListening}: Prop
             onClick={handleClick}
             className="
                 cursor-pointer
-                absolute bottom-4 right-4
+                absolute bottom-3 left-3
                 flex items-center justify-center
                 h-12 w-12 rounded-full
                 bg-blue-600 disabled:bg-blue-400
