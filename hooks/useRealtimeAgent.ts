@@ -27,7 +27,8 @@ export function useRealtimeAgent() {
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions:
-                "Use Excalidraw for any drawing-related tasks.",
+                "If you are asked to draw something, don't say it; instead use Drawing tools.\n" +
+                "If you are asked to write something, don't say it; instead use the Writing tools.\n",
             tools: [...excalidrawTools, ...lexicalTools],
         });
 
