@@ -85,9 +85,14 @@ export default function useExcalidrawTools() {
         parameters: z.object({}).strict(),
         strict: true,
         execute: async () => {
-            if (!apiRef.current) return "Canvas not ready";
-            const elements = apiRef.current.getSceneElements(); // Excalidraw API
-            return JSON.stringify(elements);
+            try {
+                if (!apiRef.current) throw new Error("Canvas not ready");
+                const elements = apiRef.current.getSceneElements(); // Excalidraw API
+                return JSON.stringify(elements);
+            } catch (err) {
+                console.error("read-canvas tool error:", err);
+                return err instanceof Error ? err.message : String(err);
+            }
         },
     }), [apiRef]);
 
