@@ -79,5 +79,10 @@ export function useRealtimeAgent() {
     };
     const toggleListening = () => listening ? mute() : unmute();
 
-    return {errored, listening, speaking, toggleListening, working};
+    const sendMessage = (text: string) => {
+        if (!text) return;
+        session.current?.sendMessage(text);
+    };
+
+    return {errored, listening, speaking, toggleListening, working, sendMessage};
 }

@@ -2,16 +2,19 @@
 
 import ExcalidrawCanvas from "@/components/excalidraw/ExcalidrawCanvas.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer";
+import TextInput from "@/components/speech/TextInput.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
+import { KeyboardIcon } from "@/components/icons/KeyboardIcon.tsx";
 import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Dashboard() {
-    const {listening, speaking, toggleListening, working} = useRealtimeAgent();
+    const {listening, speaking, toggleListening, working, sendMessage} = useRealtimeAgent();
 
     const minSidebar = 100;
     const defaultSidebar = 350;
     const [sidebarWidth, setSidebarWidth] = useState(defaultSidebar);
+    const [showInput, setShowInput] = useState(false);
     const resizing = useRef(false);
 
     useEffect(() => {
@@ -32,15 +35,25 @@ export default function Dashboard() {
     return (
         <div className="flex w-screen h-screen bg-black">
             <div
-                className="relative flex items-center justify-center flex-none"
+                className="relative flex flex-col items-center flex-none"
                 style={{width: `${sidebarWidth}px`}}
             >
-                <AudioVisualizer listening={listening} speaking={speaking} working={working}/>
+                <div className={showInput ? "flex items-center justify-center flex-1" : "flex items-center justify-center h-full"}>
+                    <AudioVisualizer listening={listening} speaking={speaking} working={working}/>
+                </div>
+                {showInput && <TextInput sendMessage={sendMessage}/>} 
 
                 <ToggleListeningButton
                     listening={listening}
                     toggleListening={toggleListening}
                 />
+                <button
+                    onClick={() => setShowInput(v => !v)}
+                    className="absolute bottom-4 left-4 flex items-center justify-center h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+                >
+                    <KeyboardIcon className="size-6" />
+                    <span className="sr-only">Toggle text input</span>
+                </button>
             </div>
             <div
                 className="w-1 cursor-col-resize bg-gray-700"
