@@ -1,7 +1,9 @@
 "use client";
 
+import clsx from "clsx";
 import ExcalidrawCanvas from "@/components/excalidraw/ExcalidrawCanvas.tsx";
-import AudioVisualizer from "@/components/speech/AudioVisualizer";
+import LexicalCanvas from "@/components/lexical/LexicalCanvas.tsx";
+import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
 import React, { useEffect, useRef, useState } from "react";
@@ -12,6 +14,7 @@ export default function Dashboard() {
     const minSidebar = 100;
     const defaultSidebar = 350;
     const [sidebarWidth, setSidebarWidth] = useState(defaultSidebar);
+    const [surface, setSurface] = useState<"draw" | "text">("draw");
     const resizing = useRef(false);
 
     useEffect(() => {
@@ -43,11 +46,28 @@ export default function Dashboard() {
                 />
             </div>
             <div
-                className="w-1 cursor-col-resize bg-gray-700"
+                className="w-1 cursor-col-resize"
                 onMouseDown={() => (resizing.current = true)}
             />
-            <div className="flex-1">
-                <ExcalidrawCanvas/>
+            <div className="flex-1 flex flex-col">
+                <div className="p-1 flex gap-2 justify-end text-sm">
+                    <button
+                        className={`px-2 py-1 ${surface === "draw" ? "text-white" : "text-gray-500"}`}
+                        onClick={() => setSurface("draw")}
+                    >Drawing</button>
+                    <button
+                        className={`px-2 py-1 ${surface === "text" ? "text-white" : "text-gray-500"}`}
+                        onClick={() => setSurface("text")}
+                    >Writing</button>
+                </div>
+                <div className="flex-1 overflow-hidden relative">
+                    <div className={clsx("absolute inset-0 pr-1 pb-1", { hidden: surface !== "draw" })}>
+                        <ExcalidrawCanvas />
+                    </div>
+                    <div className={clsx("absolute inset-0 pr-1 pb-1", { hidden: surface !== "text" })}>
+                        <LexicalCanvas />
+                    </div>
+                </div>
             </div>
         </div>
     );

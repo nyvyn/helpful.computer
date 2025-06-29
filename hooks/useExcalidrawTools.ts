@@ -1,6 +1,6 @@
 "use client";
 
-import { ExcalidrawContext } from "@/components/excalidraw/ExcalidrawContext.tsx";
+import { ToolContext } from "@/components/tool/ToolContext.tsx";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
@@ -15,13 +15,13 @@ const schema = z.object({
 
 /* Returns Tool instances bound to the current Excalidraw API */
 export default function useExcalidrawTools() {
-    const ctx = useContext(ExcalidrawContext);
+    const ctx = useContext(ToolContext);
     const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
 
     useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
 
     const drawCanvas = useMemo(() => tool({
-        name: "Draw Canvas",
+        name: "Update Canvas",
         description:
             "Draw on the Excalidraw canvas using natural language instructions.\n" +
             "The provided instructions will be sent to a language model which will return either Excalidraw elements or a Mermaid diagram.\n" +
@@ -85,9 +85,13 @@ export default function useExcalidrawTools() {
         parameters: z.object({}).strict(),
         strict: true,
         execute: async () => {
-            if (!apiRef.current) return "Canvas not ready";
-            const elements = apiRef.current.getSceneElements(); // Excalidraw API
-            return JSON.stringify(elements);
+            try {
+                const elements = apiRef.current?.getSceneElements(); // Excalidraw API
+                return JSON.stringify(elements);
+            } catch (err) {
+                console.error("read-canvas tool error:", err);
+                return err instanceof Error ? err.message : String(err);
+            }
         },
     }), [apiRef]);
 
