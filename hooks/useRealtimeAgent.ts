@@ -55,6 +55,7 @@ export function useRealtimeAgent() {
         getToken().then((token) => {
             console.log("Token: ", token);
             session.current?.connect({apiKey: token}).then(() => {
+                session.current?.mute(true);
                 console.log("Connected: ", session.current?.transport);
             }).catch(setErrored);
         });
