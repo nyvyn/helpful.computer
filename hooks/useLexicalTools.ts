@@ -50,13 +50,19 @@ export default function useLexicalTools() {
       parameters: z.object({}).strict(),
       strict: true,
       execute: async () => {
-        let markdown = "";
-        editorRef.current
-          ?.getEditorState()
-          .read(() => {
+        try {
+          const editor = editorRef.current;
+          if (!editor) throw new Error("Lexical editor not ready");
+
+          let markdown = "";
+          editor.getEditorState().read(() => {
             markdown = $convertToMarkdownString(TRANSFORMERS);
           });
-        return markdown;
+          return markdown;
+        } catch (err) {
+          console.error("read-document-markdown tool error:", err);
+          return err instanceof Error ? err.message : String(err);
+        }
       },
     }),
   [editorRef]);
