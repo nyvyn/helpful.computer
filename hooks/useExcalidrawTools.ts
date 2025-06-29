@@ -21,7 +21,7 @@ export default function useExcalidrawTools() {
     useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
 
     const drawCanvas = useMemo(() => tool({
-        name: "Draw Canvas",
+        name: "Update Canvas",
         description:
             "Draw on the Excalidraw canvas using natural language instructions.\n" +
             "The provided instructions will be sent to a language model which will return either Excalidraw elements or a Mermaid diagram.\n" +
