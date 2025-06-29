@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import ExcalidrawCanvas from "@/components/excalidraw/ExcalidrawCanvas.tsx";
 import LexicalCanvas from "@/components/lexical/LexicalCanvas.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
@@ -59,8 +60,13 @@ export default function Dashboard() {
                         onClick={() => setSurface("text")}
                     >Document</button>
                 </div>
-                <div className="flex-1 overflow-hidden pr-1 pb-1">
-                    {surface === "draw" ? <ExcalidrawCanvas/> : <LexicalCanvas/>}
+                <div className="flex-1 overflow-hidden pr-1 pb-1 relative">
+                    <div className={clsx("absolute inset-0", { hidden: surface !== "draw" })}>
+                        <ExcalidrawCanvas />
+                    </div>
+                    <div className={clsx("absolute inset-0", { hidden: surface !== "text" })}>
+                        <LexicalCanvas />
+                    </div>
                 </div>
             </div>
         </div>
