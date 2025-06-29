@@ -6,7 +6,7 @@ import LexicalCanvas from "@/components/lexical/LexicalCanvas.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export default function Dashboard() {
     const {listening, speaking, toggleListening, working, surface, selectSurface} = useRealtimeAgent();
