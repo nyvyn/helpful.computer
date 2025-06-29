@@ -10,6 +10,7 @@ export function useRealtimeAgent() {
     const [listening, setListening] = useState(false);
     const [speaking, setSpeaking] = useState(false);
     const [working, setWorking] = useState(false);
+    const [surface, setSurface] = useState<"draw" | "text">("draw");
 
     const session = useRef<RealtimeSession | null>(null);
 
@@ -50,6 +51,9 @@ export function useRealtimeAgent() {
         session.current.on("agent_tool_start", (_, _agent, tool) => {
             setWorking(true);
             toast(`Using ${tool.name}`);
+
+            if (lexicalTools.includes(tool)) setSurface("text");
+            else if (excalidrawTools.includes(tool)) setSurface("draw");
         });
 
         /* 3. Connect the session */
@@ -83,5 +87,16 @@ export function useRealtimeAgent() {
         session.current?.sendMessage(text);
     };
 
-    return {errored, listening, speaking, toggleListening, working, sendMessage};
+    const selectSurface = (s: "draw" | "text") => setSurface(s);
+
+    return {
+        errored,
+        listening,
+        speaking,
+        toggleListening,
+        working,
+        sendMessage,
+        surface,
+        selectSurface,
+    };
 }
