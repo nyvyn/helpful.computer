@@ -1,4 +1,4 @@
-import { MicIcon } from "@/components/icons/MicIcon.tsx";
+import { MicOnIcon } from "@/components/icons/MicOnIcon.tsx";
 import { MicOffIcon } from "@/components/icons/MicOffIcon.tsx";
 import { useRef } from "react";
 
@@ -47,7 +47,7 @@ export default function ToggleListeningButton({listening, toggleListening}: Prop
                 shadow-lg transition"
         >
             {listening ? (
-                <MicIcon className="size-6 transition-transform scale-110" />
+                <MicOnIcon className="size-6 transition-transform scale-110" />
             ) : (
                 <MicOffIcon className="size-6 transition-transform" />
             )}

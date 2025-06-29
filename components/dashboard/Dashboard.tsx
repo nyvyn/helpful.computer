@@ -60,10 +60,10 @@ export default function Dashboard() {
                     >Writing</button>
                 </div>
                 <div className="flex-1 overflow-hidden relative">
-                    <div className={clsx("absolute inset-0 pr-1 pb-1", { hidden: surface !== "draw" })}>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: surface !== "draw" })}>
                         <ExcalidrawCanvas />
                     </div>
-                    <div className={clsx("absolute inset-0 pr-1 pb-1", { hidden: surface !== "text" })}>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: surface !== "text" })}>
                         <LexicalCanvas />
                     </div>
                 </div>

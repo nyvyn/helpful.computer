@@ -3,7 +3,6 @@ import useLexicalTools from "@/hooks/useLexicalTools.ts";
 import { getToken } from "@/lib/ai/getToken.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 
 export function useRealtimeAgent() {
     const [errored, setErrored] = useState<boolean | string>(false);
@@ -50,10 +49,9 @@ export function useRealtimeAgent() {
         });
         session.current.on("agent_tool_start", (_, _agent, tool) => {
             setWorking(true);
-            toast(`Using ${tool.name}`);
 
-            if (lexicalTools.includes(tool)) setSurface("text");
-            else if (excalidrawTools.includes(tool)) setSurface("draw");
+            if (lexicalTools.map(tool => tool.name).includes(tool.name)) setSurface("text");
+            else if (excalidrawTools.map(tool => tool.name).includes(tool.name)) setSurface("draw");
         });
 
         /* 3. Connect the session */
