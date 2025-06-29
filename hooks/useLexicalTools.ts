@@ -5,9 +5,12 @@ import { tool } from "@openai/agents-realtime";
 import { $getRoot, LexicalEditor } from "lexical";
 import { useContext, useEffect, useMemo, useRef } from "react";
 import { z } from "zod";
+import OpenAI from "openai";
 
 const schema = z.object({
-    markdown: z.string().describe("Full markdown document to place in the editor"),
+    instructions: z.string().describe(
+        "Natural-language description of what should be written in the document."
+    ),
 });
 
 export default function useLexicalTools() {
@@ -41,16 +44,37 @@ export default function useLexicalTools() {
     const setDocumentMarkdown = useMemo(() => tool({
         name: "Set Document Markdown",
         description:
-            "Replace the entire document with the provided `markdown` string.",
+            "Write content inside the document using natural-language `instructions` (Markdown format).",
         parameters: schema,
         strict: true,
-        execute: async ({markdown}: z.infer<typeof schema>) => {
+        execute: async ({ instructions }: z.infer<typeof schema>) => {
             try {
+                const openai = new OpenAI({
+                    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+                    dangerouslyAllowBrowser: true,
+                });
+
+                const completion = await openai.chat.completions.create({
+                    model: "gpt-4.1",
+                    messages: [
+                        {
+                            role: "system",
+                            content:
+                                "You are a writing assistant. " +
+                                "Return ONLY the final Markdown document with no explanations.",
+                        },
+                        { role: "user", content: instructions },
+                    ],
+                });
+
+                const markdown = completion.choices[0].message.content as string;
+
                 editorRef.current?.update(() => {
                     const root = $getRoot();
                     root.clear();
                     $convertFromMarkdownString(markdown, TRANSFORMERS);
                 });
+
                 return "ok";
             } catch (err) {
                 console.error("set-document-markdown tool error:", err);
