@@ -54,11 +54,11 @@ export default function Dashboard() {
                     <button
                         className={`px-2 py-1 ${surface === "draw" ? "text-white" : "text-gray-500"}`}
                         onClick={() => setSurface("draw")}
-                    >Canvas</button>
+                    >Drawing</button>
                     <button
                         className={`px-2 py-1 ${surface === "text" ? "text-white" : "text-gray-500"}`}
                         onClick={() => setSurface("text")}
-                    >Document</button>
+                    >Writing</button>
                 </div>
                 <div className="flex-1 overflow-hidden pr-1 pb-1 relative">
                     <div className={clsx("absolute inset-0", { hidden: surface !== "draw" })}>
