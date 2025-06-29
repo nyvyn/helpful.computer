@@ -86,8 +86,7 @@ export default function useExcalidrawTools() {
         strict: true,
         execute: async () => {
             try {
-                if (!apiRef.current) throw new Error("Canvas not ready");
-                const elements = apiRef.current.getSceneElements(); // Excalidraw API
+                const elements = apiRef.current?.getSceneElements(); // Excalidraw API
                 return JSON.stringify(elements);
             } catch (err) {
                 console.error("read-canvas tool error:", err);

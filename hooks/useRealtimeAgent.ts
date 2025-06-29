@@ -13,19 +13,22 @@ export function useRealtimeAgent() {
 
     const session = useRef<RealtimeSession | null>(null);
 
-    const tools = [...useExcalidrawTools(), ...useLexicalTools()];
+    const excalidrawTools = useExcalidrawTools();
+    const lexicalTools = useLexicalTools();
 
     /* create once */
     useEffect(() => {
         // Only create a single session
         if (session.current) return;
 
+        console.log("Creating session");
+
         /* 1. Create the agent and session */
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions:
-                "Use Excalidraw for drawing tasks and the text editor for writing tasks.",
-            tools,
+                "Use Excalidraw for any drawing-related tasks.",
+            tools: [...excalidrawTools, ...lexicalTools],
         });
 
         session.current = new RealtimeSession(assistantAgent, {
@@ -40,31 +43,24 @@ export function useRealtimeAgent() {
         session.current.on("audio_start", () => setSpeaking(true));
         session.current.on("audio_stopped", () => setSpeaking(false));
         session.current.on("error", (e) => setErrored(String(e)));
-        session.current.on("agent_tool_end", (_, agent) => {
+        session.current.on("agent_tool_end", () => {
             setWorking(false);
-            toast(`Returning to ${agent.name}`);
         });
         session.current.on("agent_tool_start", (_, _agent, tool) => {
             setWorking(true);
             toast(`Using ${tool.name}`);
         });
 
+        /* 3. Connect the session */
         getToken().then((token) => {
-            // Aseguramos que sea una string.  
-            // Si `getToken` devolvió un objeto (como en los tests),
-            // intentamos extraer `session`; si no existe, usamos cadena vacía.
-            const apiKey =
-                typeof token === "string"
-                    ? token
-                    : (token as { session?: string })?.session ?? "";
-
-            session.current?.connect({ apiKey }).then(() => {
+            console.log("Token: ", token);
+            session.current?.connect({apiKey: token}).then(() => {
                 console.log("Connected: ", session.current?.transport);
             }).catch(setErrored);
         });
 
         return () => session.current?.close();
-    }, [tools]);
+    }, [excalidrawTools, lexicalTools]);
 
     /* commands that UI can call */
     const mute = () => {
@@ -80,5 +76,10 @@ export function useRealtimeAgent() {
     };
     const toggleListening = () => listening ? mute() : unmute();
 
-    return {errored, listening, speaking, toggleListening, working};
+    const sendMessage = (text: string) => {
+        if (!text) return;
+        session.current?.sendMessage(text);
+    };
+
+    return {errored, listening, speaking, toggleListening, working, sendMessage};
 }

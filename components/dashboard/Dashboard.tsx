@@ -2,7 +2,7 @@
 
 import ExcalidrawCanvas from "@/components/excalidraw/ExcalidrawCanvas.tsx";
 import LexicalCanvas from "@/components/lexical/LexicalCanvas.tsx";
-import AudioVisualizer from "@/components/speech/AudioVisualizer";
+import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
 import React, { useEffect, useRef, useState } from "react";
@@ -45,21 +45,21 @@ export default function Dashboard() {
                 />
             </div>
             <div
-                className="w-1 cursor-col-resize bg-gray-700"
+                className="w-1 cursor-col-resize"
                 onMouseDown={() => (resizing.current = true)}
             />
             <div className="flex-1 flex flex-col">
-                <div className="p-1 bg-gray-800 flex gap-2 justify-end">
+                <div className="p-1 flex gap-2 justify-end text-sm">
                     <button
-                        className={`px-2 py-1 rounded ${surface === "draw" ? "bg-gray-600" : "bg-gray-700"}`}
+                        className={`px-2 py-1 ${surface === "draw" ? "text-white" : "text-gray-500"}`}
                         onClick={() => setSurface("draw")}
                     >Canvas</button>
                     <button
-                        className={`px-2 py-1 rounded ${surface === "text" ? "bg-gray-600" : "bg-gray-700"}`}
+                        className={`px-2 py-1 ${surface === "text" ? "text-white" : "text-gray-500"}`}
                         onClick={() => setSurface("text")}
-                    >Text</button>
+                    >Document</button>
                 </div>
-                <div className="flex-1 overflow-hidden">
+                <div className="flex-1 overflow-hidden pr-1 pb-1">
                     {surface === "draw" ? <ExcalidrawCanvas/> : <LexicalCanvas/>}
                 </div>
             </div>

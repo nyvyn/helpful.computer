@@ -51,13 +51,11 @@ export default function useLexicalTools() {
       strict: true,
       execute: async () => {
         try {
-          const editor = editorRef.current;
-          if (!editor) throw new Error("Lexical editor not ready");
-
           let markdown = "";
-          editor.getEditorState().read(() => {
+          editorRef.current?.getEditorState().read(() => {
             markdown = $convertToMarkdownString(TRANSFORMERS);
           });
+          console.log(markdown);
           return markdown;
         } catch (err) {
           console.error("read-document-markdown tool error:", err);
