@@ -1,14 +1,23 @@
 "use client";
 import { CodeNode } from "@lexical/code";
+import { LinkNode } from "@lexical/link";
 import { ListItemNode, ListNode } from "@lexical/list";
+import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
+import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode";
+import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
+import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
+import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { HeadingNode, QuoteNode, } from "@lexical/rich-text";
-import { ParagraphNode, TextNode } from "lexical";
+import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
+import { ParagraphNode, TabNode, TextNode } from "lexical";
 
 import React, { useContext, useEffect } from "react";
 import { ToolContext } from "../tool/ToolContext.tsx";
@@ -24,7 +33,7 @@ function EditorCapture() {
 
 function Placeholder() {
     return (
-        <div className="pointer-events-none absolute top-2 left-2 text-gray-400">
+        <div className="pointer-events-none absolute top-4 left-4 text-gray-400">
             Write something...
         </div>
     );
@@ -34,13 +43,19 @@ export default function LexicalCanvas() {
     const initialConfig = {
         namespace: "editor",
         nodes: [
-            ParagraphNode,
-            TextNode,
-            HeadingNode,
-            ListNode,
-            ListItemNode,
-            QuoteNode,
             CodeNode,
+            HeadingNode,
+            HorizontalRuleNode,
+            LinkNode,
+            ListItemNode,
+            ListNode,
+            ParagraphNode,
+            QuoteNode,
+            TabNode,
+            TableCellNode,
+            TableNode,
+            TableRowNode,
+            TextNode,
         ],
         onError: (error: Error) => {
             console.error(error);
@@ -50,7 +65,7 @@ export default function LexicalCanvas() {
     return (
         <LexicalComposer initialConfig={initialConfig}>
             <EditorCapture/>
-            <div className="relative w-full h-full border border-gray-700 p-2 overflow-auto text-black bg-white">
+            <div className="relative w-full h-full border p-4 overflow-auto text-black bg-white">
                 <RichTextPlugin
                     contentEditable={
                         <ContentEditable className="outline-none w-full h-full"/>
@@ -59,7 +74,13 @@ export default function LexicalCanvas() {
                     ErrorBoundary={LexicalErrorBoundary}
                 />
             </div>
+            <CheckListPlugin/>
             <HistoryPlugin/>
+            <LinkPlugin/>
+            <ListPlugin/>
+            <MarkdownShortcutPlugin/>
+            <TabIndentationPlugin/>
+            <TablePlugin/>
         </LexicalComposer>
     );
 }
