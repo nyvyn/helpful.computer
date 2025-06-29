@@ -1,6 +1,6 @@
 "use client";
 
-import { ExcalidrawContext } from "@/components/excalidraw/ExcalidrawContext.tsx";
+import { ToolContext } from "@/components/tool/ToolContext.tsx";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
@@ -15,7 +15,7 @@ const schema = z.object({
 
 /* Returns Tool instances bound to the current Excalidraw API */
 export default function useExcalidrawTools() {
-    const ctx = useContext(ExcalidrawContext);
+    const ctx = useContext(ToolContext);
     const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
 
     useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);

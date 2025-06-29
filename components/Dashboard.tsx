@@ -1,6 +1,7 @@
 "use client";
 
 import ExcalidrawCanvas from "@/components/excalidraw/ExcalidrawCanvas.tsx";
+import LexicalCanvas from "@/components/lexical/LexicalCanvas.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
@@ -12,6 +13,7 @@ export default function Dashboard() {
     const minSidebar = 100;
     const defaultSidebar = 350;
     const [sidebarWidth, setSidebarWidth] = useState(defaultSidebar);
+    const [surface, setSurface] = useState<"draw" | "text">("draw");
     const resizing = useRef(false);
 
     useEffect(() => {
@@ -46,8 +48,20 @@ export default function Dashboard() {
                 className="w-1 cursor-col-resize bg-gray-700"
                 onMouseDown={() => (resizing.current = true)}
             />
-            <div className="flex-1">
-                <ExcalidrawCanvas/>
+            <div className="flex-1 flex flex-col">
+                <div className="p-1 bg-gray-800 flex gap-2 justify-end">
+                    <button
+                        className={`px-2 py-1 rounded ${surface === "draw" ? "bg-gray-600" : "bg-gray-700"}`}
+                        onClick={() => setSurface("draw")}
+                    >Canvas</button>
+                    <button
+                        className={`px-2 py-1 rounded ${surface === "text" ? "bg-gray-600" : "bg-gray-700"}`}
+                        onClick={() => setSurface("text")}
+                    >Text</button>
+                </div>
+                <div className="flex-1 overflow-hidden">
+                    {surface === "draw" ? <ExcalidrawCanvas/> : <LexicalCanvas/>}
+                </div>
             </div>
         </div>
     );

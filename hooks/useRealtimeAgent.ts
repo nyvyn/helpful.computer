@@ -1,4 +1,5 @@
 import useExcalidrawTools from "@/hooks/useExcalidrawTools.ts";
+import useLexicalTools from "@/hooks/useLexicalTools.ts";
 import { getToken } from "@/lib/ai/getToken.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
@@ -12,7 +13,7 @@ export function useRealtimeAgent() {
 
     const session = useRef<RealtimeSession | null>(null);
 
-    const tools = useExcalidrawTools();
+    const tools = [...useExcalidrawTools(), ...useLexicalTools()];
 
     /* create once */
     useEffect(() => {
@@ -23,7 +24,7 @@ export function useRealtimeAgent() {
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions:
-                "Use Excalidraw for any drawing-related tasks.",
+                "Use Excalidraw for drawing tasks and the text editor for writing tasks.",
             tools,
         });
 
