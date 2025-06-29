@@ -5,6 +5,14 @@ import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { ParagraphNode, TextNode } from "lexical";
+import {
+  HeadingNode,
+  ListNode,
+  ListItemNode,
+  QuoteNode,
+  CodeNode,
+} from "@lexical/rich-text";
 
 import React, { useContext, useEffect } from "react";
 import { ToolContext } from "../tool/ToolContext.tsx";
@@ -29,6 +37,15 @@ function Placeholder() {
 export default function LexicalCanvas() {
   const initialConfig = {
     namespace: "editor",
+    nodes: [
+      ParagraphNode,
+      TextNode,
+      HeadingNode,
+      ListNode,
+      ListItemNode,
+      QuoteNode,
+      CodeNode,
+    ],
     onError(error: Error) {
       console.error(error);
     },
