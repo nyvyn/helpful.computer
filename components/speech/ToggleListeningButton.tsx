@@ -47,7 +47,7 @@ export default function ToggleListeningButton({listening, toggleListening}: Prop
                 shadow-lg transition"
         >
             {listening ? (
-                <MicOnIcon className="size-6 transition-transform scale-110" />
+                <MicOnIcon className="size-6 transition-transform" />
             ) : (
                 <MicOffIcon className="size-6 transition-transform" />
             )}
