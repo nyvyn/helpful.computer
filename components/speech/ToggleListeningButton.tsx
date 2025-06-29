@@ -1,4 +1,5 @@
 import { MicIcon } from "@/components/icons/MicIcon.tsx";
+import { MicOffIcon } from "@/components/icons/MicOffIcon.tsx";
 import { useRef } from "react";
 
 interface Props {
@@ -45,9 +46,11 @@ export default function ToggleListeningButton({listening, toggleListening}: Prop
                 hover:bg-blue-700 text-white
                 shadow-lg transition"
         >
-            <MicIcon
-                className={`size-6 transition-transform ${listening ? "scale-110" : ""}`}
-            />
+            {listening ? (
+                <MicIcon className="size-6 transition-transform scale-110" />
+            ) : (
+                <MicOffIcon className="size-6 transition-transform" />
+            )}
             <span className="sr-only">
                 {listening ? "Stop listening" : "Start listening"}
             </span>
