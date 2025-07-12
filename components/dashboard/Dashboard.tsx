@@ -9,12 +9,11 @@ import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Dashboard() {
-    const {listening, speaking, toggleListening, working} = useRealtimeAgent();
+    const {listening, speaking, toggleListening, working, surface, selectSurface} = useRealtimeAgent();
 
     const minSidebar = 100;
     const defaultSidebar = 350;
     const [sidebarWidth, setSidebarWidth] = useState(defaultSidebar);
-    const [surface, setSurface] = useState<"draw" | "text">("draw");
     const resizing = useRef(false);
 
     useEffect(() => {
@@ -53,18 +52,18 @@ export default function Dashboard() {
                 <div className="p-1 flex gap-2 justify-end text-sm">
                     <button
                         className={`px-2 py-1 ${surface === "draw" ? "text-white" : "text-gray-500"}`}
-                        onClick={() => setSurface("draw")}
+                        onClick={() => selectSurface("draw")}
                     >Drawing</button>
                     <button
                         className={`px-2 py-1 ${surface === "text" ? "text-white" : "text-gray-500"}`}
-                        onClick={() => setSurface("text")}
+                        onClick={() => selectSurface("text")}
                     >Writing</button>
                 </div>
                 <div className="flex-1 overflow-hidden relative">
-                    <div className={clsx("absolute inset-0 pr-1 pb-1", { hidden: surface !== "draw" })}>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: surface !== "draw" })}>
                         <ExcalidrawCanvas />
                     </div>
-                    <div className={clsx("absolute inset-0 pr-1 pb-1", { hidden: surface !== "text" })}>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: surface !== "text" })}>
                         <LexicalCanvas />
                     </div>
                 </div>

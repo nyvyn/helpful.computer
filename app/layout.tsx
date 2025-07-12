@@ -13,7 +13,7 @@ export default function RootLayout({
         <html lang="en">
         <body>
         <ToolProvider>{children}</ToolProvider>
-        <Toaster position="top-left"/>
+        <Toaster position="top-left" style={{ maxWidth: "24px" }}/>
         </body>
         </html>
     );

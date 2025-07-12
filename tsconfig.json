@@ -48,10 +48,11 @@
   "include": [
     ".next/types/**/*.ts",
     "app/**/*",
-    "components/**/*",   // ⬅ components and their .test.ts(x)
-    "lib/**/*",          // ⬅ lib code + tests
-    "hooks/**/*",
-    "vitest.config.ts"
+    "components/**/*", // ⬅ components and their .test.ts(x)
+    "hooks/**/*", // ⬅ lib code + tests
+    "lib/**/*",
+    "vitest.config.ts",
+    "dist/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

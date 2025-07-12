@@ -18,17 +18,36 @@ export default function useExcalidrawTools() {
     const ctx = useContext(ToolContext);
     const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
 
-    useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
+    useEffect(() => {
+        apiRef.current = ctx ? ctx.excalidrawApi : null;
+    }, [ctx, ctx?.excalidrawApi]);
 
-    const drawCanvas = useMemo(() => tool({
-        name: "Update Canvas",
+    const getCanvasElements = useMemo(() => tool({
+        name: "Get Canvas Elements",
+        description:
+            "Returns the current elements on the drawing canvas as JSON (Excalidraw format).",
+        parameters: z.object({}).strict(),
+        strict: true,
+        execute: async () => {
+            try {
+                const elements = apiRef.current?.getSceneElements(); // Excalidraw API
+                return JSON.stringify(elements);
+            } catch (err) {
+                console.error("read-canvas tool error:", err);
+                return err instanceof Error ? err.message : String(err);
+            }
+        },
+    }), [apiRef]);
+
+    const setCanvasElements = useMemo(() => tool({
+        name: "Set Canvas Elements",
         description:
             "Draw on the Excalidraw canvas using natural language instructions.\n" +
             "The provided instructions will be sent to a language model which will return either Excalidraw elements or a Mermaid diagram.\n" +
             "The resulting elements always replace the current scene.",
         parameters: schema,
         strict: true,
-        execute: async ({ instructions }: z.infer<typeof schema>) => {
+        execute: async ({instructions}: z.infer<typeof schema>) => {
             try {
                 const openai = new OpenAI({
                     apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
@@ -50,17 +69,17 @@ export default function useExcalidrawTools() {
                                 "All other points must be offsets from that origin: \`points[i] = [absX_i - x, absY_i - y]\`.\n" +
                                 "Respond with JSON: { format: 'excalidraw' | 'mermaid', elements: string }.",
                         },
-                        { role: "user", content: instructions },
+                        {role: "user", content: instructions},
                     ],
-                    response_format: { type: "json_object" },
+                    response_format: {type: "json_object"},
                 });
 
-                const { elements, format } = JSON.parse(
+                const {elements, format} = JSON.parse(
                     completion.choices[0].message.content as string,
                 );
 
-                const { convertToExcalidrawElements } = await import("@excalidraw/excalidraw");
-                const { parseMermaidToExcalidraw } = await import("@excalidraw/mermaid-to-excalidraw");
+                const {convertToExcalidrawElements} = await import("@excalidraw/excalidraw");
+                const {parseMermaidToExcalidraw} = await import("@excalidraw/mermaid-to-excalidraw");
 
                 const skeleton =
                     format === "excalidraw"
@@ -68,7 +87,7 @@ export default function useExcalidrawTools() {
                         : (await parseMermaidToExcalidraw(elements)).elements;
 
                 const converted = convertToExcalidrawElements(skeleton);
-                apiRef.current?.updateScene({ elements: converted });
+                apiRef.current?.updateScene({elements: converted});
 
                 return "ok";
             } catch (err) {
@@ -78,22 +97,5 @@ export default function useExcalidrawTools() {
         },
     }), [apiRef]);
 
-    const readCanvas = useMemo(() => tool({
-        name: "Read Canvas",
-        description:
-            "Returns the current elements on the drawing canvas as JSON (Excalidraw format).",
-        parameters: z.object({}).strict(),
-        strict: true,
-        execute: async () => {
-            try {
-                const elements = apiRef.current?.getSceneElements(); // Excalidraw API
-                return JSON.stringify(elements);
-            } catch (err) {
-                console.error("read-canvas tool error:", err);
-                return err instanceof Error ? err.message : String(err);
-            }
-        },
-    }), [apiRef]);
-
-    return [drawCanvas, readCanvas];
+    return [getCanvasElements, setCanvasElements];
 }

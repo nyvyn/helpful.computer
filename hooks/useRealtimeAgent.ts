@@ -1,15 +1,15 @@
 import useExcalidrawTools from "@/hooks/useExcalidrawTools.ts";
 import useLexicalTools from "@/hooks/useLexicalTools.ts";
-import { getToken } from "@/lib/ai/getToken.ts";
+import { getToken } from "@/lib/getToken.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 
 export function useRealtimeAgent() {
     const [errored, setErrored] = useState<boolean | string>(false);
     const [listening, setListening] = useState(false);
     const [speaking, setSpeaking] = useState(false);
     const [working, setWorking] = useState(false);
+    const [surface, setSurface] = useState<"draw" | "text">("draw");
 
     const session = useRef<RealtimeSession | null>(null);
 
@@ -27,7 +27,8 @@ export function useRealtimeAgent() {
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions:
-                "Use Excalidraw for any drawing-related tasks.",
+                "If you are asked to draw something, don't say it; instead use Drawing tools.\n" +
+                "If you are asked to write something, don't say it; instead use the Writing tools.\n",
             tools: [...excalidrawTools, ...lexicalTools],
         });
 
@@ -48,7 +49,9 @@ export function useRealtimeAgent() {
         });
         session.current.on("agent_tool_start", (_, _agent, tool) => {
             setWorking(true);
-            toast(`Using ${tool.name}`);
+
+            if (lexicalTools.map(tool => tool.name).includes(tool.name)) setSurface("text");
+            else if (excalidrawTools.map(tool => tool.name).includes(tool.name)) setSurface("draw");
         });
 
         /* 3. Connect the session */
@@ -82,5 +85,16 @@ export function useRealtimeAgent() {
         session.current?.sendMessage(text);
     };
 
-    return {errored, listening, speaking, toggleListening, working, sendMessage};
+    const selectSurface = (s: "draw" | "text") => setSurface(s);
+
+    return {
+        errored,
+        listening,
+        speaking,
+        toggleListening,
+        working,
+        sendMessage,
+        surface,
+        selectSurface,
+    };
 }
