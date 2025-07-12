@@ -1,6 +1,6 @@
 import useExcalidrawTools from "@/hooks/useExcalidrawTools.ts";
 import useLexicalTools from "@/hooks/useLexicalTools.ts";
-import { getToken } from "@/lib/ai/getToken.ts";
+import { getToken } from "@/lib/getToken.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
 
