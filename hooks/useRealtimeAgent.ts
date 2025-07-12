@@ -5,6 +5,11 @@ import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
+/**
+ * React hook that manages a connection to the OpenAI Realtime agent.
+ *
+ * Handles session creation, state updates and exposes a small API for the UI.
+ */
 export function useRealtimeAgent() {
     const [errored, setErrored] = useState<boolean | string>(false);
     const [listening, setListening] = useState(false);

@@ -6,6 +6,12 @@ interface Props {
     toggleListening: () => void;
 }
 
+/**
+ * Button that toggles the microphone's listening state.
+ *
+ * A long press enables push-to-talk behaviour while a simple click toggles
+ * listening on or off.
+ */
 export default function ToggleListeningButton({listening, toggleListening}: Props) {
 
     const LONG_PRESS_MS = 600; // tap-vs-hold threshold

@@ -4,6 +4,9 @@ import { Toaster } from "sonner";
 
 import "./globals.css";
 
+/**
+ * Global layout wrapper used by Next.js. Sets up providers and the UI chrome.
+ */
 export default function RootLayout({
     children,
 }: {

@@ -22,6 +22,9 @@ import { ParagraphNode, TabNode, TextNode } from "lexical";
 import React, { useContext, useEffect } from "react";
 import { ToolContext } from "../tool/ToolContext.tsx";
 
+/**
+ * Helper component that exposes the Lexical editor instance via context.
+ */
 function EditorCapture() {
     const [editor] = useLexicalComposerContext();
     const ctx = useContext(ToolContext);
@@ -31,6 +34,9 @@ function EditorCapture() {
     return null;
 }
 
+/**
+ * Placeholder content shown when the editor is empty.
+ */
 function Placeholder() {
     return (
         <div className="pointer-events-none absolute top-4 left-4 text-gray-400">
@@ -39,6 +45,9 @@ function Placeholder() {
     );
 }
 
+/**
+ * Rich text editor powered by Lexical and integrated with agent tools.
+ */
 export default function LexicalCanvas() {
     const initialConfig = {
         namespace: "editor",

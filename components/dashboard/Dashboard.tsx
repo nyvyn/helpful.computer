@@ -8,6 +8,9 @@ import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx
 import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
 import React, { useEffect, useRef, useState } from "react";
 
+/**
+ * Main application dashboard with drawing tools and realtime assistant.
+ */
 export default function Dashboard() {
     const {listening, speaking, toggleListening, working} = useRealtimeAgent();
 

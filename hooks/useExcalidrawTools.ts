@@ -13,7 +13,11 @@ const schema = z.object({
     ),
 });
 
-/* Returns Tool instances bound to the current Excalidraw API */
+/**
+ * Creates OpenAI agent tools bound to the current Excalidraw instance.
+ *
+ * The returned array contains a draw and read tool that operate on the canvas.
+ */
 export default function useExcalidrawTools() {
     const ctx = useContext(ToolContext);
     const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);

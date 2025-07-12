@@ -13,6 +13,9 @@ const ExcalidrawLazy = dynamic(
     ExcalidrawProps & RefAttributes<ExcalidrawImperativeAPI>
 >;
 
+/**
+ * Loads the heavy Excalidraw component lazily and forwards its ref.
+ */
 const ExcalidrawWrapper = forwardRef<
     ExcalidrawImperativeAPI,
     ExcalidrawProps

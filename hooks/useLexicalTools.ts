@@ -14,6 +14,9 @@ const schema = z.object({
   markdown: z.string().describe("Full markdown document to place in the editor"),
 });
 
+/**
+ * Provides OpenAI agent tools bound to the current Lexical editor instance.
+ */
 export default function useLexicalTools() {
   const ctx = useContext(ToolContext);
   const editorRef = useRef<LexicalEditor | null>(null);

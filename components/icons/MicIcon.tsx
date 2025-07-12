@@ -1,5 +1,9 @@
 import { SVGProps } from "react";
 
+/**
+ * Simple microphone SVG icon used throughout the UI.
+ */
+
 export function MicIcon(props: SVGProps<SVGSVGElement>) {
     return (
         <svg

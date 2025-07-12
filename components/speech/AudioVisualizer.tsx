@@ -9,6 +9,9 @@ interface AudioVisualizerProps {
     working: boolean;
 }
 
+/**
+ * Circular visual indicator showing the assistant's current audio state.
+ */
 export default function AudioVisualizer({listening, speaking, working}: AudioVisualizerProps) {
     // Default classes for the visualizer
     const baseClasses =

@@ -1,5 +1,8 @@
 "use server"
 
+/**
+ * Fetches an ephemeral session token used to connect to OpenAI's realtime API.
+ */
 export async function getToken(): Promise<string> {
     const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
         method: "POST",
