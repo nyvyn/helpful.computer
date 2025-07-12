@@ -4,6 +4,10 @@ import { Toaster } from "sonner";
 
 import "./globals.css";
 
+/**
+ * Application layout used by Next.js pages.
+ */
+
 export default function RootLayout({
     children,
 }: {

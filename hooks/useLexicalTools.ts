@@ -7,12 +7,21 @@ import { useContext, useEffect, useMemo, useRef } from "react";
 import { z } from "zod";
 import OpenAI from "openai";
 
+/**
+ * Bind Lexical editor operations to OpenAI agent tools.
+ *
+ * Provides "Read Markdown" and "Write Markdown" tools for the current editor.
+ */
+
 const schema = z.object({
     instructions: z.string().describe(
         "Natural-language description of what should be written in the document."
     ),
 });
 
+/**
+ * Provide OpenAI tools for reading and writing Markdown via Lexical.
+ */
 export default function useLexicalTools() {
     const ctx = useContext(ToolContext);
     const editorRef = useRef<LexicalEditor | null>(null);

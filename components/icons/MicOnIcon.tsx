@@ -1,5 +1,9 @@
 import { SVGProps } from "react";
 
+/**
+ * Microphone icon shown when the app is actively listening.
+ */
+
 export function MicOnIcon(props: SVGProps<SVGSVGElement>) {
     return (
         <svg

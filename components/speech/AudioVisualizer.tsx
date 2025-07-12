@@ -3,6 +3,10 @@
 import clsx from "clsx";
 import React from "react";
 
+/**
+ * Animated status indicator showing listening/speaking states.
+ */
+
 interface AudioVisualizerProps {
     listening: boolean;
     speaking: boolean;

@@ -37,3 +37,8 @@ Use `npm test` to execute the Vitest suite.
 
 - [VS Code](https://code.visualstudio.com/) with the [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) extension and [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
 
+## Documentation
+
+All exported functions and components are documented with JSDoc or Rust doc comments.
+See the source code for usage details and available APIs.
+

@@ -1,5 +1,10 @@
-"use server"
+"use server";
 
+/**
+ * Request an OpenAI realtime session token.
+ *
+ * @returns Client secret used to authenticate realtime API requests.
+ */
 export async function getToken(): Promise<string> {
     const r = await fetch("https://api.openai.com/v1/realtime/sessions", {
         method: "POST",
