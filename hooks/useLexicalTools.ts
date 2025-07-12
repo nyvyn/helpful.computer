@@ -21,8 +21,8 @@ export default function useLexicalTools() {
         editorRef.current = ctx ? ctx.lexicalEditor : null;
     }, [ctx, ctx?.lexicalEditor]);
 
-    const getDocumentMarkdown = useMemo(() => tool({
-        name: "Get Document Markdown",
+    const readMarkdown = useMemo(() => tool({
+        name: "Read Markdown",
         description: "Returns the current document as a markdown string.",
         parameters: z.object({}).strict(),
         strict: true,
@@ -35,14 +35,14 @@ export default function useLexicalTools() {
                 console.log(markdown);
                 return markdown;
             } catch (err) {
-                console.error("read-document-markdown tool error:", err);
+                console.error("read-markdown tool error:", err);
                 return err instanceof Error ? err.message : String(err);
             }
         },
     }), [editorRef]);
 
-    const setDocumentMarkdown = useMemo(() => tool({
-        name: "Set Document Markdown",
+    const writeMarkdown = useMemo(() => tool({
+        name: "Write Markdown",
         description:
             "Write content inside the document using natural-language `instructions` (Markdown format).",
         parameters: schema,
@@ -77,11 +77,11 @@ export default function useLexicalTools() {
 
                 return "ok";
             } catch (err) {
-                console.error("set-document-markdown tool error:", err);
+                console.error("write-markdown tool error:", err);
                 return err instanceof Error ? err.message : String(err);
             }
         },
     }), [editorRef]);
 
-    return [getDocumentMarkdown, setDocumentMarkdown];
+    return [readMarkdown, writeMarkdown];
 }
