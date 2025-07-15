@@ -1,5 +1,9 @@
 import { SVGProps } from "react";
 
+/**
+ * Microphone icon shown when the app is muted.
+ */
+
 export function MicOffIcon(props: SVGProps<SVGSVGElement>) {
     return (
         <svg

@@ -86,6 +86,7 @@ export default function useExcalidrawTools() {
         },
     }), [apiRef]);
 
+    
     const readCanvas = useMemo(() => tool({
         name: "Read Canvas",
         description:

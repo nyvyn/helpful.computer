@@ -2,6 +2,10 @@
 
 import { ToolContext } from "../tool/ToolContext.tsx";
 import ExcalidrawWrapper from "components/excalidraw/ExcalidrawWrapper.tsx";
+
+/**
+ * Canvas surface using Excalidraw and exposing its API via context.
+ */
 import React, { useContext } from "react";
 
 export default function ExcalidrawCanvas() {

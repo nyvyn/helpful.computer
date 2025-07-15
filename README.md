@@ -1,39 +1,70 @@
-# Helpful Computer
+# Helpful Computer: Your Real-Time AI Voice Assistant
 
-**Helpful Computer** is a real-time voice assistant powered by OpenAI. The project combines Next.js, React, and Tauri to provide a cross-platform desktop experience. Voice input is streamed directly to OpenAI's realtime APIs and responses are read back to you with minimal latency.
+**Helpful Computer** is a cross-platform desktop application that brings the power of OpenAI's real-time AI to your
+fingertips. This project provides a seamless, low-latency voice interface for interacting with an AI assistant, complete
+with a dynamic and interactive user interface built with Next.js, React, and Tauri.
 
-## Features
+## Key Features
 
-- Works as a desktop application via Tauri.
-- Streams your microphone audio to OpenAI's `gpt-4o-realtime` model.
-- Speaks responses aloud while also showing a visual audio indicator.
-- The audio-visualizer sidebar starts at 350 px and can be resized by dragging
-  the vertical divider, letting you allocate more or less space to the canvas.
-- Includes an Excalidraw canvas controlled by the AI agent.
-- Includes a Lexical text editor pane controlled by the AI agent.
+- **Real-Time Voice Interaction**: Stream your voice directly to OpenAI's `gpt-4o-realtime` model and receive spoken
+  responses with minimal delay.
+- **Cross-Platform Desktop App**: Built with Tauri, Helpful Computer runs natively on Windows, macOS, and Linux.
+- **Interactive UI Components**:
+- **Visual Audio Indicator**: A sleek audio visualizer provides real-time feedback on your voice input.
+- **Resizable Layout**: The UI features a draggable vertical divider, allowing you to customize the space allocated to
+  the audio visualizer and other panes.
+- **AI-Controlled Canvas**: Includes an integrated Excalidraw canvas that the AI agent can use to draw diagrams and
+  visualize concepts.
+- **AI-Powered Text Editor**: A Lexical text editor pane allows the AI to write and edit text, from code snippets to
+  long-form content.
+- **Extensible and Well-Documented**: The codebase is written in TypeScript and Rust, with all exported functions and
+  components documented with JSDoc or Rust doc comments.
 
 ## Getting Started
 
+Follow these instructions to get a local copy of Helpful Computer up and running for development and testing.
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18 or later)
+- [npm](https://www.npmjs.com/)
+- [Rust](https://www.rust-lang.org/tools/install)
+
+### Installation and Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/helpful-computer.git
+   cd helpful-computer
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up your environment variables:**
+
+   Create a `.env.local` file in the root of the project and add your OpenAI API key:
+
+   ```
+   NEXT_PUBLIC_OPENAI_API_KEY=your_openai_api_key
+   ```
+
+   This key is used to generate ephemeral session tokens for making requests to the OpenAI API.
+
+### Running the Application
+
+- **Development Mode:**
+  To run the app with hot-reloading and developer tools, use:
+  ```bash
+  npm run tauri:dev
+  ```
+
+### Running Tests
+
+To run the test suite, use the following command:
+
 ```bash
-# Install dependencies
-npm install
-
-# Run the app in development mode
-npm run dev
-
-# For a native desktop build with Tauri
-npm run tauri:dev
+  npm test
 ```
-
-### Environment variables
-
-Set `NEXT_PUBLIC_OPENAI_API_KEY` in your shell or `.env` file. This key is used to generate ephemeral session tokens for OpenAI.
-
-### Running tests
-
-Use `npm test` to execute the Vitest suite.
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) with the [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) extension and [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
-

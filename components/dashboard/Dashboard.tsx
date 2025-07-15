@@ -8,6 +8,13 @@ import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx
 import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
 import React, { useEffect, useRef, useState } from "react";
 
+/**
+ * Main application interface combining:
+ * - A resizable sidebar with audio visualizer and listening controls
+ * - Drawing and writing surfaces that can be toggled between
+ * - Tool selection buttons in the header
+ */
+
 export default function Dashboard() {
     const {listening, speaking, toggleListening, working, surface, selectSurface} = useRealtimeAgent();
 

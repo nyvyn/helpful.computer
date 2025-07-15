@@ -19,6 +19,12 @@ import { HeadingNode, QuoteNode, } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { ParagraphNode, TabNode, TextNode } from "lexical";
 
+/**
+ * Rich text editor surface backed by Lexical.
+ *
+ * Exposes the editor instance via context so tools can read and write markdown.
+ */
+
 import React, { useContext, useEffect } from "react";
 import { ToolContext } from "../tool/ToolContext.tsx";
 
@@ -39,6 +45,9 @@ function Placeholder() {
     );
 }
 
+/**
+ * Top-level editor component housing all Lexical plugins.
+ */
 export default function LexicalCanvas() {
     const initialConfig = {
         namespace: "editor",

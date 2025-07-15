@@ -4,6 +4,14 @@ import { getToken } from "@/lib/getToken.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
 
+/**
+ * Manage a single OpenAI `RealtimeSession`.
+ *
+ * The hook initializes the session with Excalidraw and Lexical tools,
+ * connects it using a token from `getToken`, and exposes state used by
+ * the dashboard UI.
+ */
+
 export function useRealtimeAgent() {
     const [errored, setErrored] = useState<boolean | string>(false);
     const [listening, setListening] = useState(false);

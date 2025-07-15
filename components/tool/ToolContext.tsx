@@ -12,6 +12,10 @@ type ToolCtx = {
 
 export const ToolContext = createContext<ToolCtx | null>(null);
 
+/**
+ * Provider exposing Excalidraw and Lexical references to children.
+ */
+
 export function ToolProvider({ children }: { children: ReactNode }) {
   const [excalidrawApi, setExcalidrawApi] = useState<ExcalidrawImperativeAPI | null>(null);
   const [lexicalEditor, setLexicalEditor] = useState<LexicalEditor | null>(null);

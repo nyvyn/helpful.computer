@@ -6,8 +6,8 @@ describe("getToken", () => {
         vi.restoreAllMocks();
     });
 
-    it("calls OpenAI API and returns JSON", async () => {
-        const mockResponse = {session: "test"};
+    it("calls OpenAI API and returns a token", async () => {
+        const mockResponse = { client_secret: { value: "test" } };
         const json = vi.fn().mockResolvedValue(mockResponse);
         global.fetch = vi.fn().mockResolvedValue({json} as never);
 
@@ -22,6 +22,6 @@ describe("getToken", () => {
                 "Content-Type": "application/json",
             })
         }));
-        expect(result).toEqual(mockResponse);
+        expect(result).toEqual("test");
     });
 });

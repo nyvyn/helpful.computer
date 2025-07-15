@@ -1,5 +1,11 @@
 import { MicOnIcon } from "@/components/icons/MicOnIcon.tsx";
 import { MicOffIcon } from "@/components/icons/MicOffIcon.tsx";
+
+/**
+ * Button used to toggle microphone listening state.
+ *
+ * Supports tap-to-toggle and push-to-talk via long press.
+ */
 import { useRef } from "react";
 
 interface Props {
