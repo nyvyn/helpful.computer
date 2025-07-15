@@ -3,16 +3,21 @@
 import clsx from "clsx";
 import React from "react";
 
-/**
- * Animated status indicator showing listening/speaking states.
- */
-
 interface AudioVisualizerProps {
     listening: boolean;
     speaking: boolean;
     working: boolean;
 }
 
+/**
+ * Animated status indicator showing listening/speaking states.
+ *
+ * States:
+ * - Listening: Gradient pulse effect (fuchsia/rose/orange) with rose glow
+ * - Speaking: Solid green pulse with light shadow
+ * - Working: Spinning gradient (sky/blue/indigo) with blue glow
+ * - Idle: Dimmed slate gray
+ */
 export default function AudioVisualizer({listening, speaking, working}: AudioVisualizerProps) {
     // Default classes for the visualizer
     const baseClasses =

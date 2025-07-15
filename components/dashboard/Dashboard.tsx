@@ -9,7 +9,10 @@ import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
 import React, { useEffect, useRef, useState } from "react";
 
 /**
- * Main application interface combining tool surfaces and controls.
+ * Main application interface combining:
+ * - A resizable sidebar with audio visualizer and listening controls
+ * - Drawing and writing surfaces that can be toggled between
+ * - Tool selection buttons in the header
  */
 
 export default function Dashboard() {
