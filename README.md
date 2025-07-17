@@ -1,24 +1,17 @@
 # Helpful Computer: Your Real-Time AI Voice Assistant
 
-**Helpful Computer** is a cross-platform desktop application that brings the power of OpenAI's real-time AI to your
-fingertips. This project provides a seamless, low-latency voice interface for interacting with an AI assistant, complete
-with a dynamic and interactive user interface built with Next.js, React, and Tauri.
+**Helpful Computer** provides a seamless, low-latency voice interface for interacting with an AI assistant.
+
+![Helpful Computer Overview](overview.gif)
 
 ## Key Features
 
 - **Real-Time Voice Interaction**: Stream your voice directly to OpenAI's `gpt-4o-realtime` model and receive spoken
   responses with minimal delay.
-- **Cross-Platform Desktop App**: Built with Tauri, Helpful Computer runs natively on Windows, macOS, and Linux.
-- **Interactive UI Components**:
-- **Visual Audio Indicator**: A sleek audio visualizer provides real-time feedback on your voice input.
-- **Resizable Layout**: The UI features a draggable vertical divider, allowing you to customize the space allocated to
-  the audio visualizer and other panes.
 - **AI-Controlled Canvas**: Includes an integrated Excalidraw canvas that the AI agent can use to draw diagrams and
   visualize concepts.
 - **AI-Powered Text Editor**: A Lexical text editor pane allows the AI to write and edit text, from code snippets to
   long-form content.
-- **Extensible and Well-Documented**: The codebase is written in TypeScript and Rust, with all exported functions and
-  components documented with JSDoc or Rust doc comments.
 
 ## Getting Started
 
