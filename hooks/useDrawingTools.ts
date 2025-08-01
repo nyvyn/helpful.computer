@@ -24,7 +24,7 @@ export default function useDrawingTools() {
 
     useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
 
-    const drawCanvas = useMemo(() => tool({
+    const drawCanvasTool = useMemo(() => tool({
         name: "Update Canvas",
         description:
             "Draw on the Excalidraw canvas using natural language instructions.\n" +
@@ -87,7 +87,7 @@ export default function useDrawingTools() {
     }), [apiRef]);
 
     
-    const readCanvas = useMemo(() => tool({
+    const readCanvasTool = useMemo(() => tool({
         name: "Read Canvas",
         description:
             "Returns the current elements on the drawing canvas as JSON (Excalidraw format).",
@@ -104,5 +104,5 @@ export default function useDrawingTools() {
         },
     }), [apiRef]);
 
-    return [drawCanvas, readCanvas];
+    return [drawCanvasTool, readCanvasTool];
 }

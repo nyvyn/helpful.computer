@@ -33,7 +33,7 @@ export default function useWritingTools() {
         editorRef.current = ctx ? ctx.lexicalEditor : null;
     }, [ctx, ctx?.lexicalEditor]);
 
-    const readMarkdown = useMemo(() => tool({
+    const readMarkdownTool = useMemo(() => tool({
         name: "Read Markdown",
         description: "Returns the current document as a markdown string.",
         parameters: z.object({}).strict(),
@@ -53,7 +53,7 @@ export default function useWritingTools() {
         },
     }), [editorRef]);
 
-    const writeMarkdown = useMemo(() => tool({
+    const writeMarkdownTool = useMemo(() => tool({
         name: "Write Markdown",
         description:
             "Write content inside the document using natural-language `instructions` (Markdown format).",
@@ -95,5 +95,5 @@ export default function useWritingTools() {
         },
     }), [editorRef]);
 
-    return [readMarkdown, writeMarkdown];
+    return [readMarkdownTool, writeMarkdownTool];
 }
