@@ -18,7 +18,7 @@ const schema = z.object({
  *
  * The returned array contains a draw and read tool that operate on the canvas.
  */
-export default function useExcalidrawTools() {
+export default function useDrawingTools() {
     const ctx = useContext(ToolContext);
     const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
 

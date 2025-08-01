@@ -1,9 +1,15 @@
-import useExcalidrawTools from "@/hooks/useExcalidrawTools.ts";
-import useLexicalTools from "@/hooks/useLexicalTools.ts";
-import useDesktopTools from "@/hooks/useDesktopTools.ts";
+import useDrawingTools from "@/hooks/useDrawingTools.ts";
+import useWritingTools from "@/hooks/useWritingTools.ts";
+import useComputingTools from "@/hooks/useComputingTools.ts";
 import { getToken } from "@/lib/getToken.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
+
+export enum ViewType {
+    DRAWING = "drawing",
+    WRITING = "writing",
+    COMPUTING = "computing"
+}
 
 /**
  * Manage a single OpenAI `RealtimeSession`.
@@ -18,13 +24,13 @@ export function useRealtimeAgent() {
     const [listening, setListening] = useState(false);
     const [speaking, setSpeaking] = useState(false);
     const [working, setWorking] = useState(false);
-    const [surface, setSurface] = useState<"draw" | "text" | "desktop">("draw");
+    const [view, setView] = useState<ViewType>(ViewType.DRAWING);
 
     const session = useRef<RealtimeSession | null>(null);
 
-    const excalidrawTools = useExcalidrawTools();
-    const lexicalTools = useLexicalTools();
-    const { tools: desktopTools, screenshot, capture } = useDesktopTools();
+    const drawingTools = useDrawingTools();
+    const writingTools = useWritingTools();
+    const computingTools = useComputingTools();
 
     /* create once */
     useEffect(() => {
@@ -38,8 +44,9 @@ export function useRealtimeAgent() {
             name: "Assistant",
             instructions:
                 "If you are asked to draw something, don't say it; instead use Drawing tools.\n" +
-                "If you are asked to write something, don't say it; instead use the Writing tools.\n",
-            tools: [...excalidrawTools, ...lexicalTools, ...desktopTools],
+                "If you are asked to write something, don't say it; instead use the Writing tools.\n" +
+                "If you are asked about the computer, dont say it; instead use the Computing tools.\n",
+            tools: [...drawingTools, ...writingTools, ...computingTools],
         });
 
         session.current = new RealtimeSession(assistantAgent, {
@@ -60,9 +67,9 @@ export function useRealtimeAgent() {
         session.current.on("agent_tool_start", (_, _agent, tool) => {
             setWorking(true);
 
-            if (lexicalTools.map(t => t.name).includes(tool.name)) setSurface("text");
-            else if (excalidrawTools.map(t => t.name).includes(tool.name)) setSurface("draw");
-            else if (desktopTools.map(t => t.name).includes(tool.name)) setSurface("desktop");
+            if (writingTools.map(t => t.name).includes(tool.name)) setView(ViewType.WRITING);
+            else if (drawingTools.map(t => t.name).includes(tool.name)) setView(ViewType.DRAWING);
+            else if (computingTools.map(t => t.name).includes(tool.name)) setView(ViewType.COMPUTING);
         });
 
         /* 3. Connect the session */
@@ -75,7 +82,7 @@ export function useRealtimeAgent() {
         });
 
         return () => session.current?.close();
-    }, [excalidrawTools, lexicalTools, desktopTools]);
+    }, [drawingTools, writingTools, computingTools]);
 
     /* commands that UI can call */
     const mute = () => {
@@ -96,7 +103,7 @@ export function useRealtimeAgent() {
         session.current?.sendMessage(text);
     };
 
-    const selectSurface = (s: "draw" | "text" | "desktop") => setSurface(s);
+    const selectView = (s: ViewType) => setView(s);
 
     return {
         errored,
@@ -105,9 +112,7 @@ export function useRealtimeAgent() {
         toggleListening,
         working,
         sendMessage,
-        surface,
-        selectSurface,
-        screenshot,
-        capture,
+        view,
+        selectView,
     };
 }

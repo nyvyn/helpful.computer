@@ -22,10 +22,13 @@ const schema = z.object({
 /**
  * Provide OpenAI tools for reading and writing Markdown via Lexical.
  */
-export default function useLexicalTools() {
+export default function useWritingTools() {
     const ctx = useContext(ToolContext);
     const editorRef = useRef<LexicalEditor | null>(null);
 
+    /*
+     * Store the current Lexical editor instance in a ref.
+     */
     useEffect(() => {
         editorRef.current = ctx ? ctx.lexicalEditor : null;
     }, [ctx, ctx?.lexicalEditor]);

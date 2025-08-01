@@ -1,7 +1,8 @@
 "use client";
-import { invoke } from "@tauri-apps/api/core";
+import { ToolContext } from "@/components/tool/ToolContext.tsx";
 import { tool } from "@openai/agents-realtime";
-import { useMemo, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { useContext, useMemo } from "react";
 import { z } from "zod";
 
 /**
@@ -11,8 +12,8 @@ import { z } from "zod";
  * - Capture Screenshot: Returns a base64 encoded PNG image of the desktop.
  * - Run AppleScript: Executes arbitrary AppleScript code on macOS.
  */
-export default function useDesktopTools() {
-    const [screenshot, setScreenshot] = useState<string | null>(null);
+export default function useComputingTools() {
+    const ctx = useContext(ToolContext);
 
     const captureScreenshotTool = useMemo(() => tool({
         name: "Capture Screenshot",
@@ -21,19 +22,15 @@ export default function useDesktopTools() {
         strict: true,
         execute: async () => {
             try {
-                return await capture();
+                const screenshot = await invoke<string>("capture_screenshot");
+                ctx?.setScreenshot(screenshot);
+                return screenshot;
             } catch (err) {
                 console.error("capture-screenshot tool error:", err);
                 return err instanceof Error ? err.message : String(err);
             }
         },
     }), []);
-
-    const capture = async () => {
-        const image = await invoke<string>("capture_screenshot");
-        setScreenshot(image);
-        return image;
-    };
 
     const runAppleScriptTool = useMemo(() => tool({
         name: "Run AppleScript",
@@ -42,10 +39,9 @@ export default function useDesktopTools() {
             script: z.string().describe("AppleScript source to execute"),
         }).strict(),
         strict: true,
-        execute: async ({ script }: { script: string }) => {
+        execute: async ({script}: { script: string }) => {
             try {
-                const result = await invoke<string>("run_applescript", { script });
-                return result;
+                return await invoke<string>("run_applescript", {script});
             } catch (err) {
                 console.error("run-applescript tool error:", err);
                 return err instanceof Error ? err.message : String(err);
@@ -53,5 +49,5 @@ export default function useDesktopTools() {
         },
     }), []);
 
-    return { tools: [captureScreenshotTool, runAppleScriptTool], screenshot, capture };
+    return [captureScreenshotTool, runAppleScriptTool];
 }
