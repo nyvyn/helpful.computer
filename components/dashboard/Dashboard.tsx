@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import ExcalidrawCanvas from "@/components/excalidraw/ExcalidrawCanvas.tsx";
 import LexicalCanvas from "@/components/lexical/LexicalCanvas.tsx";
+import DesktopPanel from "@/components/desktop/DesktopPanel.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
@@ -16,7 +17,7 @@ import React, { useEffect, useRef, useState } from "react";
  */
 
 export default function Dashboard() {
-    const {listening, speaking, toggleListening, working, surface, selectSurface} = useRealtimeAgent();
+    const {listening, speaking, toggleListening, working, surface, selectSurface, screenshot, capture} = useRealtimeAgent();
 
     const minSidebar = 100;
     const defaultSidebar = 350;
@@ -65,6 +66,10 @@ export default function Dashboard() {
                         className={`px-2 py-1 ${surface === "text" ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectSurface("text")}
                     >Writing</button>
+                    <button
+                        className={`px-2 py-1 ${surface === "desktop" ? "text-white" : "text-gray-500"}`}
+                        onClick={() => selectSurface("desktop")}
+                    >Desktop</button>
                 </div>
                 <div className="flex-1 overflow-hidden relative">
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: surface !== "draw" })}>
@@ -72,6 +77,9 @@ export default function Dashboard() {
                     </div>
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: surface !== "text" })}>
                         <LexicalCanvas />
+                    </div>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: surface !== "desktop" })}>
+                        <DesktopPanel image={screenshot} capture={capture}/>
                     </div>
                 </div>
             </div>
