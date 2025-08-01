@@ -21,6 +21,10 @@ const schema = z.object({
 export default function useDrawingTools() {
     const ctx = useContext(ToolContext);
     const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
+    const openai = useMemo(() => new OpenAI({
+        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+        dangerouslyAllowBrowser: true,
+    }), []);
 
     useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
 
@@ -34,11 +38,6 @@ export default function useDrawingTools() {
         strict: true,
         execute: async ({ instructions }: z.infer<typeof schema>) => {
             try {
-                const openai = new OpenAI({
-                    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-                    dangerouslyAllowBrowser: true,
-                });
-
                 const completion = await openai.chat.completions.create({
                     model: "gpt-4.1",
                     messages: [
@@ -84,7 +83,7 @@ export default function useDrawingTools() {
                 return err instanceof Error ? err.message : String(err);
             }
         },
-    }), [apiRef]);
+    }), [openai]);
 
     
     const readCanvasTool = useMemo(() => tool({
