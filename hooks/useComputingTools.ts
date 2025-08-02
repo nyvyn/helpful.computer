@@ -1,8 +1,8 @@
 "use client";
 import { ToolContext } from "@/components/tool/ToolContext.tsx";
+import { getOpenAiKey } from "@/lib/openAiKey.ts";
 import { tool } from "@openai/agents-realtime";
 import { invoke } from "@tauri-apps/api/core";
-import { getOpenAiKey } from "@/lib/openAiKey.ts";
 import OpenAI from "openai";
 import { ResponseComputerToolCall } from "openai/resources/responses/responses";
 import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
@@ -33,7 +33,7 @@ export default function useComputingTools() {
                 });
             }
         };
-        initOpenAI();
+        void initOpenAI();
     }, []);
 
     /** Low-level desktop actions for the CUA agent. */
@@ -158,7 +158,7 @@ export default function useComputingTools() {
                         ctx?.setScreenshot(screenshot);
 
                         if (!openai.current) {
-                            throw new Error("OpenAI client not initialized");
+                            return "OpenAI client not initialized";
                         }
 
                         const response = await openai.current.responses.create({

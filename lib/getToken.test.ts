@@ -1,10 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { getToken } from "./getToken.ts";
 
 vi.mock("@/lib/openAiKey.ts", () => ({
     getOpenAiKey: vi.fn().mockResolvedValue("test-key")
 }));
-
-import { getToken } from "./getToken.ts";
 
 describe("getToken", () => {
     it("calls OpenAI API and returns a token", async () => {
