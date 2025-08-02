@@ -65,10 +65,22 @@ export default function useComputingTools() {
             const osInfo = await invoke<string>("get_os_info");
             const environment = osInfo as "windows" | "mac" | "linux" | "ubuntu" | "browser";
 
+            const shot = await invoke<string>("capture_screenshot");
+            ctx?.setScreenshot(shot);
+
             let response = await openai.responses.create({
                 model: "computer-use-preview",
                 tools: [{ type: "computer-preview", display_width: screenInfo.width, display_height: screenInfo.height, environment }],
-                input: [{ type: "message", role: "user", content: instruction }],
+                input: [
+                    { 
+                        type: "message", 
+                        role: "user", 
+                        content: [
+                            { type: "input_text", text: instruction },
+                            { type: "input_image", image_url: `data:image/png;base64,${shot}`, detail: "high" }
+                        ]
+                    }
+                ],
                 truncation: "auto",
             });
 
