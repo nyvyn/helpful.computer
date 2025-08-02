@@ -48,7 +48,7 @@ function Placeholder() {
 /**
  * Top-level editor component housing all Lexical plugins.
  */
-export default function LexicalCanvas() {
+export default function LexicalView() {
     const initialConfig = {
         namespace: "editor",
         theme: {

@@ -1,11 +1,12 @@
 "use client";
 
-import clsx from "clsx";
-import ExcalidrawCanvas from "@/components/excalidraw/ExcalidrawCanvas.tsx";
-import LexicalCanvas from "@/components/lexical/LexicalCanvas.tsx";
+import ComputerView from "@/components/computer/ComputerView.tsx";
+import ExcalidrawView from "@/components/excalidraw/ExcalidrawView.tsx";
+import LexicalView from "@/components/lexical/LexicalView.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
-import { useRealtimeAgent } from "@/hooks/useRealtimeAgent.ts";
+import { useRealtimeAgent, ViewType } from "@/hooks/useRealtimeAgent.ts";
+import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 
 /**
@@ -16,7 +17,7 @@ import React, { useEffect, useRef, useState } from "react";
  */
 
 export default function Dashboard() {
-    const {listening, speaking, toggleListening, working, surface, selectSurface} = useRealtimeAgent();
+    const {listening, speaking, toggleListening, working, view, selectView} = useRealtimeAgent();
 
     const minSidebar = 100;
     const defaultSidebar = 350;
@@ -58,20 +59,27 @@ export default function Dashboard() {
             <div className="flex-1 flex flex-col">
                 <div className="p-1 flex gap-2 justify-end text-sm">
                     <button
-                        className={`px-2 py-1 ${surface === "draw" ? "text-white" : "text-gray-500"}`}
-                        onClick={() => selectSurface("draw")}
+                        className={`px-2 py-1 ${view === ViewType.DRAWING ? "text-white" : "text-gray-500"}`}
+                        onClick={() => selectView(ViewType.DRAWING)}
                     >Drawing</button>
                     <button
-                        className={`px-2 py-1 ${surface === "text" ? "text-white" : "text-gray-500"}`}
-                        onClick={() => selectSurface("text")}
+                        className={`px-2 py-1 ${view === ViewType.WRITING ? "text-white" : "text-gray-500"}`}
+                        onClick={() => selectView(ViewType.WRITING)}
                     >Writing</button>
+                    <button
+                        className={`px-2 py-1 ${view === ViewType.COMPUTING ? "text-white" : "text-gray-500"}`}
+                        onClick={() => selectView(ViewType.COMPUTING)}
+                    >Desktop</button>
                 </div>
                 <div className="flex-1 overflow-hidden relative">
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: surface !== "draw" })}>
-                        <ExcalidrawCanvas />
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.DRAWING })}>
+                        <ExcalidrawView />
                     </div>
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: surface !== "text" })}>
-                        <LexicalCanvas />
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.WRITING })}>
+                        <LexicalView />
+                    </div>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.COMPUTING })}>
+                        <ComputerView />
                     </div>
                 </div>
             </div>

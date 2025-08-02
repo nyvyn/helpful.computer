@@ -22,15 +22,18 @@ const schema = z.object({
 /**
  * Provide OpenAI tools for reading and writing Markdown via Lexical.
  */
-export default function useLexicalTools() {
+export default function useWritingTools() {
     const ctx = useContext(ToolContext);
     const editorRef = useRef<LexicalEditor | null>(null);
 
+    /*
+     * Store the current Lexical editor instance in a ref.
+     */
     useEffect(() => {
         editorRef.current = ctx ? ctx.lexicalEditor : null;
     }, [ctx, ctx?.lexicalEditor]);
 
-    const readMarkdown = useMemo(() => tool({
+    const readMarkdownTool = useMemo(() => tool({
         name: "Read Markdown",
         description: "Returns the current document as a markdown string.",
         parameters: z.object({}).strict(),
@@ -50,7 +53,7 @@ export default function useLexicalTools() {
         },
     }), [editorRef]);
 
-    const writeMarkdown = useMemo(() => tool({
+    const writeMarkdownTool = useMemo(() => tool({
         name: "Write Markdown",
         description:
             "Write content inside the document using natural-language `instructions` (Markdown format).",
@@ -92,5 +95,5 @@ export default function useLexicalTools() {
         },
     }), [editorRef]);
 
-    return [readMarkdown, writeMarkdown];
+    return [readMarkdownTool, writeMarkdownTool];
 }

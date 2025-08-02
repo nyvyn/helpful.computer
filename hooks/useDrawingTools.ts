@@ -18,13 +18,17 @@ const schema = z.object({
  *
  * The returned array contains a draw and read tool that operate on the canvas.
  */
-export default function useExcalidrawTools() {
+export default function useDrawingTools() {
     const ctx = useContext(ToolContext);
     const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
+    const openai = useMemo(() => new OpenAI({
+        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+        dangerouslyAllowBrowser: true,
+    }), []);
 
     useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
 
-    const drawCanvas = useMemo(() => tool({
+    const drawCanvasTool = useMemo(() => tool({
         name: "Update Canvas",
         description:
             "Draw on the Excalidraw canvas using natural language instructions.\n" +
@@ -34,11 +38,6 @@ export default function useExcalidrawTools() {
         strict: true,
         execute: async ({ instructions }: z.infer<typeof schema>) => {
             try {
-                const openai = new OpenAI({
-                    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-                    dangerouslyAllowBrowser: true,
-                });
-
                 const completion = await openai.chat.completions.create({
                     model: "gpt-4.1",
                     messages: [
@@ -84,10 +83,10 @@ export default function useExcalidrawTools() {
                 return err instanceof Error ? err.message : String(err);
             }
         },
-    }), [apiRef]);
+    }), [openai]);
 
     
-    const readCanvas = useMemo(() => tool({
+    const readCanvasTool = useMemo(() => tool({
         name: "Read Canvas",
         description:
             "Returns the current elements on the drawing canvas as JSON (Excalidraw format).",
@@ -104,5 +103,5 @@ export default function useExcalidrawTools() {
         },
     }), [apiRef]);
 
-    return [drawCanvas, readCanvas];
+    return [drawCanvasTool, readCanvasTool];
 }

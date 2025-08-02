@@ -8,7 +8,7 @@ import ExcalidrawWrapper from "components/excalidraw/ExcalidrawWrapper.tsx";
  */
 import React, { useContext } from "react";
 
-export default function ExcalidrawCanvas() {
+export default function ExcalidrawView() {
     const ctx = useContext(ToolContext);
 
     return (

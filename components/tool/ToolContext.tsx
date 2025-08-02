@@ -8,6 +8,8 @@ type ToolCtx = {
   setExcalidrawApi: (api: ExcalidrawImperativeAPI | null) => void;
   lexicalEditor: LexicalEditor | null;
   setLexicalEditor: (editor: LexicalEditor | null) => void;
+  screenshot: string | null;
+  setScreenshot: (screenshot: string | null) => void;
 };
 
 export const ToolContext = createContext<ToolCtx | null>(null);
@@ -19,8 +21,9 @@ export const ToolContext = createContext<ToolCtx | null>(null);
 export function ToolProvider({ children }: { children: ReactNode }) {
   const [excalidrawApi, setExcalidrawApi] = useState<ExcalidrawImperativeAPI | null>(null);
   const [lexicalEditor, setLexicalEditor] = useState<LexicalEditor | null>(null);
+  const [screenshot, setScreenshot] = useState<string | null>(null);
   return (
-    <ToolContext.Provider value={{ excalidrawApi, setExcalidrawApi, lexicalEditor, setLexicalEditor }}>
+    <ToolContext.Provider value={{ excalidrawApi, setExcalidrawApi, lexicalEditor, setLexicalEditor, screenshot, setScreenshot }}>
       {children}
     </ToolContext.Provider>
   );
