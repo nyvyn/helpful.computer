@@ -18,7 +18,7 @@ export default function ComputerView() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={`data:image/png;base64,${ctx.screenshot}`} className="max-w-full max-h-full" alt="screentshot"/>
             ) : (
-                <div className="text-white">No screenshot</div>
+                <div className="text-white">Working...</div>
             )}
         </div>
     );
