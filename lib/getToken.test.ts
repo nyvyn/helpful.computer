@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { getToken } from "./getToken.ts";
 
-vi.mock("@/lib/openAiKey.ts", () => ({
-    getOpenAiKey: vi.fn().mockResolvedValue("test-key")
+vi.mock("@/lib/manageOpenaiKey.ts", () => ({
+    getOpenaiKey: vi.fn().mockResolvedValue("test-key")
 }));
 
 describe("getToken", () => {

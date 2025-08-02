@@ -1,4 +1,4 @@
-"use client";
+"use server";
 
 import { getOpenaiKey } from "@/lib/manageOpenaiKey.ts";
 
