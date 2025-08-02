@@ -1,9 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { getOpenAiKey, setOpenAiKey } from "@/lib/openAiKey.ts";
+import React, { useEffect, useState } from "react";
 
-export default function SettingsView() {
+interface SettingsViewProps {
+    onKeySaved?: () => Promise<void>;
+}
+
+export default function SettingsView({onKeySaved}: SettingsViewProps) {
     const [key, setKey] = useState("");
     const [show, setShow] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -43,6 +47,7 @@ export default function SettingsView() {
                                 setSaving(true);
                                 try {
                                     await setOpenAiKey(key);
+                                    await onKeySaved?.();
                                 } finally {
                                     setSaving(false);
                                 }

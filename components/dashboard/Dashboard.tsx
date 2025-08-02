@@ -18,7 +18,7 @@ import React, { useEffect, useRef, useState } from "react";
  */
 
 export default function Dashboard() {
-    const {listening, speaking, toggleListening, working, view, selectView} = useRealtimeAgent();
+    const {listening, speaking, toggleListening, working, view, selectView, reconnect} = useRealtimeAgent();
 
     const minSidebar = 100;
     const defaultSidebar = 350;
@@ -90,7 +90,7 @@ export default function Dashboard() {
                         <ComputerView />
                     </div>
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.SETTINGS })}>
-                        <SettingsView />
+                        <SettingsView onKeySaved={reconnect}/>
                     </div>
                 </div>
             </div>

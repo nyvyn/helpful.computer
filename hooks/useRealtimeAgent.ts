@@ -1,6 +1,6 @@
+import useComputingTools from "@/hooks/useComputingTools.ts";
 import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
-import useComputingTools from "@/hooks/useComputingTools.ts";
 import { getToken } from "@/lib/getToken.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useEffect, useRef, useState } from "react";
@@ -106,6 +106,67 @@ export function useRealtimeAgent() {
 
     const selectView = (s: ViewType) => setView(s);
 
+    const reconnect = async () => {
+        try {
+            // Close existing session
+            if (session.current) {
+                session.current.close();
+                session.current = null;
+            }
+
+            // Reset states
+            setErrored(false);
+            setListening(false);
+            setSpeaking(false);
+            setWorking(false);
+
+            console.log("Reconnecting session");
+
+            /* 1. Create the agent and session */
+            const assistantAgent = new RealtimeAgent({
+                name: "Assistant",
+                instructions:
+                    "If you are asked to draw something, don't say it; instead use Drawing tools.\n" +
+                    "If you are asked to write something, don't say it; instead use the Writing tools.\n" +
+                    "If you are asked about the computer, dont say it; instead use the Computing tools.\n",
+                tools: [...drawingTools, ...writingTools, ...computingTools],
+            });
+
+            session.current = new RealtimeSession(assistantAgent, {
+                model: "gpt-4o-realtime-preview-2025-06-03",
+                tracingDisabled: true,
+                config: {
+                    voice: "ash"
+                }
+            });
+
+            /* 2. Wire state updates */
+            session.current.on("audio_start", () => setSpeaking(true));
+            session.current.on("audio_stopped", () => setSpeaking(false));
+            session.current.on("error", (e) => setErrored(String(e)));
+            session.current.on("agent_tool_end", () => {
+                setWorking(false);
+            });
+            session.current.on("agent_tool_start", (_, _agent, tool) => {
+                setWorking(true);
+
+                if (writingTools.map(t => t.name).includes(tool.name)) setView(ViewType.WRITING);
+                else if (drawingTools.map(t => t.name).includes(tool.name)) setView(ViewType.DRAWING);
+                else if (computingTools.map(t => t.name).includes(tool.name)) setView(ViewType.COMPUTING);
+            });
+
+            /* 3. Connect the session */
+            const token = await getToken();
+            console.log("Token: ", token);
+            await session.current.connect({apiKey: token});
+            session.current.mute(true);
+            console.log("Connected: ", session.current.transport);
+        } catch (error) {
+            console.error("Reconnection failed:", error);
+            setErrored(String(error));
+        }
+    };
+
     return {
         errored,
         listening,
@@ -115,5 +176,6 @@ export function useRealtimeAgent() {
         sendMessage,
         view,
         selectView,
+        reconnect,
     };
 }
