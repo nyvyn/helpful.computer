@@ -1,6 +1,6 @@
-"use server";
+"use client";
 
-import { getOpenAiKey } from "@/lib/openAiKey.ts";
+import { getOpenaiKey } from "@/lib/manageOpenaiKey.ts";
 
 /**
  * Request an OpenAI realtime session token.
@@ -8,7 +8,7 @@ import { getOpenAiKey } from "@/lib/openAiKey.ts";
  * @returns Client secret used to authenticate realtime API requests.
  */
 export async function getToken(): Promise<string> {
-    const apiKey = await getOpenAiKey();
+    const apiKey = await getOpenaiKey();
     if (!apiKey) throw new Error("Missing OpenAI API key");
 
     const r = await fetch("https://api.openai.com/v1/realtime/sessions", {

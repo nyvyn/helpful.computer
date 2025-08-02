@@ -17,7 +17,6 @@
     "@lexical/react": "^0.12.6",
     "@openai/agents": "^0.0.8",
     "@tauri-apps/api": "^2.5.0",
-    "@tauri-apps/plugin-fs": "^2.3.0",
     "@tauri-apps/plugin-opener": "^2.2.6",
     "@tauri-apps/plugin-stronghold": "^2.3.0",
     "clsx": "^2.1.1",

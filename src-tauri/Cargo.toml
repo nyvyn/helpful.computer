@@ -1,7 +1,7 @@
 [package]
 name = "helpful-computer"
 version = "0.1.0"
-description = "A Tauri App"
+description = "Local AI assistant for your computer"
 authors = ["you"]
 edition = "2021"
 
@@ -30,6 +30,6 @@ serde_json = "1.0.142"
 base64 = "0.22.1"
 enigo = "0.5.0"
 xcap = "0.6.2"
-tokio = { version = "1.0", features = ["time"] }
+tokio = { version = "1.47.1", features = ["time"] }
 argon2 = { package = "rust-argon2", version = "3.0.0" }
 

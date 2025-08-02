@@ -3,7 +3,7 @@ import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
 import { getToken } from "@/lib/getToken.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export enum ViewType {
     DRAWING = "drawing",
@@ -33,14 +33,9 @@ export function useRealtimeAgent() {
     const writingTools = useWritingTools();
     const computingTools = useComputingTools();
 
-    /* create once */
-    useEffect(() => {
-        // Only create a single session
-        if (session.current) return;
-
+    const createSession = useCallback(async () => {
         console.log("Creating session");
 
-        /* 1. Create the agent and session */
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions:
@@ -58,7 +53,6 @@ export function useRealtimeAgent() {
             }
         });
 
-        /* 2. Wire state updates */
         session.current.on("audio_start", () => setSpeaking(true));
         session.current.on("audio_stopped", () => setSpeaking(false));
         session.current.on("error", (e) => setErrored(String(e)));
@@ -73,17 +67,22 @@ export function useRealtimeAgent() {
             else if (computingTools.map(t => t.name).includes(tool.name)) setView(ViewType.COMPUTING);
         });
 
-        /* 3. Connect the session */
-        getToken().then((token) => {
-            console.log("Token: ", token);
-            session.current?.connect({apiKey: token}).then(() => {
-                session.current?.mute(true);
-                console.log("Connected: ", session.current?.transport);
-            }).catch(setErrored);
-        });
+        const token = await getToken();
+        console.log("Token: ", token);
+        await session.current.connect({apiKey: token});
+        session.current.mute(true);
+        console.log("Connected: ", session.current.transport);
+    }, [drawingTools, writingTools, computingTools]);
+
+    /* create once */
+    useEffect(() => {
+        // Only create a single session
+        if (session.current) return;
+
+        createSession().catch(setErrored);
 
         return () => session.current?.close();
-    }, [drawingTools, writingTools, computingTools]);
+    }, [createSession]);
 
     /* commands that UI can call */
     const mute = () => {
@@ -122,45 +121,7 @@ export function useRealtimeAgent() {
 
             console.log("Reconnecting session");
 
-            /* 1. Create the agent and session */
-            const assistantAgent = new RealtimeAgent({
-                name: "Assistant",
-                instructions:
-                    "If you are asked to draw something, don't say it; instead use Drawing tools.\n" +
-                    "If you are asked to write something, don't say it; instead use the Writing tools.\n" +
-                    "If you are asked about the computer, dont say it; instead use the Computing tools.\n",
-                tools: [...drawingTools, ...writingTools, ...computingTools],
-            });
-
-            session.current = new RealtimeSession(assistantAgent, {
-                model: "gpt-4o-realtime-preview-2025-06-03",
-                tracingDisabled: true,
-                config: {
-                    voice: "ash"
-                }
-            });
-
-            /* 2. Wire state updates */
-            session.current.on("audio_start", () => setSpeaking(true));
-            session.current.on("audio_stopped", () => setSpeaking(false));
-            session.current.on("error", (e) => setErrored(String(e)));
-            session.current.on("agent_tool_end", () => {
-                setWorking(false);
-            });
-            session.current.on("agent_tool_start", (_, _agent, tool) => {
-                setWorking(true);
-
-                if (writingTools.map(t => t.name).includes(tool.name)) setView(ViewType.WRITING);
-                else if (drawingTools.map(t => t.name).includes(tool.name)) setView(ViewType.DRAWING);
-                else if (computingTools.map(t => t.name).includes(tool.name)) setView(ViewType.COMPUTING);
-            });
-
-            /* 3. Connect the session */
-            const token = await getToken();
-            console.log("Token: ", token);
-            await session.current.connect({apiKey: token});
-            session.current.mute(true);
-            console.log("Connected: ", session.current.transport);
+            await createSession();
         } catch (error) {
             console.error("Reconnection failed:", error);
             setErrored(String(error));

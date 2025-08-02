@@ -1,6 +1,6 @@
 "use client";
 
-import { getOpenAiKey, setOpenAiKey } from "@/lib/openAiKey.ts";
+import { getOpenaiKey, setOpenaiKey } from "@/lib/manageOpenaiKey.ts";
 import React, { useEffect, useState } from "react";
 
 interface SettingsViewProps {
@@ -11,9 +11,10 @@ export default function SettingsView({onKeySaved}: SettingsViewProps) {
     const [key, setKey] = useState("");
     const [show, setShow] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        getOpenAiKey().then((k) => k && setKey(k));
+        getOpenaiKey().then((k) => k && setKey(k));
     }, []);
 
     return (
@@ -45,9 +46,13 @@ export default function SettingsView({onKeySaved}: SettingsViewProps) {
                             className="px-3 py-1 bg-blue-600 text-white rounded"
                             onClick={async () => {
                                 setSaving(true);
+                                setError(null);
                                 try {
-                                    await setOpenAiKey(key);
+                                    await setOpenaiKey(key);
                                     await onKeySaved?.();
+                                } catch (err) {
+                                    console.error("Failed to save API key:", err);
+                                    setError("Failed to save API key. Please try again.");
                                 } finally {
                                     setSaving(false);
                                 }
@@ -57,6 +62,11 @@ export default function SettingsView({onKeySaved}: SettingsViewProps) {
                         </button>
                     )}
                 </div>
+                {error && (
+                    <div className="mt-2 text-red-400 text-xs">
+                        {error}
+                    </div>
+                )}
             </div>
         </div>
     );
