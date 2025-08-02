@@ -3,10 +3,10 @@
 import ComputerView from "@/components/computer/ComputerView.tsx";
 import ExcalidrawView from "@/components/excalidraw/ExcalidrawView.tsx";
 import LexicalView from "@/components/lexical/LexicalView.tsx";
+import SettingsView from "@/components/settings/SettingsView.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import KeyIcon from "@/components/icons/KeyIcon.tsx";
-import OpenAiKeyDialog from "@/components/dashboard/OpenAiKeyDialog.tsx";
 import { useRealtimeAgent, ViewType } from "@/hooks/useRealtimeAgent.ts";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
@@ -20,7 +20,6 @@ import React, { useEffect, useRef, useState } from "react";
 
 export default function Dashboard() {
     const {listening, speaking, toggleListening, working, view, selectView} = useRealtimeAgent();
-    const [showKeyDialog, setShowKeyDialog] = useState(false);
 
     const minSidebar = 100;
     const defaultSidebar = 350;
@@ -74,11 +73,12 @@ export default function Dashboard() {
                         onClick={() => selectView(ViewType.COMPUTING)}
                     >Desktop</button>
                     <button
-                        className="px-2 py-1 text-gray-500"
-                        onClick={() => setShowKeyDialog(true)}
-                        aria-label="Set OpenAI API Key"
+                        className={`px-2 py-1 flex items-center gap-1 ${view === ViewType.SETTINGS ? "text-white" : "text-gray-500"}`}
+                        onClick={() => selectView(ViewType.SETTINGS)}
+                        aria-label="Settings"
                     >
                         <KeyIcon className="w-4 h-4" />
+                        Settings
                     </button>
                 </div>
                 <div className="flex-1 overflow-hidden relative">
@@ -91,9 +91,11 @@ export default function Dashboard() {
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.COMPUTING })}>
                         <ComputerView />
                     </div>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.SETTINGS })}>
+                        <SettingsView />
+                    </div>
                 </div>
             </div>
-            <OpenAiKeyDialog open={showKeyDialog} onClose={() => setShowKeyDialog(false)} />
         </div>
     );
 }

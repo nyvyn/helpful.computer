@@ -8,7 +8,8 @@ import { useEffect, useRef, useState } from "react";
 export enum ViewType {
     DRAWING = "drawing",
     WRITING = "writing",
-    COMPUTING = "computing"
+    COMPUTING = "computing",
+    SETTINGS = "settings"
 }
 
 /**
