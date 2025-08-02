@@ -6,6 +6,7 @@ import { getOpenAiKey, setOpenAiKey } from "@/lib/openAiKey.ts";
 export default function SettingsView() {
     const [key, setKey] = useState("");
     const [show, setShow] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         getOpenAiKey().then((k) => k && setKey(k));
@@ -30,14 +31,26 @@ export default function SettingsView() {
                         />
                         Show key
                     </label>
-                    <button
-                        className="px-3 py-1 bg-blue-600 text-white rounded"
-                        onClick={async () => {
-                            await setOpenAiKey(key);
-                        }}
-                    >
-                        Save
-                    </button>
+                    {saving ? (
+                        <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-gray-400 text-xs">Saving...</span>
+                        </div>
+                    ) : (
+                        <button
+                            className="px-3 py-1 bg-blue-600 text-white rounded"
+                            onClick={async () => {
+                                setSaving(true);
+                                try {
+                                    await setOpenAiKey(key);
+                                } finally {
+                                    setSaving(false);
+                                }
+                            }}
+                        >
+                            Save
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

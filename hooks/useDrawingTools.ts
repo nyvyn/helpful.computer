@@ -3,6 +3,7 @@
 import { ToolContext } from "@/components/tool/ToolContext.tsx";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
+import { getOpenAiKey } from "@/lib/openAiKey.ts";
 import OpenAI from "openai";
 import { useContext, useEffect, useMemo, useRef } from "react";
 import { z } from "zod";
@@ -21,12 +22,22 @@ const schema = z.object({
 export default function useDrawingTools() {
     const ctx = useContext(ToolContext);
     const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
-    const openai = useMemo(() => new OpenAI({
-        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-        dangerouslyAllowBrowser: true,
-    }), []);
+    const openai = useRef<OpenAI | null>(null);
 
     useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
+
+    useEffect(() => {
+        const initOpenAI = async () => {
+            const apiKey = await getOpenAiKey();
+            if (apiKey) {
+                openai.current = new OpenAI({
+                    apiKey,
+                    dangerouslyAllowBrowser: true,
+                });
+            }
+        };
+        initOpenAI();
+    }, []);
 
     const drawCanvasTool = useMemo(() => tool({
         name: "Update Canvas",
@@ -38,7 +49,10 @@ export default function useDrawingTools() {
         strict: true,
         execute: async ({ instructions }: z.infer<typeof schema>) => {
             try {
-                const completion = await openai.chat.completions.create({
+                if (!openai.current) {
+                    return "OpenAI client not initialized";
+                }
+                const completion = await openai.current.chat.completions.create({
                     model: "gpt-4.1",
                     messages: [
                         {
@@ -83,7 +97,7 @@ export default function useDrawingTools() {
                 return err instanceof Error ? err.message : String(err);
             }
         },
-    }), [openai]);
+    }), []);
 
     
     const readCanvasTool = useMemo(() => tool({

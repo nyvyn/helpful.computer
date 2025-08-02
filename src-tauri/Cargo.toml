@@ -14,6 +14,9 @@ edition = "2021"
 name = "helpful_computer_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
+[profile.dev.package.scrypt]
+opt-level = 3
+
 [build-dependencies]
 tauri-build = { version = "2.2.0", features = [] }
 

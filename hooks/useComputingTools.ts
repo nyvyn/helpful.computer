@@ -2,9 +2,10 @@
 import { ToolContext } from "@/components/tool/ToolContext.tsx";
 import { tool } from "@openai/agents-realtime";
 import { invoke } from "@tauri-apps/api/core";
+import { getOpenAiKey } from "@/lib/openAiKey.ts";
 import OpenAI from "openai";
 import { ResponseComputerToolCall } from "openai/resources/responses/responses";
-import { useCallback, useContext, useMemo } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { z } from "zod";
 
 type DesktopAction =
@@ -20,10 +21,20 @@ type DesktopAction =
 
 export default function useComputingTools() {
     const ctx = useContext(ToolContext);
-    const openai = useMemo(() => new OpenAI({
-        apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-        dangerouslyAllowBrowser: true,
-    }), []);
+    const openai = useRef<OpenAI | null>(null);
+
+    useEffect(() => {
+        const initOpenAI = async () => {
+            const apiKey = await getOpenAiKey();
+            if (apiKey) {
+                openai.current = new OpenAI({
+                    apiKey,
+                    dangerouslyAllowBrowser: true,
+                });
+            }
+        };
+        initOpenAI();
+    }, []);
 
     /** Low-level desktop actions for the CUA agent. */
     const handleDesktopAction = useCallback(async (action: DesktopAction) => {
@@ -68,7 +79,11 @@ export default function useComputingTools() {
             const shot = await invoke<string>("capture_screenshot");
             ctx?.setScreenshot(shot);
 
-            let response = await openai.responses.create({
+            if (!openai.current) {
+                throw new Error("OpenAI client not initialized");
+            }
+
+            let response = await openai.current.responses.create({
                 model: "computer-use-preview",
                 tools: [{ type: "computer-preview", display_width: screenInfo.width, display_height: screenInfo.height, environment }],
                 input: [
@@ -95,7 +110,7 @@ export default function useComputingTools() {
                 const shot = await invoke<string>("capture_screenshot");
                 ctx?.setScreenshot(shot);
 
-                response = await openai.responses.create({
+                response = await openai.current.responses.create({
                     model: "computer-use-preview",
                     previous_response_id: response.id,
                     tools: [{ type: "computer-preview", display_width: screenInfo.width, display_height: screenInfo.height, environment }],
@@ -108,7 +123,7 @@ export default function useComputingTools() {
                 });
             }
         },
-        [openai, ctx, handleDesktopAction],
+        [ctx, handleDesktopAction],
     );
 
     const interactComputerTool = useMemo(
@@ -142,7 +157,11 @@ export default function useComputingTools() {
                         const screenshot = await invoke<string>("capture_screenshot");
                         ctx?.setScreenshot(screenshot);
 
-                        const response = await openai.responses.create({
+                        if (!openai.current) {
+                            throw new Error("OpenAI client not initialized");
+                        }
+
+                        const response = await openai.current.responses.create({
                             model: "gpt-4.1-mini",
                             input: [{
                                 role: "user",
@@ -165,7 +184,7 @@ export default function useComputingTools() {
                     }
                 },
             }),
-        [ctx, openai],
+        [ctx],
     );
 
     return [interactComputerTool, describeComputerTool] as const;

@@ -6,7 +6,6 @@ import LexicalView from "@/components/lexical/LexicalView.tsx";
 import SettingsView from "@/components/settings/SettingsView.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
-import KeyIcon from "@/components/icons/KeyIcon.tsx";
 import { useRealtimeAgent, ViewType } from "@/hooks/useRealtimeAgent.ts";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
@@ -59,7 +58,7 @@ export default function Dashboard() {
                 onMouseDown={() => (resizing.current = true)}
             />
             <div className="flex-1 flex flex-col">
-                <div className="p-1 flex gap-2 justify-end text-sm">
+                <div className="p-1 pr-4 flex gap-2 justify-end text-sm">
                     <button
                         className={`px-2 py-1 ${view === ViewType.DRAWING ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.DRAWING)}
@@ -73,11 +72,10 @@ export default function Dashboard() {
                         onClick={() => selectView(ViewType.COMPUTING)}
                     >Desktop</button>
                     <button
-                        className={`px-2 py-1 flex items-center gap-1 ${view === ViewType.SETTINGS ? "text-white" : "text-gray-500"}`}
+                        className={`px-2 py-1 ${view === ViewType.SETTINGS ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.SETTINGS)}
                         aria-label="Settings"
                     >
-                        <KeyIcon className="w-4 h-4" />
                         Settings
                     </button>
                 </div>

@@ -25,3 +25,4 @@ dist-ssr
 
 # Aider
 .aider*
+/tsconfig.tsbuildinfo
