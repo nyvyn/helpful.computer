@@ -26,7 +26,7 @@ export default function useComputingTools() {
     }), []);
 
     /** Low-level desktop actions for the CUA agent. */
-    const runDesktopAction = useCallback(async (action: DesktopAction) => {
+    const handleDesktopAction = useCallback(async (action: DesktopAction) => {
         switch (action.type) {
             case "click":
                 await invoke("click_at", { x: action.x, y: action.y, button: action.button ?? "left" });
@@ -44,8 +44,7 @@ export default function useComputingTools() {
                 await invoke("move_mouse_to", { x: action.x, y: action.y });
                 break;
             case "screenshot":
-                const shot = await invoke<string>("capture_screenshot");
-                ctx?.setScreenshot(shot);
+                // Nothing to do as screenshot is handled in runCUA
                 break;
             case "scroll":
                 await invoke("scroll_at", { x: action.x, y: action.y, scrollX: action.scroll_x, scrollY: action.scroll_y });
@@ -57,9 +56,8 @@ export default function useComputingTools() {
                 await new Promise(r => setTimeout(r, 2_000));
                 break;
         }
-    }, [ctx]);
+    }, []);
 
-    /** Full CUA loop – used only by Interact Computer. */
     const runCUA = useCallback(
         async (instruction: string): Promise<string> => {
             // Get screen dimensions and OS info from Rust backend
@@ -80,7 +78,7 @@ export default function useComputingTools() {
                 if (!call)
                     return response.output.filter((o) => o.type === "message").map((o) => o.content).join("\n");
 
-                await runDesktopAction(call.action);
+                await handleDesktopAction(call.action);
 
                 const shot = await invoke<string>("capture_screenshot");
                 ctx?.setScreenshot(shot);
@@ -98,41 +96,14 @@ export default function useComputingTools() {
                 });
             }
         },
-        [openai, ctx, runDesktopAction],
-    );
-
-    /** Evaluate Computer – screenshot + GPT-4o vision. */
-    const evaluateDesktop = useCallback(
-        async (query: string): Promise<string> => {
-            const screenshot = await invoke<string>("capture_screenshot");
-            ctx?.setScreenshot(screenshot);
-
-            const response = await openai.responses.create({
-                model: "gpt-4.1-mini",
-                input: [{
-                        role: "user",
-                        content: [
-                            { type: "input_text", text: query },
-                            {
-                                type: "input_image",
-                                image_url: `data:image/png;base64,${screenshot}`,
-                                detail: "high",
-                            }
-                        ],
-                    },
-                ],
-            });
-
-            return response.output_text;
-        },
-        [openai, ctx],
+        [openai, ctx, handleDesktopAction],
     );
 
     const interactComputerTool = useMemo(
         () =>
             tool({
                 name: "Interact Computer",
-                description: "Enacts a series of commands and interactions with the desktop.",
+                description: "Control the users's desktop.",
                 parameters: z.object({ instruction: z.string().describe("Instructions on what to accomplish") }).strict(),
                 strict: true,
                 execute: async ({ instruction }: { instruction: string }) => {
@@ -151,19 +122,38 @@ export default function useComputingTools() {
         () =>
             tool({
                 name: "Evaluate Computer",
-                description: "Responds with a description of the current desktop state.",
+                description: "Describe the user's desktop.",
                 parameters: z.object({ query: z.string().describe("Instructions on what to evaluate.") }).strict(),
                 strict: true,
                 execute: async ({ query }: { query: string }) => {
                     try {
-                        return await evaluateDesktop(query);
+                        const screenshot = await invoke<string>("capture_screenshot");
+                        ctx?.setScreenshot(screenshot);
+
+                        const response = await openai.responses.create({
+                            model: "gpt-4.1-mini",
+                            input: [{
+                                role: "user",
+                                content: [
+                                    { type: "input_text", text: query },
+                                    {
+                                        type: "input_image",
+                                        image_url: `data:image/png;base64,${screenshot}`,
+                                        detail: "high",
+                                    }
+                                ],
+                            },
+                            ],
+                        });
+
+                        return response.output_text;
                     } catch (err) {
                         console.error("Evaluate Computer tool error:", err);
                         return err instanceof Error ? err.message : String(err);
                     }
                 },
             }),
-        [evaluateDesktop],
+        [ctx, openai],
     );
 
     return [interactComputerTool, describeComputerTool] as const;
