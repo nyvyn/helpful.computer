@@ -1,17 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/openAiKey.ts", () => ({
+    getOpenAiKey: vi.fn().mockResolvedValue("test-key")
+}));
+
 import { getToken } from "./getToken.ts";
 
 describe("getToken", () => {
-    beforeEach(() => {
-        vi.restoreAllMocks();
-    });
-
     it("calls OpenAI API and returns a token", async () => {
         const mockResponse = { client_secret: { value: "test" } };
         const json = vi.fn().mockResolvedValue(mockResponse);
         global.fetch = vi.fn().mockResolvedValue({json} as never);
-
-        process.env.NEXT_PUBLIC_OPENAI_API_KEY = "test-key";
 
         const result = await getToken();
 

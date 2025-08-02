@@ -2,6 +2,7 @@ mod cua;
 use cua::*;
 use serde::{Deserialize, Serialize};
 use xcap::image;
+use argon2::{hash_raw, Config, Variant, Version};
 
 #[derive(Serialize, Deserialize)]
 pub struct ScreenInfo {
@@ -106,8 +107,20 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_macos_permissions::init())
+        .plugin(tauri_plugin_stronghold::Builder::new(|password| {
+            let config = Config {
+                lanes: 4,
+                mem_cost: 10_000,
+                time_cost: 10,
+                variant: Variant::Argon2id,
+                version: Version::Version13,
+                ..Default::default()
+            };
+            let salt = b"helpful-computer";
+            hash_raw(password.as_ref(), salt, &config).expect("failed to hash password")
+        }).build())
         .invoke_handler(tauri::generate_handler![
-            run_applescript, 
+            run_applescript,
             capture_screenshot,
             get_screen_dimensions,
             get_os_info,
