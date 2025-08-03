@@ -1,6 +1,6 @@
 "use client";
 import { ToolContext } from "@/components/tool/ToolContext.tsx";
-import { getOpenaiKey } from "@/lib/manageOpenaiKey.ts";
+import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { tool } from "@openai/agents-realtime";
 import { invoke } from "@tauri-apps/api/core";
 import OpenAI from "openai";
@@ -65,7 +65,7 @@ export default function useComputingTools() {
             const shot = await invoke<string>("capture_screenshot");
             ctx?.setScreenshot(shot);
 
-            const apiKey = await getOpenaiKey();
+            const apiKey = await getOpenAIKey();
             if (!apiKey) {
                 return "OpenAI API key not set";
             }
@@ -155,7 +155,7 @@ export default function useComputingTools() {
                         const screenshot = await invoke<string>("capture_screenshot");
                         ctx?.setScreenshot(screenshot);
 
-                        const apiKey = await getOpenaiKey();
+                        const apiKey = await getOpenAIKey();
                         if (!apiKey) {
                             return "OpenAI API key not set";
                         }

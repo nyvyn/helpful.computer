@@ -1,7 +1,8 @@
 import useComputingTools from "@/hooks/useComputingTools.ts";
 import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
-import { getToken } from "@/lib/getToken.ts";
+
+import { getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -67,9 +68,11 @@ export function useRealtimeAgent() {
             else if (computingTools.map(t => t.name).includes(tool.name)) setView(ViewType.COMPUTING);
         });
 
-        const token = await getToken();
+        const token = await getOpenAISessionToken();
         console.log("Token: ", token);
-        await session.current.connect({apiKey: token});
+        await session.current.connect({
+            apiKey: token
+        });
         session.current.mute(true);
         console.log("Connected: ", session.current.transport);
     }, [drawingTools, writingTools, computingTools]);

@@ -1,7 +1,7 @@
 "use client";
 
 import { ToolContext } from "@/components/tool/ToolContext.tsx";
-import { getOpenaiKey } from "@/lib/manageOpenaiKey.ts";
+import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
@@ -35,7 +35,7 @@ export default function useDrawingTools() {
         strict: true,
         execute: async ({ instructions }: z.infer<typeof schema>) => {
             try {
-                const apiKey = await getOpenaiKey();
+                const apiKey = await getOpenAIKey();
                 if (!apiKey) {
                     return "OpenAI API key not set";
                 }
