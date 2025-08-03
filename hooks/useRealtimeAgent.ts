@@ -3,7 +3,7 @@ import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
 
 import { AppContext } from "@/components/context/AppContext.tsx";
-import { getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
+import { getOpenAIKey, getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
@@ -69,6 +69,13 @@ export function useRealtimeAgent() {
             else if (computingTools.map(t => t.name).includes(tool.name)) setView(ViewType.COMPUTING);
         });
 
+        const openAIKey = await getOpenAIKey();
+        if (!openAIKey) {
+            ctx?.setErrored("OpenAI api key not set.");
+            setView(ViewType.SETTINGS);
+            return;
+        }
+
         const token = await getOpenAISessionToken();
         if (!token) {
             ctx?.setErrored("OpenAI api key may be incorrect.");
@@ -94,11 +101,21 @@ export function useRealtimeAgent() {
 
     /* commands that UI can call */
     const mute = () => {
+        if (session.current?.transport.status !== "connected") {
+            ctx?.setErrored("Session not connected. Verify key set.");
+            return;
+        }
+
         session.current?.mute(true);
         console.log("Muted: ", session.current?.transport);
         setListening(false);
     };
     const unmute = () => {
+        if (session.current?.transport.status !== "connected") {
+            ctx?.setErrored("Session not connected. Verify key set.");
+            return;
+        }
+
         session.current?.mute(false);
         session.current?.interrupt();
         console.log("Unmuted: ", session.current?.transport);
