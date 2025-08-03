@@ -1,6 +1,6 @@
 "use client";
 
-import { ToolContext } from "@/components/tool/ToolContext.tsx";
+import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS, } from "@lexical/markdown";
 import { tool } from "@openai/agents-realtime";
@@ -25,7 +25,7 @@ const schema = z.object({
  * Provide OpenAI tools for reading and writing Markdown via Lexical.
  */
 export default function useWritingTools() {
-    const ctx = useContext(ToolContext);
+    const ctx = useContext(AppContext);
     const editorRef = useRef<LexicalEditor | null>(null);
 
     /*

@@ -1,5 +1,5 @@
 "use client";
-import { ToolContext } from "@/components/tool/ToolContext.tsx";
+import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { tool } from "@openai/agents-realtime";
 import { invoke } from "@tauri-apps/api/core";
@@ -20,7 +20,7 @@ type DesktopAction =
     | ResponseComputerToolCall.Wait;
 
 export default function useComputingTools() {
-    const ctx = useContext(ToolContext);
+    const ctx = useContext(AppContext);
 
     /** Low-level desktop actions for the CUA agent. */
     const handleDesktopAction = useCallback(async (action: DesktopAction) => {

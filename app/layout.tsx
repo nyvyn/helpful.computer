@@ -1,4 +1,4 @@
-import { ToolProvider } from "@/components/tool/ToolContext.tsx";
+import { AppProvider } from "@/components/context/AppContext.tsx";
 import { ReactNode } from "react";
 import { Toaster } from "sonner";
 
@@ -16,7 +16,7 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body>
-        <ToolProvider>{children}</ToolProvider>
+        <AppProvider>{children}</AppProvider>
         <Toaster position="top-left" style={{ maxWidth: "24px" }}/>
         </body>
         </html>

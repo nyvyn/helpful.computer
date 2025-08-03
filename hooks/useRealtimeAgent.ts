@@ -2,9 +2,10 @@ import useComputingTools from "@/hooks/useComputingTools.ts";
 import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
 
+import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 export enum ViewType {
     DRAWING = "drawing",
@@ -22,7 +23,7 @@ export enum ViewType {
  */
 
 export function useRealtimeAgent() {
-    const [errored, setErrored] = useState<boolean | string>(false);
+    const ctx = useContext(AppContext);
     const [listening, setListening] = useState(false);
     const [speaking, setSpeaking] = useState(false);
     const [working, setWorking] = useState(false);
@@ -56,7 +57,7 @@ export function useRealtimeAgent() {
 
         session.current.on("audio_start", () => setSpeaking(true));
         session.current.on("audio_stopped", () => setSpeaking(false));
-        session.current.on("error", (e) => setErrored(String(e)));
+        session.current.on("error", (e) => ctx?.setErrored(String(e)));
         session.current.on("agent_tool_end", () => {
             setWorking(false);
         });
@@ -69,23 +70,27 @@ export function useRealtimeAgent() {
         });
 
         const token = await getOpenAISessionToken();
-        console.log("Token: ", token);
+        if (!token) {
+            ctx?.setErrored("OpenAI api key may be incorrect.");
+            setView(ViewType.SETTINGS);
+            return;
+        }
         await session.current.connect({
             apiKey: token
         });
         session.current.mute(true);
         console.log("Connected: ", session.current.transport);
-    }, [drawingTools, writingTools, computingTools]);
+    }, [drawingTools, writingTools, computingTools, ctx]);
 
     /* create once */
     useEffect(() => {
         // Only create a single session
         if (session.current) return;
 
-        createSession().catch(setErrored);
+        createSession().catch(ctx?.setErrored);
 
         return () => session.current?.close();
-    }, [createSession]);
+    }, [createSession, ctx]);
 
     /* commands that UI can call */
     const mute = () => {
@@ -117,7 +122,7 @@ export function useRealtimeAgent() {
             }
 
             // Reset states
-            setErrored(false);
+            ctx?.setErrored(false);
             setListening(false);
             setSpeaking(false);
             setWorking(false);
@@ -127,12 +132,11 @@ export function useRealtimeAgent() {
             await createSession();
         } catch (error) {
             console.error("Reconnection failed:", error);
-            setErrored(String(error));
+            ctx?.setErrored(String(error));
         }
     };
 
     return {
-        errored,
         listening,
         speaking,
         toggleListening,
