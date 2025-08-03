@@ -106,8 +106,9 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_macos_permissions::init())
+        .plugin(tauri_plugin_secure_storage::init())
         .invoke_handler(tauri::generate_handler![
-            run_applescript, 
+            run_applescript,
             capture_screenshot,
             get_screen_dimensions,
             get_os_info,

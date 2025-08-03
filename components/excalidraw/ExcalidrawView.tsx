@@ -1,6 +1,6 @@
 "use client";
 
-import { ToolContext } from "../tool/ToolContext.tsx";
+import { AppContext } from "../context/AppContext.tsx";
 import ExcalidrawWrapper from "components/excalidraw/ExcalidrawWrapper.tsx";
 
 /**
@@ -9,7 +9,7 @@ import ExcalidrawWrapper from "components/excalidraw/ExcalidrawWrapper.tsx";
 import React, { useContext } from "react";
 
 export default function ExcalidrawView() {
-    const ctx = useContext(ToolContext);
+    const ctx = useContext(AppContext);
 
     return (
         <div className="w-full h-full border border-gray-700">

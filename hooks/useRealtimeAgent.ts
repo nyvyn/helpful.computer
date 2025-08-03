@@ -1,14 +1,17 @@
+import useComputingTools from "@/hooks/useComputingTools.ts";
 import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
-import useComputingTools from "@/hooks/useComputingTools.ts";
-import { getToken } from "@/lib/getToken.ts";
+
+import { AppContext } from "@/components/context/AppContext.tsx";
+import { getOpenAIKey, getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 export enum ViewType {
     DRAWING = "drawing",
     WRITING = "writing",
-    COMPUTING = "computing"
+    COMPUTING = "computing",
+    SETTINGS = "settings"
 }
 
 /**
@@ -20,7 +23,7 @@ export enum ViewType {
  */
 
 export function useRealtimeAgent() {
-    const [errored, setErrored] = useState<boolean | string>(false);
+    const ctx = useContext(AppContext);
     const [listening, setListening] = useState(false);
     const [speaking, setSpeaking] = useState(false);
     const [working, setWorking] = useState(false);
@@ -32,14 +35,9 @@ export function useRealtimeAgent() {
     const writingTools = useWritingTools();
     const computingTools = useComputingTools();
 
-    /* create once */
-    useEffect(() => {
-        // Only create a single session
-        if (session.current) return;
-
+    const createSession = useCallback(async () => {
         console.log("Creating session");
 
-        /* 1. Create the agent and session */
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions:
@@ -57,10 +55,9 @@ export function useRealtimeAgent() {
             }
         });
 
-        /* 2. Wire state updates */
         session.current.on("audio_start", () => setSpeaking(true));
         session.current.on("audio_stopped", () => setSpeaking(false));
-        session.current.on("error", (e) => setErrored(String(e)));
+        session.current.on("error", (e) => ctx?.setErrored(String(e)));
         session.current.on("agent_tool_end", () => {
             setWorking(false);
         });
@@ -72,25 +69,53 @@ export function useRealtimeAgent() {
             else if (computingTools.map(t => t.name).includes(tool.name)) setView(ViewType.COMPUTING);
         });
 
-        /* 3. Connect the session */
-        getToken().then((token) => {
-            console.log("Token: ", token);
-            session.current?.connect({apiKey: token}).then(() => {
-                session.current?.mute(true);
-                console.log("Connected: ", session.current?.transport);
-            }).catch(setErrored);
+        const openAIKey = await getOpenAIKey();
+        if (!openAIKey) {
+            ctx?.setErrored("OpenAI api key not set.");
+            setView(ViewType.SETTINGS);
+            return;
+        }
+
+        const token = await getOpenAISessionToken();
+        if (!token) {
+            ctx?.setErrored("OpenAI api key may be incorrect.");
+            setView(ViewType.SETTINGS);
+            return;
+        }
+        await session.current.connect({
+            apiKey: token
         });
+        session.current.mute(true);
+        console.log("Connected: ", session.current.transport);
+    }, [drawingTools, writingTools, computingTools, ctx]);
+
+    /* create once */
+    useEffect(() => {
+        // Only create a single session
+        if (session.current) return;
+
+        createSession().catch(ctx?.setErrored);
 
         return () => session.current?.close();
-    }, [drawingTools, writingTools, computingTools]);
+    }, [createSession, ctx]);
 
     /* commands that UI can call */
     const mute = () => {
+        if (session.current?.transport.status !== "connected") {
+            ctx?.setErrored("Session not connected. Verify key set.");
+            return;
+        }
+
         session.current?.mute(true);
         console.log("Muted: ", session.current?.transport);
         setListening(false);
     };
     const unmute = () => {
+        if (session.current?.transport.status !== "connected") {
+            ctx?.setErrored("Session not connected. Verify key set.");
+            return;
+        }
+
         session.current?.mute(false);
         session.current?.interrupt();
         console.log("Unmuted: ", session.current?.transport);
@@ -105,8 +130,30 @@ export function useRealtimeAgent() {
 
     const selectView = (s: ViewType) => setView(s);
 
+    const reconnect = async () => {
+        try {
+            // Close existing session
+            if (session.current) {
+                session.current.close();
+                session.current = null;
+            }
+
+            // Reset states
+            ctx?.setErrored(false);
+            setListening(false);
+            setSpeaking(false);
+            setWorking(false);
+
+            console.log("Reconnecting session");
+
+            await createSession();
+        } catch (error) {
+            console.error("Reconnection failed:", error);
+            ctx?.setErrored(String(error));
+        }
+    };
+
     return {
-        errored,
         listening,
         speaking,
         toggleListening,
@@ -114,5 +161,6 @@ export function useRealtimeAgent() {
         sendMessage,
         view,
         selectView,
+        reconnect,
     };
 }

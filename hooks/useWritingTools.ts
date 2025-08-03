@@ -1,11 +1,13 @@
 "use client";
-import { ToolContext } from "@/components/tool/ToolContext.tsx";
+
+import { AppContext } from "@/components/context/AppContext.tsx";
+import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS, } from "@lexical/markdown";
 import { tool } from "@openai/agents-realtime";
 import { $getRoot, LexicalEditor } from "lexical";
+import OpenAI from "openai";
 import { useContext, useEffect, useMemo, useRef } from "react";
 import { z } from "zod";
-import OpenAI from "openai";
 
 /**
  * Bind Lexical editor operations to OpenAI agent tools.
@@ -23,7 +25,7 @@ const schema = z.object({
  * Provide OpenAI tools for reading and writing Markdown via Lexical.
  */
 export default function useWritingTools() {
-    const ctx = useContext(ToolContext);
+    const ctx = useContext(AppContext);
     const editorRef = useRef<LexicalEditor | null>(null);
 
     /*
@@ -61,10 +63,17 @@ export default function useWritingTools() {
         strict: true,
         execute: async ({ instructions }: z.infer<typeof schema>) => {
             try {
+                const apiKey = await getOpenAIKey();
+                if (!apiKey) {
+                    return "OpenAI API key not set";
+                }
                 const openai = new OpenAI({
-                    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+                    apiKey: apiKey!,
                     dangerouslyAllowBrowser: true,
                 });
+                if (!openai) {
+                    return "OpenAI client not initialized";
+                }
 
                 const completion = await openai.chat.completions.create({
                     model: "gpt-4.1",
