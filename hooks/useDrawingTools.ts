@@ -1,7 +1,7 @@
 "use client";
 
-import { ToolContext } from "@/components/tool/ToolContext.tsx";
-import { getOpenaiKey } from "@/lib/manageOpenaiKey.ts";
+import { AppContext } from "@/components/context/AppContext.tsx";
+import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
@@ -20,7 +20,7 @@ const schema = z.object({
  * The returned array contains a draw and read tool that operate on the canvas.
  */
 export default function useDrawingTools() {
-    const ctx = useContext(ToolContext);
+    const ctx = useContext(AppContext);
     const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
 
     useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
@@ -35,7 +35,7 @@ export default function useDrawingTools() {
         strict: true,
         execute: async ({ instructions }: z.infer<typeof schema>) => {
             try {
-                const apiKey = await getOpenaiKey();
+                const apiKey = await getOpenAIKey();
                 if (!apiKey) {
                     return "OpenAI API key not set";
                 }

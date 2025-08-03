@@ -9,6 +9,6 @@
     "core:default",
     "opener:default",
     "macos-permissions:default",
-    "stronghold:default"
+    "secure-storage:default"
   ]
 }

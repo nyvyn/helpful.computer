@@ -1,9 +1,11 @@
 import useComputingTools from "@/hooks/useComputingTools.ts";
 import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
-import { getToken } from "@/lib/getToken.ts";
+
+import { AppContext } from "@/components/context/AppContext.tsx";
+import { getOpenAIKey, getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 export enum ViewType {
     DRAWING = "drawing",
@@ -21,7 +23,7 @@ export enum ViewType {
  */
 
 export function useRealtimeAgent() {
-    const [errored, setErrored] = useState<boolean | string>(false);
+    const ctx = useContext(AppContext);
     const [listening, setListening] = useState(false);
     const [speaking, setSpeaking] = useState(false);
     const [working, setWorking] = useState(false);
@@ -55,7 +57,7 @@ export function useRealtimeAgent() {
 
         session.current.on("audio_start", () => setSpeaking(true));
         session.current.on("audio_stopped", () => setSpeaking(false));
-        session.current.on("error", (e) => setErrored(String(e)));
+        session.current.on("error", (e) => ctx?.setErrored(String(e)));
         session.current.on("agent_tool_end", () => {
             setWorking(false);
         });
@@ -67,30 +69,53 @@ export function useRealtimeAgent() {
             else if (computingTools.map(t => t.name).includes(tool.name)) setView(ViewType.COMPUTING);
         });
 
-        const token = await getToken();
-        console.log("Token: ", token);
-        await session.current.connect({apiKey: token});
+        const openAIKey = await getOpenAIKey();
+        if (!openAIKey) {
+            ctx?.setErrored("OpenAI api key not set.");
+            setView(ViewType.SETTINGS);
+            return;
+        }
+
+        const token = await getOpenAISessionToken();
+        if (!token) {
+            ctx?.setErrored("OpenAI api key may be incorrect.");
+            setView(ViewType.SETTINGS);
+            return;
+        }
+        await session.current.connect({
+            apiKey: token
+        });
         session.current.mute(true);
         console.log("Connected: ", session.current.transport);
-    }, [drawingTools, writingTools, computingTools]);
+    }, [drawingTools, writingTools, computingTools, ctx]);
 
     /* create once */
     useEffect(() => {
         // Only create a single session
         if (session.current) return;
 
-        createSession().catch(setErrored);
+        createSession().catch(ctx?.setErrored);
 
         return () => session.current?.close();
-    }, [createSession]);
+    }, [createSession, ctx]);
 
     /* commands that UI can call */
     const mute = () => {
+        if (session.current?.transport.status !== "connected") {
+            ctx?.setErrored("Session not connected. Verify key set.");
+            return;
+        }
+
         session.current?.mute(true);
         console.log("Muted: ", session.current?.transport);
         setListening(false);
     };
     const unmute = () => {
+        if (session.current?.transport.status !== "connected") {
+            ctx?.setErrored("Session not connected. Verify key set.");
+            return;
+        }
+
         session.current?.mute(false);
         session.current?.interrupt();
         console.log("Unmuted: ", session.current?.transport);
@@ -114,7 +139,7 @@ export function useRealtimeAgent() {
             }
 
             // Reset states
-            setErrored(false);
+            ctx?.setErrored(false);
             setListening(false);
             setSpeaking(false);
             setWorking(false);
@@ -124,12 +149,11 @@ export function useRealtimeAgent() {
             await createSession();
         } catch (error) {
             console.error("Reconnection failed:", error);
-            setErrored(String(error));
+            ctx?.setErrored(String(error));
         }
     };
 
     return {
-        errored,
         listening,
         speaking,
         toggleListening,

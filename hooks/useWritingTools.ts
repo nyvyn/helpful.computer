@@ -1,7 +1,7 @@
 "use client";
 
-import { ToolContext } from "@/components/tool/ToolContext.tsx";
-import { getOpenaiKey } from "@/lib/manageOpenaiKey.ts";
+import { AppContext } from "@/components/context/AppContext.tsx";
+import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS, } from "@lexical/markdown";
 import { tool } from "@openai/agents-realtime";
 import { $getRoot, LexicalEditor } from "lexical";
@@ -25,7 +25,7 @@ const schema = z.object({
  * Provide OpenAI tools for reading and writing Markdown via Lexical.
  */
 export default function useWritingTools() {
-    const ctx = useContext(ToolContext);
+    const ctx = useContext(AppContext);
     const editorRef = useRef<LexicalEditor | null>(null);
 
     /*
@@ -63,7 +63,7 @@ export default function useWritingTools() {
         strict: true,
         execute: async ({ instructions }: z.infer<typeof schema>) => {
             try {
-                const apiKey = await getOpenaiKey();
+                const apiKey = await getOpenAIKey();
                 if (!apiKey) {
                     return "OpenAI API key not set";
                 }

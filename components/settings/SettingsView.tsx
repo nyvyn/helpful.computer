@@ -1,6 +1,6 @@
 "use client";
 
-import { getOpenaiKey, setOpenaiKey } from "@/lib/manageOpenaiKey.ts";
+import { getOpenAIKey, setOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import React, { useEffect, useState } from "react";
 
 interface SettingsViewProps {
@@ -14,7 +14,7 @@ export default function SettingsView({onKeySaved}: SettingsViewProps) {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        getOpenaiKey().then((k) => k && setKey(k));
+        getOpenAIKey().then((k) => k && setKey(k));
     }, []);
 
     return (
@@ -48,7 +48,7 @@ export default function SettingsView({onKeySaved}: SettingsViewProps) {
                                 setSaving(true);
                                 setError(null);
                                 try {
-                                    await setOpenaiKey(key);
+                                    await setOpenAIKey(key);
                                     await onKeySaved?.();
                                 } catch (err) {
                                     console.error("Failed to save API key:", err);

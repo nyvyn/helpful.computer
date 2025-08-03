@@ -1,6 +1,6 @@
 "use client";
 
-import { ToolContext } from "@/components/tool/ToolContext.tsx";
+import { AppContext } from "@/components/context/AppContext.tsx";
 import { useContext } from "react";
 
 /**
@@ -10,7 +10,7 @@ import { useContext } from "react";
  * to request a new one from the backend.
  */
 export default function ComputerView() {
-    const ctx = useContext(ToolContext);
+    const ctx = useContext(AppContext);
 
     return (
         <div className="relative w-full h-full bg-gray-900 flex items-center justify-center">
@@ -18,7 +18,7 @@ export default function ComputerView() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={`data:image/png;base64,${ctx.screenshot}`} className="max-w-full max-h-full" alt="screentshot"/>
             ) : (
-                <div className="text-white">Working...</div>
+                <div className="text-white">Idle...</div>
             )}
         </div>
     );
