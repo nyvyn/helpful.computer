@@ -4,6 +4,7 @@ import ComputerView from "@/components/computer/ComputerView.tsx";
 import ExcalidrawView from "@/components/excalidraw/ExcalidrawView.tsx";
 import LexicalView from "@/components/lexical/LexicalView.tsx";
 import SettingsView from "@/components/settings/SettingsView.tsx";
+import BrowserView from "@/components/browser/BrowserView.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import { useRealtimeAgent, ViewType } from "@/hooks/useRealtimeAgent.ts";
@@ -73,6 +74,10 @@ export default function Dashboard() {
                         onClick={() => selectView(ViewType.COMPUTING)}
                     >Desktop</button>
                     <button
+                        className={`px-2 py-1 ${view === ViewType.BROWSING ? "text-white" : "text-gray-500"}`}
+                        onClick={() => selectView(ViewType.BROWSING)}
+                    >Browser</button>
+                    <button
                         className={`px-2 py-1 ${view === ViewType.SETTINGS ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.SETTINGS)}
                         aria-label="Settings"
@@ -89,6 +94,9 @@ export default function Dashboard() {
                     </div>
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.COMPUTING })}>
                         <ComputerView />
+                    </div>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.BROWSING })}>
+                        <BrowserView active={view === ViewType.BROWSING}/>
                     </div>
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.SETTINGS })}>
                         <SettingsView onKeySaved={reconnect}/>

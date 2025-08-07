@@ -3,9 +3,9 @@ import { render } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/manageOpenaiKey.ts", () => ({
-    getOpenaiKey: vi.fn().mockResolvedValue("test-key"),
-    setOpenaiKey: vi.fn().mockResolvedValue(void 0),
+vi.mock("@/lib/manageOpenAIKey.ts", () => ({
+    getOpenAIKey: vi.fn().mockResolvedValue("test-key"),
+    setOpenAIKey: vi.fn().mockResolvedValue(void 0),
 }));
 
 describe("SettingsView", () => {

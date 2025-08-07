@@ -1,6 +1,7 @@
 import useComputingTools from "@/hooks/useComputingTools.ts";
 import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
+import useBrowserTools from "@/hooks/useBrowserTools.ts";
 
 import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAIKey, getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
@@ -11,6 +12,7 @@ export enum ViewType {
     DRAWING = "drawing",
     WRITING = "writing",
     COMPUTING = "computing",
+    BROWSING = "browsing",
     SETTINGS = "settings"
 }
 
@@ -34,6 +36,7 @@ export function useRealtimeAgent() {
     const drawingTools = useDrawingTools();
     const writingTools = useWritingTools();
     const computingTools = useComputingTools();
+    const browserTools = useBrowserTools();
 
     const createSession = useCallback(async () => {
         console.log("Creating session");
@@ -44,7 +47,7 @@ export function useRealtimeAgent() {
                 "If you are asked to draw something, don't say it; instead use Drawing tools.\n" +
                 "If you are asked to write something, don't say it; instead use the Writing tools.\n" +
                 "If you are asked about the computer, dont say it; instead use the Computing tools.\n",
-            tools: [...drawingTools, ...writingTools, ...computingTools],
+            tools: [...drawingTools, ...writingTools, ...computingTools, ...browserTools],
         });
 
         session.current = new RealtimeSession(assistantAgent, {
@@ -67,6 +70,7 @@ export function useRealtimeAgent() {
             if (writingTools.map(t => t.name).includes(tool.name)) setView(ViewType.WRITING);
             else if (drawingTools.map(t => t.name).includes(tool.name)) setView(ViewType.DRAWING);
             else if (computingTools.map(t => t.name).includes(tool.name)) setView(ViewType.COMPUTING);
+            else if (browserTools.map(t => t.name).includes(tool.name)) setView(ViewType.BROWSING);
         });
 
         const openAIKey = await getOpenAIKey();
