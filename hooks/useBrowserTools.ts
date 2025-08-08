@@ -1,27 +1,28 @@
 "use client";
 
-import { tool } from "@openai/agents-realtime";
-import { z } from "zod";
-import OpenAI from "openai";
+import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
-import {
-    navigateBrowser,
-    displayContent,
-    getBrowserUrl,
-} from "@/lib/browser.ts";
+import { tool } from "@openai/agents-realtime";
+import OpenAI from "openai";
+import { useContext } from "react";
+import { z } from "zod";
 
 /**
  * Tools to control the secondary browser view.
  */
 export default function useBrowserTools() {
+    const ctx = useContext(AppContext);
+
     const navigateTool = tool({
         name: "Navigate Browser",
         description: "Open the given URL in the browser view.",
-        parameters: z.object({ url: z.string().describe("The URL to open") }).strict(),
+        parameters: z.object({url: z.string().describe("The URL to open")}).strict(),
         strict: true,
-        execute: async ({ url }: { url: string }) => {
+        execute: async ({url}: { url: string }) => {
             try {
-                await navigateBrowser(url);
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                ctx?.browserView?.evaluateJavascript(`console.log(\"Navigating to:\", ${url});`, null);
                 return "ok";
             } catch (err) {
                 console.error("navigate-browser tool error:", err);
@@ -37,7 +38,7 @@ export default function useBrowserTools() {
         strict: true,
         execute: async () => {
             try {
-                const url = getBrowserUrl();
+                const url = "";
                 if (!url) return "No page loaded";
                 const html = await fetch(url).then((r) => r.text());
 
@@ -45,7 +46,7 @@ export default function useBrowserTools() {
                 if (!apiKey) {
                     return "OpenAI API key not set";
                 }
-                const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+                const openai = new OpenAI({apiKey, dangerouslyAllowBrowser: true});
                 const response = await openai.responses.create({
                     model: "gpt-4.1",
                     input: [{
@@ -68,11 +69,11 @@ export default function useBrowserTools() {
     const displayTool = tool({
         name: "Display Content",
         description: "Render provided HTML content in the browser view.",
-        parameters: z.object({ html: z.string().describe("HTML to display") }).strict(),
+        parameters: z.object({html: z.string().describe("HTML to display")}).strict(),
         strict: true,
-        execute: async ({ html }: { html: string }) => {
+        execute: async ({html}: { html: string }) => {
             try {
-                await displayContent(html);
+                console.log("Displaying HTML:", html);
                 return "ok";
             } catch (err) {
                 console.error("display-content tool error:", err);

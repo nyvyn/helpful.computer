@@ -83,7 +83,7 @@ export default function useComputingTools() {
 
             let response = await openai.responses.create({
                 model: "computer-use-preview",
-                tools: [{type: "computer-preview", display_width: screenInfo.width, display_height: screenInfo.height, environment}],
+                tools: [{type: "computer_use_preview", display_width: screenInfo.width, display_height: screenInfo.height, environment}],
                 input: [
                     {
                         type: "message",
@@ -111,7 +111,7 @@ export default function useComputingTools() {
                 response = await openai.responses.create({
                     model: "computer-use-preview",
                     previous_response_id: response.id,
-                    tools: [{type: "computer-preview", display_width: screenInfo.width, display_height: screenInfo.height, environment}],
+                    tools: [{type: "computer_use_preview", display_width: screenInfo.width, display_height: screenInfo.height, environment}],
                     input: [{
                         call_id: call.call_id,
                         type: "computer_call_output",

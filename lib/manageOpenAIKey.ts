@@ -1,11 +1,12 @@
 "use client";
 
-import { secureStorage } from "tauri-plugin-secure-storage";
+import { LazyStore } from "@tauri-apps/plugin-store";
 
 const STORE_KEY = "openai_api_key";
+const store = new LazyStore("settings.json");
 
 export async function getOpenAIKey(): Promise<string | null> {
-    return await secureStorage.getItem(STORE_KEY);
+    return await store.get<string>(STORE_KEY);
 }
 
 /**
@@ -33,5 +34,6 @@ export async function getOpenAISessionToken(): Promise<string> {
 }
 
 export async function setOpenAIKey(key: string) {
-    await secureStorage.setItem(STORE_KEY, key);
+    await store.set(STORE_KEY, key);
+    await store.save();
 }
