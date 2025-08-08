@@ -20,12 +20,10 @@ export default function useBrowserTools() {
         strict: true,
         execute: async ({url}: { url: string }) => {
             try {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                ctx?.browserView?.evaluateJavascript(`console.log(\"Navigating to:\", ${url});`, null);
+                if (ctx?.browserView) ctx.browserView.src = url;
                 return "ok";
             } catch (err) {
-                console.error("navigate-browser tool error:", err);
+                ctx?.setErrored(err instanceof Error ? err.message : String(err));
                 return err instanceof Error ? err.message : String(err);
             }
         },
@@ -38,9 +36,16 @@ export default function useBrowserTools() {
         strict: true,
         execute: async () => {
             try {
-                const url = "";
-                if (!url) return "No page loaded";
-                const html = await fetch(url).then((r) => r.text());
+                if (!ctx?.browserView) return "No browser view available";
+                const iframe = ctx?.browserView;
+                let html: string;
+                const url = iframe.src || "";
+                if (iframe.srcdoc && iframe.srcdoc.trim().length) {
+                    html = iframe.srcdoc;
+                } else {
+                    if (!url) return "No page loaded";
+                    html = await fetch(url).then((r) => r.text());
+                }
 
                 const apiKey = await getOpenAIKey();
                 if (!apiKey) {
@@ -60,7 +65,7 @@ export default function useBrowserTools() {
 
                 return response.output_text;
             } catch (err) {
-                console.error("read-browser tool error:", err);
+                ctx?.setErrored(err instanceof Error ? err.message : String(err));
                 return err instanceof Error ? err.message : String(err);
             }
         },
@@ -73,10 +78,11 @@ export default function useBrowserTools() {
         strict: true,
         execute: async ({html}: { html: string }) => {
             try {
-                console.log("Displaying HTML:", html);
+                // Use srcdoc to render arbitrary HTML
+                if (ctx?.browserView) ctx.browserView.srcdoc = html;
                 return "ok";
             } catch (err) {
-                console.error("display-content tool error:", err);
+                ctx?.setErrored(err instanceof Error ? err.message : String(err));
                 return err instanceof Error ? err.message : String(err);
             }
         },
@@ -84,4 +90,3 @@ export default function useBrowserTools() {
 
     return [navigateTool, readTool, displayTool] as const;
 }
-

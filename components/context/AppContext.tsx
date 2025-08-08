@@ -1,13 +1,12 @@
 "use client";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
-import { Webview } from "@tauri-apps/api/webview";
 import type { LexicalEditor } from "lexical";
 import React, { createContext, ReactNode, useCallback, useState } from "react";
 import { toast } from "sonner";
 
 type AppCtx = {
-    browserView: Webview | null;
-    setBrowserView: (view: Webview | null) => void;
+    browserView: HTMLIFrameElement | null;
+    setBrowserView: (view: HTMLIFrameElement | null) => void;
     excalidrawApi: ExcalidrawImperativeAPI | null;
     setExcalidrawApi: (api: ExcalidrawImperativeAPI | null) => void;
     lexicalEditor: LexicalEditor | null;
@@ -25,7 +24,7 @@ export const AppContext = createContext<AppCtx | null>(null);
  */
 
 export function AppProvider({children}: { children: ReactNode }) {
-    const [browserView, setBrowserView] = useState<Webview | null>(null);
+    const [browserView, setBrowserView] = useState<HTMLIFrameElement | null>(null);
     const [excalidrawApi, setExcalidrawApi] = useState<ExcalidrawImperativeAPI | null>(null);
     const [lexicalEditor, setLexicalEditor] = useState<LexicalEditor | null>(null);
     const [screenshot, setScreenshot] = useState<string | null>(null);
