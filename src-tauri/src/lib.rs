@@ -1,7 +1,10 @@
 mod cua;
+mod view;
+
 use cua::*;
 use serde::{Deserialize, Serialize};
-use xcap::image;
+use tauri::Manager;
+use view::{hide_browser, move_browser, navigate_browser, show_browser};
 
 #[derive(Serialize, Deserialize)]
 pub struct ScreenInfo {
@@ -52,62 +55,6 @@ fn get_os_info() -> Result<String, String> {
     return Ok("unknown".to_string());
 }
 
-/// Execute an AppleScript on macOS and return the output.
-#[tauri::command]
-fn run_applescript(script: &str) -> Result<String, String> {
-    use std::process::Command;
-
-    let output = Command::new("osascript")
-        .arg("-e")
-        .arg(script)
-        .output()
-        .map_err(|e| e.to_string())?;
-
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).to_string())
-    } else {
-        Err(String::from_utf8_lossy(&output.stderr).to_string())
-    }
-}
-
-/// Capture a desktop screenshot and return it as a base64 PNG string.
-/// Hides the current window, takes the screenshot, then restores the window.
-#[tauri::command]
-async fn capture_screenshot(window: tauri::Window) -> Result<String, String> {
-    use base64::{engine::general_purpose, Engine as _};
-    use std::io::Cursor;
-    use std::time::Duration;
-    use tokio::time::sleep;
-    use xcap::Monitor;
-
-    // Hide the current window
-    window.hide().map_err(|e| e.to_string())?;
-
-    // Wait a brief moment for the window to be hidden
-    sleep(Duration::from_millis(100)).await;
-
-    // Get the primary monitor
-    let monitors = Monitor::all().map_err(|e| e.to_string())?;
-    let monitor = monitors.first().ok_or("No monitors found")?;
-
-    // Capture screenshot
-    let image = monitor.capture_image().map_err(|e| e.to_string())?;
-
-    // Show the window again
-    window.show().map_err(|e| e.to_string())?;
-
-    // Convert to PNG bytes
-    let mut buffer = Vec::new();
-    let mut cursor = Cursor::new(&mut buffer);
-    image
-        .write_to(&mut cursor, image::ImageFormat::Png)
-        .map_err(|e| e.to_string())?;
-
-    // Encode to base64
-    Ok(general_purpose::STANDARD.encode(buffer))
-}
-
-/// Build the Tauri application and start the runtime.
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -125,8 +72,28 @@ pub fn run() {
             press_key,
             move_mouse_to,
             scroll_at,
-            type_text
+            type_text,
+            show_browser,
+            hide_browser,
+            move_browser,
+            navigate_browser
         ])
+        .setup(|app| {
+            let window = app.get_window("main").unwrap();
+            let webview_builder = tauri::webview::WebviewBuilder::new(
+                "browser",
+                tauri::WebviewUrl::App("about:blank".into()),
+            );
+            let webview = window
+                .add_child(
+                    webview_builder,
+                    tauri::LogicalPosition::new(0, 0),
+                    window.inner_size().unwrap(),
+                )
+                .expect("unable to create webview");
+            webview.hide().expect("uanble to hide webview");
+            Ok(())
+        })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

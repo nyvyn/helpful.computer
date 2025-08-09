@@ -1,10 +1,10 @@
 "use client";
 
+import BrowserView from "@/components/browser/BrowserView.tsx";
 import ComputerView from "@/components/computer/ComputerView.tsx";
 import ExcalidrawView from "@/components/excalidraw/ExcalidrawView.tsx";
 import LexicalView from "@/components/lexical/LexicalView.tsx";
 import SettingsView from "@/components/settings/SettingsView.tsx";
-import BrowserView from "@/components/browser/BrowserView.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import { useRealtimeAgent, ViewType } from "@/hooks/useRealtimeAgent.ts";
@@ -97,7 +97,7 @@ export default function Dashboard() {
                         <LexicalView />
                     </div>
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.BROWSING })}>
-                        <BrowserView />
+                        <BrowserView isActive={view === ViewType.BROWSING}/>
                     </div>
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.COMPUTING })}>
                         <ComputerView />

@@ -2,6 +2,7 @@
 
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { tool } from "@openai/agents-realtime";
+import { invoke } from "@tauri-apps/api/core";
 import OpenAI from "openai";
 import { useMemo } from "react";
 import { z } from "zod";
@@ -22,16 +23,10 @@ export default function useBrowsingTools() {
         execute: async ({url}: { url: string }) => {
             try {
                 console.log("Navigating to:", url);
-                console.log("Iframe ref:", iframeRef.current);
-                if (iframeRef.current) {
-                    console.log("Current iframe src:", iframeRef.current.src);
-                    // Remove srcdoc attribute since it takes precedence over src
-                    iframeRef.current.removeAttribute('srcdoc');
-                    iframeRef.current.src = url;
-                    console.log("Set iframe src to:", iframeRef.current.src);
-                } else {
-                    console.log("No iframe reference available");
-                }
+
+                await invoke("navigate_browser", {url});
+                console.log("Navigated using Tauri command");
+                
                 return "ok";
             } catch (err) {
                 console.error("Navigation error:", err);
