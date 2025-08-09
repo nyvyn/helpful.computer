@@ -1,11 +1,10 @@
 "use client";
-import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { tool } from "@openai/agents-realtime";
 import { invoke } from "@tauri-apps/api/core";
 import OpenAI from "openai";
 import { ResponseComputerToolCall } from "openai/resources/responses/responses";
-import { useCallback, useContext, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { z } from "zod";
 
 type DesktopAction =
@@ -20,7 +19,7 @@ type DesktopAction =
     | ResponseComputerToolCall.Wait;
 
 export default function useComputingTools() {
-    const ctx = useContext(AppContext);
+    const [screenshot, setScreenshot] = useState<string | null>(null);
 
     /** Low-level desktop actions for the CUA agent. */
     const handleDesktopAction = useCallback(async (action: DesktopAction) => {
@@ -63,7 +62,7 @@ export default function useComputingTools() {
             const environment = osInfo as "windows" | "mac" | "linux" | "ubuntu" | "browser";
 
             const shot = await invoke<string>("capture_screenshot");
-            ctx?.setScreenshot(shot);
+            setScreenshot(shot);
 
             const apiKey = await getOpenAIKey();
             if (!apiKey) {
@@ -83,7 +82,7 @@ export default function useComputingTools() {
 
             let response = await openai.responses.create({
                 model: "computer-use-preview",
-                tools: [{type: "computer-preview", display_width: screenInfo.width, display_height: screenInfo.height, environment}],
+                tools: [{type: "computer_use_preview", display_width: screenInfo.width, display_height: screenInfo.height, environment}],
                 input: [
                     {
                         type: "message",
@@ -106,12 +105,12 @@ export default function useComputingTools() {
                 await handleDesktopAction(call.action);
 
                 const shot = await invoke<string>("capture_screenshot");
-                ctx?.setScreenshot(shot);
+                setScreenshot(shot);
 
                 response = await openai.responses.create({
                     model: "computer-use-preview",
                     previous_response_id: response.id,
-                    tools: [{type: "computer-preview", display_width: screenInfo.width, display_height: screenInfo.height, environment}],
+                    tools: [{type: "computer_use_preview", display_width: screenInfo.width, display_height: screenInfo.height, environment}],
                     input: [{
                         call_id: call.call_id,
                         type: "computer_call_output",
@@ -121,7 +120,7 @@ export default function useComputingTools() {
                 });
             }
         },
-        [ctx, handleDesktopAction],
+        [handleDesktopAction],
     );
 
     const interactComputerTool = useMemo(
@@ -153,7 +152,7 @@ export default function useComputingTools() {
                 execute: async ({query}: { query: string }) => {
                     try {
                         const screenshot = await invoke<string>("capture_screenshot");
-                        ctx?.setScreenshot(screenshot);
+                        setScreenshot(screenshot);
 
                         const apiKey = await getOpenAIKey();
                         if (!apiKey) {
@@ -190,8 +189,10 @@ export default function useComputingTools() {
                     }
                 },
             }),
-        [ctx],
+        [],
     );
 
-    return [interactComputerTool, describeComputerTool] as const;
+    const tools = useMemo(() => [interactComputerTool, describeComputerTool] as const, [interactComputerTool, describeComputerTool]);
+    
+    return { tools, screenshot };
 }

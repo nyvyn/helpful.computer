@@ -18,7 +18,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2.2.0", features = [] }
 
 [dependencies]
-tauri = { version = "2.7.0", features = [] }
+tauri = { version = "2.7.0", features = ["webview-data-url"] }
 tauri-plugin-opener = "2.4.0"
 tauri-plugin-macos-permissions = "2.3.0"
 serde = { version = "1.0.219", features = ["derive"] }
@@ -27,5 +27,5 @@ base64 = "0.22.1"
 enigo = "0.5.0"
 xcap = "0.6.2"
 tokio = { version = "1.47.1", features = ["time"] }
-tauri-plugin-secure-storage = "1"
+tauri-plugin-store = "2.0.0"
 

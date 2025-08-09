@@ -1,4 +1,3 @@
-import { AppProvider } from "@/components/context/AppContext.tsx";
 import { ReactNode } from "react";
 import { Toaster } from "sonner";
 
@@ -16,7 +15,7 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body>
-        <AppProvider>{children}</AppProvider>
+        {children}
         <Toaster position="top-left" style={{ maxWidth: "24px" }}/>
         </body>
         </html>

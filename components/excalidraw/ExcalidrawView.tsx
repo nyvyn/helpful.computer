@@ -1,19 +1,19 @@
 "use client";
 
-import { AppContext } from "../context/AppContext.tsx";
+import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import ExcalidrawWrapper from "components/excalidraw/ExcalidrawWrapper.tsx";
 
 /**
- * Canvas surface using Excalidraw and exposing its API via context.
+ * Canvas surface using Excalidraw and exposing its API via drawing tools.
  */
-import React, { useContext } from "react";
+import React from "react";
 
 export default function ExcalidrawView() {
-    const ctx = useContext(AppContext);
+    const { setExcalidrawApi } = useDrawingTools();
 
     return (
         <div className="w-full h-full border border-gray-700">
-            <ExcalidrawWrapper excalidrawAPI={(api) => ctx?.setExcalidrawApi(api)}/>
+            <ExcalidrawWrapper excalidrawAPI={setExcalidrawApi}/>
         </div>
     );
 }

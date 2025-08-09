@@ -1,11 +1,10 @@
 "use client";
 
-import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
-import { useContext, useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { z } from "zod";
 
 const schema = z.object({
@@ -14,16 +13,15 @@ const schema = z.object({
     ),
 });
 
+// Module-level singleton ref - shared across all hook instances
+const apiRef = { current: null as ExcalidrawImperativeAPI | null };
+
 /**
  * Creates OpenAI agent tools bound to the current Excalidraw instance.
  *
  * The returned array contains a draw and read tool that operate on the canvas.
  */
 export default function useDrawingTools() {
-    const ctx = useContext(AppContext);
-    const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
-
-    useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
 
     const drawCanvasTool = useMemo(() => tool({
         name: "Update Canvas",
@@ -33,7 +31,7 @@ export default function useDrawingTools() {
             "The resulting elements always replace the current scene.",
         parameters: schema,
         strict: true,
-        execute: async ({ instructions }: z.infer<typeof schema>) => {
+        execute: async ({instructions}: z.infer<typeof schema>) => {
             try {
                 const apiKey = await getOpenAIKey();
                 if (!apiKey) {
@@ -65,17 +63,17 @@ export default function useDrawingTools() {
                                 "All other points must be offsets from that origin: `points[i] = [absX_i - x, absY_i - y]`.\n" +
                                 "Respond with JSON: { format: 'excalidraw' | 'mermaid', elements: string }.",
                         },
-                        { role: "user", content: instructions },
+                        {role: "user", content: instructions},
                     ],
-                    response_format: { type: "json_object" },
+                    response_format: {type: "json_object"},
                 });
 
-                const { elements, format } = JSON.parse(
+                const {elements, format} = JSON.parse(
                     completion.choices[0].message.content as string,
                 );
 
-                const { convertToExcalidrawElements } = await import("@excalidraw/excalidraw");
-                const { parseMermaidToExcalidraw } = await import("@excalidraw/mermaid-to-excalidraw");
+                const {convertToExcalidrawElements} = await import("@excalidraw/excalidraw");
+                const {parseMermaidToExcalidraw} = await import("@excalidraw/mermaid-to-excalidraw");
 
                 const skeleton =
                     format === "excalidraw"
@@ -83,7 +81,7 @@ export default function useDrawingTools() {
                         : (await parseMermaidToExcalidraw(elements)).elements;
 
                 const converted = convertToExcalidrawElements(skeleton);
-                apiRef.current?.updateScene({ elements: converted });
+                apiRef.current?.updateScene({elements: converted});
 
                 return "ok";
             } catch (err) {
@@ -93,7 +91,7 @@ export default function useDrawingTools() {
         },
     }), []);
 
-    
+
     const readCanvasTool = useMemo(() => tool({
         name: "Read Canvas",
         description:
@@ -109,7 +107,14 @@ export default function useDrawingTools() {
                 return err instanceof Error ? err.message : String(err);
             }
         },
-    }), [apiRef]);
+    }), []);
 
-    return [drawCanvasTool, readCanvasTool];
+    const setExcalidrawApi = (api: ExcalidrawImperativeAPI | null) => {
+        console.log("Setting Excalidraw API in drawing tools:", api);
+        apiRef.current = api;
+    };
+
+    const tools = useMemo(() => [drawCanvasTool, readCanvasTool] as const, [drawCanvasTool, readCanvasTool]);
+
+    return {tools, setExcalidrawApi};
 }

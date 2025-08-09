@@ -1,7 +1,6 @@
 "use client";
 
-import { AppContext } from "@/components/context/AppContext.tsx";
-import { useContext } from "react";
+import useComputingTools from "@/hooks/useComputingTools.ts";
 
 /**
  * Simple panel displaying a desktop screenshot.
@@ -10,13 +9,13 @@ import { useContext } from "react";
  * to request a new one from the backend.
  */
 export default function ComputerView() {
-    const ctx = useContext(AppContext);
+    const {screenshot} = useComputingTools();
 
     return (
         <div className="relative w-full h-full bg-gray-900 flex items-center justify-center">
-            {ctx?.screenshot ? (
+            {screenshot ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={`data:image/png;base64,${ctx.screenshot}`} className="max-w-full max-h-full" alt="screentshot"/>
+                <img src={`data:image/png;base64,${screenshot}`} className="max-w-full max-h-full" alt="screentshot"/>
             ) : (
                 <div className="text-white">Idle...</div>
             )}
