@@ -47,16 +47,18 @@ export default function useBrowsingTools() {
         strict: true,
         execute: async () => {
             try {
-                if (!iframeRef.current) return "No browser view available";
                 const iframe = iframeRef.current;
-                let html: string;
+                if (!iframe) return "No browser view available";
+
                 const url = iframe.src || "";
-                if (iframe.srcdoc && iframe.srcdoc.trim().length) {
-                    html = iframe.srcdoc;
-                } else {
-                    if (!url) return "No page loaded";
-                    html = await fetch(url).then((r) => r.text());
-                }
+                const html =
+                  iframe.srcdoc?.trim()?.length
+                    ? iframe.srcdoc
+                    : url
+                    ? await fetch(url, { cache: "no-store" }).then(r => r.text()).catch(() => "")
+                    : "";
+
+                if (!html) return "No page loaded or cross-origin fetch blocked";
 
                 const apiKey = await getOpenAIKey();
                 if (!apiKey) {
