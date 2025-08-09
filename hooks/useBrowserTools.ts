@@ -3,14 +3,16 @@
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { z } from "zod";
 
 /**
  * Tools to control the secondary browser view.
  */
+// Singleton iframe reference that persists across hook instances
+let globalIframeRef: HTMLIFrameElement | null = null;
+
 export default function useBrowserTools() {
-    const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
     const navigateTool = useMemo(() => tool({
         name: "Navigate Browser",
@@ -20,13 +22,13 @@ export default function useBrowserTools() {
         execute: async ({url}: { url: string }) => {
             try {
                 console.log("Navigating to:", url);
-                console.log("Iframe ref:", iframeRef.current);
-                if (iframeRef.current) {
-                    console.log("Current iframe src:", iframeRef.current.src);
-                    // Clear srcdoc first since it takes precedence over src
-                    iframeRef.current.srcdoc = "";
-                    iframeRef.current.src = url;
-                    console.log("Set iframe src to:", iframeRef.current.src);
+                console.log("Iframe ref:", globalIframeRef);
+                if (globalIframeRef) {
+                    console.log("Current iframe src:", globalIframeRef.src);
+                    // Remove srcdoc attribute since it takes precedence over src
+                    globalIframeRef.removeAttribute('srcdoc');
+                    globalIframeRef.src = url;
+                    console.log("Set iframe src to:", globalIframeRef.src);
                 } else {
                     console.log("No iframe reference available");
                 }
@@ -45,8 +47,8 @@ export default function useBrowserTools() {
         strict: true,
         execute: async () => {
             try {
-                if (!iframeRef.current) return "No browser view available";
-                const iframe = iframeRef.current;
+                if (!globalIframeRef) return "No browser view available";
+                const iframe = globalIframeRef;
                 let html: string;
                 const url = iframe.src || "";
                 if (iframe.srcdoc && iframe.srcdoc.trim().length) {
@@ -88,8 +90,8 @@ export default function useBrowserTools() {
         execute: async ({html}: { html: string }) => {
             try {
                 // Use srcdoc to render arbitrary HTML
-                if (iframeRef.current) {
-                    iframeRef.current.srcdoc = html;
+                if (globalIframeRef) {
+                    globalIframeRef.srcdoc = html;
                 }
                 return "ok";
             } catch (err) {
@@ -101,7 +103,13 @@ export default function useBrowserTools() {
 
     const setIframe = (iframe: HTMLIFrameElement | null) => {
         console.log("Setting iframe ref in browser tools:", iframe);
-        iframeRef.current = iframe;
+        if (iframe) {
+            // Only update when we have a valid iframe, don't clear on null
+            globalIframeRef = iframe;
+            console.log("Iframe ref updated to:", iframe);
+        } else {
+            console.log("Ignoring null iframe ref to preserve existing reference");
+        }
     };
 
     const tools = useMemo(() => [navigateTool, readTool, displayTool] as const, [navigateTool, readTool, displayTool]);

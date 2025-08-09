@@ -3,10 +3,10 @@ import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
 import useBrowserTools from "@/hooks/useBrowserTools.ts";
 
-import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAIKey, getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 export enum ViewType {
     DRAWING = "drawing",
@@ -25,7 +25,6 @@ export enum ViewType {
  */
 
 export function useRealtimeAgent() {
-    const ctx = useContext(AppContext);
     const [listening, setListening] = useState(false);
     const [speaking, setSpeaking] = useState(false);
     const [working, setWorking] = useState(false);
@@ -67,7 +66,10 @@ export function useRealtimeAgent() {
 
         session.current.on("audio_start", () => setSpeaking(true));
         session.current.on("audio_stopped", () => setSpeaking(false));
-        session.current.on("error", (e) => ctx?.setErrored(String(e)));
+        session.current.on("error", (e) => {
+            console.error("Session error:", e);
+            toast.error(String(e));
+        });
         session.current.on("agent_tool_end", () => {
             setWorking(false);
         });
@@ -83,7 +85,7 @@ export function useRealtimeAgent() {
         const openAIKey = await getOpenAIKey();
         console.log("OpenAI key available:", !!openAIKey);
         if (!openAIKey) {
-            ctx?.setErrored("OpenAI api key not set.");
+            toast.error("OpenAI api key not set.");
             setView(ViewType.SETTINGS);
             return;
         }
@@ -92,7 +94,7 @@ export function useRealtimeAgent() {
         const token = await getOpenAISessionToken();
         console.log("Session token available:", !!token);
         if (!token) {
-            ctx?.setErrored("OpenAI api key may be incorrect.");
+            toast.error("OpenAI api key may be incorrect.");
             setView(ViewType.SETTINGS);
             return;
         }
@@ -105,7 +107,7 @@ export function useRealtimeAgent() {
         console.log("Session connected, status:", session.current.transport.status);
         session.current.mute(true);
         console.log("Connected: ", session.current.transport);
-    }, [drawingTools, writingTools, computingTools, browserTools, ctx]);
+    }, [drawingTools, writingTools, computingTools, browserTools]);
 
     /* create once */
     useEffect(() => {
@@ -118,21 +120,21 @@ export function useRealtimeAgent() {
         console.log("Creating new session...");
         createSession().catch((error) => {
             console.error("Session creation failed:", error);
-            ctx?.setErrored(String(error));
+            toast.error(String(error));
         });
 
         return () => {
             console.log("Cleaning up session");
             session.current?.close();
         };
-    }, [createSession, ctx]);
+    }, [createSession]);
 
     /* commands that UI can call */
     const mute = () => {
         console.log("Mute called, session status:", session.current?.transport.status);
         if (!session.current || session.current.transport.status !== "connected") {
             console.log("Session not available or not connected");
-            ctx?.setErrored("Session not connected. Verify key set.");
+            toast.error("Session not connected. Verify key set.");
             return;
         }
 
@@ -144,7 +146,7 @@ export function useRealtimeAgent() {
         console.log("Unmute called, session status:", session.current?.transport.status);
         if (!session.current || session.current.transport.status !== "connected") {
             console.log("Session not available or not connected");
-            ctx?.setErrored("Session not connected. Verify key set.");
+            toast.error("Session not connected. Verify key set.");
             return;
         }
 
@@ -170,8 +172,7 @@ export function useRealtimeAgent() {
                 session.current = null;
             }
 
-            // Reset states
-            ctx?.setErrored(false);
+            // Reset states  
             setListening(false);
             setSpeaking(false);
             setWorking(false);
@@ -181,7 +182,7 @@ export function useRealtimeAgent() {
             await createSession();
         } catch (error) {
             console.error("Reconnection failed:", error);
-            ctx?.setErrored(String(error));
+            toast.error(String(error));
         }
     };
 
