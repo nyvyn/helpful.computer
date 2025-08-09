@@ -1,6 +1,9 @@
 use base64::engine::Engine;
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, LogicalPosition, LogicalSize, Manager};
+use std::sync::{Arc, Mutex};
+use tauri::{AppHandle, LogicalPosition, LogicalSize, Manager, State};
+
+pub struct PageStore(pub Arc<Mutex<Option<String>>>);
 
 #[derive(Serialize, Deserialize)]
 pub struct WebviewRect {
@@ -76,11 +79,29 @@ pub fn hide_browser(app: AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn navigate_browser(app: AppHandle, url: String) -> Result<(), String> {
+pub async fn navigate_browser(
+    app: AppHandle,
+    state: State<'_, PageStore>,
+    url: String,
+) -> Result<(), String> {
     let webviews = app.webviews();
     if let Some(webview) = webviews.get("browser") {
         let parsed_url = url.parse().map_err(|e| format!("{:?}", e))?;
         webview.navigate(parsed_url).map_err(|e| e.to_string())?;
+
+        // Fetch the URL content in the background and store it
+        let url_clone = url.clone();
+        let state_clone = state.0.clone();
+        tokio::spawn(async move {
+            if let Ok(response) = reqwest::get(&url_clone).await {
+                if let Ok(html) = response.text().await {
+                    if let Ok(mut store) = state_clone.lock() {
+                        *store = Some(html);
+                    }
+                }
+            }
+        });
+
         Ok(())
     } else {
         Err("Webview 'browser' not found".to_string())
@@ -88,19 +109,28 @@ pub fn navigate_browser(app: AppHandle, url: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn render_browser(app: AppHandle, html: String) -> Result<(), String> {
+pub async fn render_browser(
+    app: AppHandle,
+    state: State<'_, PageStore>,
+    html: String,
+) -> Result<(), String> {
+    // Store the HTML content
+    *state.0.lock().map_err(|e| e.to_string())? = Some(html.clone());
+
     let data_url = format!(
         "data:text/html;base64,{}",
         base64::engine::general_purpose::STANDARD.encode(html)
     );
 
-    navigate_browser(app, data_url)
+    navigate_browser(app, state, data_url).await
 }
 
 #[tauri::command]
-pub async fn read_browser(_app: AppHandle) -> Result<String, String> {
-    // Since webview.eval() doesn't return values, we'll need to use a different approach
-    // For now, return a placeholder indicating this functionality needs to be implemented
-    // differently, possibly using webview events or IPC communication
-    Err("Reading browser content not yet implemented - eval() doesn't return values".to_string())
+pub fn read_browser(state: State<PageStore>) -> Result<String, String> {
+    state
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .clone()
+        .ok_or("No page content available yet".to_string())
 }
