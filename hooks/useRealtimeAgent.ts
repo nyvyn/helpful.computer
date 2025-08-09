@@ -1,7 +1,7 @@
 import useComputingTools from "@/hooks/useComputingTools.ts";
 import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
-import useBrowserTools from "@/hooks/useBrowserTools.ts";
+import useBrowsingTools from "@/hooks/useBrowsingTools.ts";
 
 import { getOpenAIKey, getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
@@ -35,7 +35,7 @@ export function useRealtimeAgent() {
     const { tools: drawingTools } = useDrawingTools();
     const { tools: writingTools } = useWritingTools();
     const { tools: computingTools } = useComputingTools();
-    const { tools: browserTools } = useBrowserTools();
+    const { tools: browserTools } = useBrowsingTools();
 
     const createSession = useCallback(async () => {
         console.log("Creating session");

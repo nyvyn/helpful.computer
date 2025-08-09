@@ -5,7 +5,7 @@ import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS, } f
 import { tool } from "@openai/agents-realtime";
 import { $getRoot, LexicalEditor } from "lexical";
 import OpenAI from "openai";
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { z } from "zod";
 
 /**
@@ -23,8 +23,10 @@ const schema = z.object({
 /**
  * Provide OpenAI tools for reading and writing Markdown via Lexical.
  */
+// Module-level singleton ref - shared across all hook instances
+const editorRef = { current: null as LexicalEditor | null };
+
 export default function useWritingTools() {
-    const editorRef = useRef<LexicalEditor | null>(null);
 
     const readMarkdownTool = useMemo(() => tool({
         name: "Read Markdown",
@@ -44,7 +46,7 @@ export default function useWritingTools() {
                 return err instanceof Error ? err.message : String(err);
             }
         },
-    }), [editorRef]);
+    }), []);
 
     const writeMarkdownTool = useMemo(() => tool({
         name: "Write Markdown",
@@ -93,7 +95,7 @@ export default function useWritingTools() {
                 return err instanceof Error ? err.message : String(err);
             }
         },
-    }), [editorRef]);
+    }), []);
 
     const setLexicalEditor = (editor: LexicalEditor | null) => {
         console.log("Setting Lexical editor in writing tools:", editor);

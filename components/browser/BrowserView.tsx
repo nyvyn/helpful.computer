@@ -1,10 +1,10 @@
 "use client";
 
-import useBrowserTools from "@/hooks/useBrowserTools.ts";
+import useBrowsingTools from "@/hooks/useBrowsingTools.ts";
 import React, { useCallback } from "react";
 
 export default function BrowserView() {
-    const { setIframe } = useBrowserTools();
+    const { setIframe } = useBrowsingTools();
 
     // Use a stable callback ref to avoid timing issues with effects/StrictMode
     const setIframeRef = useCallback((node: HTMLIFrameElement | null) => {

@@ -58,17 +58,9 @@ Each view has corresponding tool hooks in `hooks/`:
 - `useDrawingTools.ts`: Excalidraw canvas manipulation
 - `useWritingTools.ts`: Lexical editor operations
 - `useComputingTools.ts`: Computer interaction and screenshots
-- `useBrowserTools.ts`: Browser navigation and control
+- `useBrowsingTools.ts`: Browser navigation and control
 
 Tools are registered with the OpenAI agent and automatically switch views when called.
-
-### Path Aliases
-```typescript
-"@/app/*": "app/*"
-"@/components/*": "components/*"
-"@/hooks/*": "hooks/*"
-"@/lib/*": "lib/*"
-```
 
 ## Configuration Requirements
 
