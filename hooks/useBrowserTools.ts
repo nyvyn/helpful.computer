@@ -1,17 +1,16 @@
 "use client";
 
-import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
-import { useContext } from "react";
+import { useRef } from "react";
 import { z } from "zod";
 
 /**
  * Tools to control the secondary browser view.
  */
 export default function useBrowserTools() {
-    const ctx = useContext(AppContext);
+    const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
     const navigateTool = tool({
         name: "Navigate Browser",
@@ -20,10 +19,20 @@ export default function useBrowserTools() {
         strict: true,
         execute: async ({url}: { url: string }) => {
             try {
-                if (ctx?.browserView) ctx.browserView.src = url;
+                console.log("Navigating to:", url);
+                console.log("Iframe ref:", iframeRef.current);
+                if (iframeRef.current) {
+                    console.log("Current iframe src:", iframeRef.current.src);
+                    // Clear srcdoc first since it takes precedence over src
+                    iframeRef.current.srcdoc = "";
+                    iframeRef.current.src = url;
+                    console.log("Set iframe src to:", iframeRef.current.src);
+                } else {
+                    console.log("No iframe reference available");
+                }
                 return "ok";
             } catch (err) {
-                ctx?.setErrored(err instanceof Error ? err.message : String(err));
+                console.error("Navigation error:", err);
                 return err instanceof Error ? err.message : String(err);
             }
         },
@@ -36,8 +45,8 @@ export default function useBrowserTools() {
         strict: true,
         execute: async () => {
             try {
-                if (!ctx?.browserView) return "No browser view available";
-                const iframe = ctx?.browserView;
+                if (!iframeRef.current) return "No browser view available";
+                const iframe = iframeRef.current;
                 let html: string;
                 const url = iframe.src || "";
                 if (iframe.srcdoc && iframe.srcdoc.trim().length) {
@@ -65,7 +74,7 @@ export default function useBrowserTools() {
 
                 return response.output_text;
             } catch (err) {
-                ctx?.setErrored(err instanceof Error ? err.message : String(err));
+                console.error("Read browser error:", err);
                 return err instanceof Error ? err.message : String(err);
             }
         },
@@ -79,14 +88,21 @@ export default function useBrowserTools() {
         execute: async ({html}: { html: string }) => {
             try {
                 // Use srcdoc to render arbitrary HTML
-                if (ctx?.browserView) ctx.browserView.srcdoc = html;
+                if (iframeRef.current) {
+                    iframeRef.current.srcdoc = html;
+                }
                 return "ok";
             } catch (err) {
-                ctx?.setErrored(err instanceof Error ? err.message : String(err));
+                console.error("Display content error:", err);
                 return err instanceof Error ? err.message : String(err);
             }
         },
     });
 
-    return [navigateTool, readTool, displayTool] as const;
+    const setIframe = (iframe: HTMLIFrameElement | null) => {
+        console.log("Setting iframe ref in browser tools:", iframe);
+        iframeRef.current = iframe;
+    };
+
+    return { tools: [navigateTool, readTool, displayTool] as const, setIframe };
 }

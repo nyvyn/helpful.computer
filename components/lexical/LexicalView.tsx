@@ -18,21 +18,21 @@ import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { HeadingNode, QuoteNode, } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { ParagraphNode, TabNode, TextNode } from "lexical";
-import React, { useContext, useEffect } from "react";
-import { AppContext } from "../context/AppContext.tsx";
+import useWritingTools from "@/hooks/useWritingTools.ts";
+import React, { useEffect } from "react";
 
 /**
  * Rich text editor surface backed by Lexical.
  *
- * Exposes the editor instance via context so tools can read and write markdown.
+ * Exposes the editor instance via writing tools so tools can read and write markdown.
  */
 
 function EditorCapture() {
     const [editor] = useLexicalComposerContext();
-    const ctx = useContext(AppContext);
+    const { setLexicalEditor } = useWritingTools();
     useEffect(() => {
-        ctx?.setLexicalEditor(editor);
-    }, [ctx, editor]);
+        setLexicalEditor(editor);
+    }, [setLexicalEditor, editor]);
     return null;
 }
 

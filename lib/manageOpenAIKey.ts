@@ -5,7 +5,14 @@ import { LazyStore } from "@tauri-apps/plugin-store";
 const STORE_KEY = "openai_api_key";
 const store = new LazyStore("settings.json");
 
-export async function getOpenAIKey(): Promise<string | null> {
+export async function getOpenAIKey(): Promise<string | undefined> {
+    // First check environment variable
+    const envKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    if (envKey) {
+        return envKey;
+    }
+    
+    // Fallback to stored value
     return await store.get<string>(STORE_KEY);
 }
 

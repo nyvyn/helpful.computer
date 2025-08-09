@@ -33,10 +33,10 @@ export function useRealtimeAgent() {
 
     const session = useRef<RealtimeSession | null>(null);
 
-    const drawingTools = useDrawingTools();
-    const writingTools = useWritingTools();
-    const computingTools = useComputingTools();
-    const browserTools = useBrowserTools();
+    const { tools: drawingTools } = useDrawingTools();
+    const { tools: writingTools } = useWritingTools();
+    const { tools: computingTools } = useComputingTools();
+    const { tools: browserTools } = useBrowserTools();
 
     const createSession = useCallback(async () => {
         console.log("Creating session");
@@ -74,24 +74,31 @@ export function useRealtimeAgent() {
         });
 
         const openAIKey = await getOpenAIKey();
+        console.log("OpenAI key available:", !!openAIKey);
         if (!openAIKey) {
             ctx?.setErrored("OpenAI api key not set.");
             setView(ViewType.SETTINGS);
             return;
         }
 
+        console.log("Generating session token...");
         const token = await getOpenAISessionToken();
+        console.log("Session token available:", !!token);
         if (!token) {
             ctx?.setErrored("OpenAI api key may be incorrect.");
             setView(ViewType.SETTINGS);
             return;
         }
+        
+        console.log("Connecting to realtime session...");
         await session.current.connect({
             apiKey: token
         });
+        
+        console.log("Session connected, status:", session.current.transport.status);
         session.current.mute(true);
         console.log("Connected: ", session.current.transport);
-    }, [drawingTools, writingTools, computingTools, ctx]);
+    }, [drawingTools, writingTools, computingTools, browserTools, ctx]);
 
     /* create once */
     useEffect(() => {
@@ -105,24 +112,28 @@ export function useRealtimeAgent() {
 
     /* commands that UI can call */
     const mute = () => {
-        if (session.current?.transport.status !== "connected") {
+        console.log("Mute called, session status:", session.current?.transport.status);
+        if (!session.current || session.current.transport.status !== "connected") {
+            console.log("Session not available or not connected");
             ctx?.setErrored("Session not connected. Verify key set.");
             return;
         }
 
-        session.current?.mute(true);
-        console.log("Muted: ", session.current?.transport);
+        session.current.mute(true);
+        console.log("Muted: ", session.current.transport);
         setListening(false);
     };
     const unmute = () => {
-        if (session.current?.transport.status !== "connected") {
+        console.log("Unmute called, session status:", session.current?.transport.status);
+        if (!session.current || session.current.transport.status !== "connected") {
+            console.log("Session not available or not connected");
             ctx?.setErrored("Session not connected. Verify key set.");
             return;
         }
 
-        session.current?.mute(false);
-        session.current?.interrupt();
-        console.log("Unmuted: ", session.current?.transport);
+        session.current.mute(false);
+        session.current.interrupt();
+        console.log("Unmuted: ", session.current.transport);
         setListening(true);
     };
     const toggleListening = () => listening ? mute() : unmute();

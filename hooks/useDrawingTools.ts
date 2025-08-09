@@ -1,11 +1,10 @@
 "use client";
 
-import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
-import { useContext, useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { z } from "zod";
 
 const schema = z.object({
@@ -20,10 +19,7 @@ const schema = z.object({
  * The returned array contains a draw and read tool that operate on the canvas.
  */
 export default function useDrawingTools() {
-    const ctx = useContext(AppContext);
     const apiRef = useRef<ExcalidrawImperativeAPI | null>(null);
-
-    useEffect(() => { apiRef.current = ctx ? ctx.excalidrawApi : null; }, [ctx, ctx?.excalidrawApi]);
 
     const drawCanvasTool = useMemo(() => tool({
         name: "Update Canvas",
@@ -111,5 +107,10 @@ export default function useDrawingTools() {
         },
     }), [apiRef]);
 
-    return [drawCanvasTool, readCanvasTool];
+    const setExcalidrawApi = (api: ExcalidrawImperativeAPI | null) => {
+        console.log("Setting Excalidraw API in drawing tools:", api);
+        apiRef.current = api;
+    };
+
+    return { tools: [drawCanvasTool, readCanvasTool] as const, setExcalidrawApi };
 }

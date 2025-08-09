@@ -1,12 +1,11 @@
 "use client";
 
-import { AppContext } from "@/components/context/AppContext.tsx";
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS, } from "@lexical/markdown";
 import { tool } from "@openai/agents-realtime";
 import { $getRoot, LexicalEditor } from "lexical";
 import OpenAI from "openai";
-import { useContext, useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { z } from "zod";
 
 /**
@@ -25,15 +24,7 @@ const schema = z.object({
  * Provide OpenAI tools for reading and writing Markdown via Lexical.
  */
 export default function useWritingTools() {
-    const ctx = useContext(AppContext);
     const editorRef = useRef<LexicalEditor | null>(null);
-
-    /*
-     * Store the current Lexical editor instance in a ref.
-     */
-    useEffect(() => {
-        editorRef.current = ctx ? ctx.lexicalEditor : null;
-    }, [ctx, ctx?.lexicalEditor]);
 
     const readMarkdownTool = useMemo(() => tool({
         name: "Read Markdown",
@@ -104,5 +95,10 @@ export default function useWritingTools() {
         },
     }), [editorRef]);
 
-    return [readMarkdownTool, writeMarkdownTool];
+    const setLexicalEditor = (editor: LexicalEditor | null) => {
+        console.log("Setting Lexical editor in writing tools:", editor);
+        editorRef.current = editor;
+    };
+
+    return { tools: [readMarkdownTool, writeMarkdownTool] as const, setLexicalEditor };
 }

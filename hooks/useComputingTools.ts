@@ -193,5 +193,5 @@ export default function useComputingTools() {
         [ctx],
     );
 
-    return [interactComputerTool, describeComputerTool] as const;
+    return { tools: [interactComputerTool, describeComputerTool] as const };
 }
