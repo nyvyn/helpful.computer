@@ -4,7 +4,9 @@ mod view;
 use cua::*;
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
-use view::{hide_browser, move_browser, navigate_browser, show_browser};
+use view::{
+    hide_browser, move_browser, navigate_browser, read_browser, render_browser, show_browser,
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct ScreenInfo {
@@ -76,7 +78,9 @@ pub fn run() {
             show_browser,
             hide_browser,
             move_browser,
-            navigate_browser
+            navigate_browser,
+            read_browser,
+            render_browser
         ])
         .setup(|app| {
             let window = app.get_window("main").unwrap();

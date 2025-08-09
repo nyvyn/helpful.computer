@@ -1,3 +1,4 @@
+use base64::engine::Engine;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, LogicalPosition, LogicalSize, Manager};
 
@@ -84,4 +85,22 @@ pub fn navigate_browser(app: AppHandle, url: String) -> Result<(), String> {
     } else {
         Err("Webview 'browser' not found".to_string())
     }
+}
+
+#[tauri::command]
+pub fn render_browser(app: AppHandle, html: String) -> Result<(), String> {
+    let data_url = format!(
+        "data:text/html;base64,{}",
+        base64::engine::general_purpose::STANDARD.encode(html)
+    );
+
+    navigate_browser(app, data_url)
+}
+
+#[tauri::command]
+pub async fn read_browser(_app: AppHandle) -> Result<String, String> {
+    // Since webview.eval() doesn't return values, we'll need to use a different approach
+    // For now, return a placeholder indicating this functionality needs to be implemented
+    // differently, possibly using webview events or IPC communication
+    Err("Reading browser content not yet implemented - eval() doesn't return values".to_string())
 }
