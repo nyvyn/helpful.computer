@@ -2,6 +2,7 @@
 
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { tool } from "@openai/agents-realtime";
+import { invoke } from "@tauri-apps/api/core";
 import OpenAI from "openai";
 import { useMemo } from "react";
 import { z } from "zod";
@@ -22,16 +23,10 @@ export default function useBrowsingTools() {
         execute: async ({url}: { url: string }) => {
             try {
                 console.log("Navigating to:", url);
-                console.log("Iframe ref:", iframeRef.current);
-                if (iframeRef.current) {
-                    console.log("Current iframe src:", iframeRef.current.src);
-                    // Remove srcdoc attribute since it takes precedence over src
-                    iframeRef.current.removeAttribute('srcdoc');
-                    iframeRef.current.src = url;
-                    console.log("Set iframe src to:", iframeRef.current.src);
-                } else {
-                    console.log("No iframe reference available");
-                }
+
+                await invoke("navigate_browser", {url});
+                console.log("Navigated using Tauri command");
+                
                 return "ok";
             } catch (err) {
                 console.error("Navigation error:", err);
@@ -47,16 +42,18 @@ export default function useBrowsingTools() {
         strict: true,
         execute: async () => {
             try {
-                if (!iframeRef.current) return "No browser view available";
                 const iframe = iframeRef.current;
-                let html: string;
+                if (!iframe) return "No browser view available";
+
                 const url = iframe.src || "";
-                if (iframe.srcdoc && iframe.srcdoc.trim().length) {
-                    html = iframe.srcdoc;
-                } else {
-                    if (!url) return "No page loaded";
-                    html = await fetch(url).then((r) => r.text());
-                }
+                const html =
+                  iframe.srcdoc?.trim()?.length
+                    ? iframe.srcdoc
+                    : url
+                    ? await fetch(url, { cache: "no-store" }).then(r => r.text()).catch(() => "")
+                    : "";
+
+                if (!html) return "No page loaded or cross-origin fetch blocked";
 
                 const apiKey = await getOpenAIKey();
                 if (!apiKey) {

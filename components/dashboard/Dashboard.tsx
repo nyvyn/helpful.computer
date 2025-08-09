@@ -1,10 +1,10 @@
 "use client";
 
+import BrowserView from "@/components/browser/BrowserView.tsx";
 import ComputerView from "@/components/computer/ComputerView.tsx";
 import ExcalidrawView from "@/components/excalidraw/ExcalidrawView.tsx";
 import LexicalView from "@/components/lexical/LexicalView.tsx";
 import SettingsView from "@/components/settings/SettingsView.tsx";
-import BrowserView from "@/components/browser/BrowserView.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import { useRealtimeAgent, ViewType } from "@/hooks/useRealtimeAgent.ts";
@@ -72,15 +72,15 @@ export default function Dashboard() {
                         aria-label="Writing"
                     >Writing</button>
                     <button
-                        className={`px-2 py-1 ${view === ViewType.COMPUTING ? "text-white" : "text-gray-500"}`}
-                        onClick={() => selectView(ViewType.COMPUTING)}
-                        aria-label="Computing"
-                    >Desktop</button>
-                    <button
                         className={`px-2 py-1 ${view === ViewType.BROWSING ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.BROWSING)}
                         aria-label="Browsing"
                     >Browser</button>
+                    <button
+                        className={`px-2 py-1 ${view === ViewType.COMPUTING ? "text-white" : "text-gray-500"}`}
+                        onClick={() => selectView(ViewType.COMPUTING)}
+                        aria-label="Computing"
+                    >Desktop</button>
                     <button
                         className={`px-2 py-1 ${view === ViewType.SETTINGS ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.SETTINGS)}
@@ -96,11 +96,11 @@ export default function Dashboard() {
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.WRITING })}>
                         <LexicalView />
                     </div>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.BROWSING })}>
+                        <BrowserView isActive={view === ViewType.BROWSING}/>
+                    </div>
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.COMPUTING })}>
                         <ComputerView />
-                    </div>
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.BROWSING })}>
-                        <BrowserView />
                     </div>
                     <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.SETTINGS })}>
                         <SettingsView onKeySaved={reconnect}/>
