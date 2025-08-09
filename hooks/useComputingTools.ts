@@ -193,5 +193,7 @@ export default function useComputingTools() {
         [ctx],
     );
 
-    return { tools: [interactComputerTool, describeComputerTool] as const };
+    const tools = useMemo(() => [interactComputerTool, describeComputerTool] as const, [interactComputerTool, describeComputerTool]);
+    
+    return { tools };
 }

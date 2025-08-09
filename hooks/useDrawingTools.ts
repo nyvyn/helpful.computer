@@ -112,5 +112,7 @@ export default function useDrawingTools() {
         apiRef.current = api;
     };
 
-    return { tools: [drawCanvasTool, readCanvasTool] as const, setExcalidrawApi };
+    const tools = useMemo(() => [drawCanvasTool, readCanvasTool] as const, [drawCanvasTool, readCanvasTool]);
+    
+    return { tools, setExcalidrawApi };
 }

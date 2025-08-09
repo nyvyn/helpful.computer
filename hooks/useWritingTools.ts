@@ -100,5 +100,7 @@ export default function useWritingTools() {
         editorRef.current = editor;
     };
 
-    return { tools: [readMarkdownTool, writeMarkdownTool] as const, setLexicalEditor };
+    const tools = useMemo(() => [readMarkdownTool, writeMarkdownTool] as const, [readMarkdownTool, writeMarkdownTool]);
+    
+    return { tools, setLexicalEditor };
 }

@@ -3,7 +3,7 @@
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { z } from "zod";
 
 /**
@@ -12,7 +12,7 @@ import { z } from "zod";
 export default function useBrowserTools() {
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
-    const navigateTool = tool({
+    const navigateTool = useMemo(() => tool({
         name: "Navigate Browser",
         description: "Open the given URL in the browser view.",
         parameters: z.object({url: z.string().describe("The URL to open")}).strict(),
@@ -36,9 +36,9 @@ export default function useBrowserTools() {
                 return err instanceof Error ? err.message : String(err);
             }
         },
-    });
+    }), []);
 
-    const readTool = tool({
+    const readTool = useMemo(() => tool({
         name: "Read Browser",
         description: "Read the current browser page and return it as markdown.",
         parameters: z.object({}).strict(),
@@ -78,9 +78,9 @@ export default function useBrowserTools() {
                 return err instanceof Error ? err.message : String(err);
             }
         },
-    });
+    }), []);
 
-    const displayTool = tool({
+    const displayTool = useMemo(() => tool({
         name: "Display Content",
         description: "Render provided HTML content in the browser view.",
         parameters: z.object({html: z.string().describe("HTML to display")}).strict(),
@@ -97,12 +97,14 @@ export default function useBrowserTools() {
                 return err instanceof Error ? err.message : String(err);
             }
         },
-    });
+    }), []);
 
     const setIframe = (iframe: HTMLIFrameElement | null) => {
         console.log("Setting iframe ref in browser tools:", iframe);
         iframeRef.current = iframe;
     };
 
-    return { tools: [navigateTool, readTool, displayTool] as const, setIframe };
+    const tools = useMemo(() => [navigateTool, readTool, displayTool] as const, [navigateTool, readTool, displayTool]);
+
+    return { tools, setIframe };
 }

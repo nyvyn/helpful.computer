@@ -40,6 +40,13 @@ export function useRealtimeAgent() {
 
     const createSession = useCallback(async () => {
         console.log("Creating session");
+        console.log("Drawing tools:", drawingTools.length);
+        console.log("Writing tools:", writingTools.length);
+        console.log("Computing tools:", computingTools.length);
+        console.log("Browser tools:", browserTools.length);
+
+        const allTools = [...drawingTools, ...writingTools, ...computingTools, ...browserTools];
+        console.log("Total tools:", allTools.length);
 
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
@@ -47,7 +54,7 @@ export function useRealtimeAgent() {
                 "If you are asked to draw something, don't say it; instead use Drawing tools.\n" +
                 "If you are asked to write something, don't say it; instead use the Writing tools.\n" +
                 "If you are asked about the computer, dont say it; instead use the Computing tools.\n",
-            tools: [...drawingTools, ...writingTools, ...computingTools, ...browserTools],
+            tools: allTools,
         });
 
         session.current = new RealtimeSession(assistantAgent, {
@@ -103,11 +110,21 @@ export function useRealtimeAgent() {
     /* create once */
     useEffect(() => {
         // Only create a single session
-        if (session.current) return;
+        if (session.current) {
+            console.log("Session already exists, skipping creation");
+            return;
+        }
 
-        createSession().catch(ctx?.setErrored);
+        console.log("Creating new session...");
+        createSession().catch((error) => {
+            console.error("Session creation failed:", error);
+            ctx?.setErrored(String(error));
+        });
 
-        return () => session.current?.close();
+        return () => {
+            console.log("Cleaning up session");
+            session.current?.close();
+        };
     }, [createSession, ctx]);
 
     /* commands that UI can call */
