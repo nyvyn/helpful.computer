@@ -18,7 +18,7 @@ export default function SettingsView({onKeySaved}: SettingsViewProps) {
     }, []);
 
     return (
-        <div className="relative w-full h-full bg-gray-900 flex items-center justify-center">
+        <div className="w-full h-full border border-gray-700 bg-gray-900 flex items-center justify-center">
             <div className="bg-gray-800 p-4 rounded w-96 text-sm">
                 <h2 className="text-white mb-2">OpenAI API Key</h2>
                 <input

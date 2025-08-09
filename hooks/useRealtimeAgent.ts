@@ -1,7 +1,7 @@
+import useBrowsingTools from "@/hooks/useBrowsingTools.ts";
 import useComputingTools from "@/hooks/useComputingTools.ts";
 import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
-import useBrowsingTools from "@/hooks/useBrowsingTools.ts";
 
 import { getOpenAIKey, getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
@@ -52,7 +52,8 @@ export function useRealtimeAgent() {
             instructions:
                 "If you are asked to draw something, don't say it; instead use Drawing tools.\n" +
                 "If you are asked to write something, don't say it; instead use the Writing tools.\n" +
-                "If you are asked about the computer, dont say it; instead use the Computing tools.\n",
+                "If you are asked about the computer, dont say it; instead use the Computing tools.\n" +
+                "When finishing a task, just respond with 'Compliance'",
             tools: allTools,
         });
 

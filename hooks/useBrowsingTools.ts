@@ -7,9 +7,6 @@ import OpenAI from "openai";
 import { useMemo } from "react";
 import { z } from "zod";
 
-// Module-level singleton ref - shared across all hook instances
-const iframeRef = { current: null as HTMLIFrameElement | null };
-
 /**
  * Tools to control the secondary browser view.
  */
@@ -42,18 +39,13 @@ export default function useBrowsingTools() {
         strict: true,
         execute: async () => {
             try {
-                const iframe = iframeRef.current;
-                if (!iframe) return "No browser view available";
+                console.log("Reading browser content");
 
-                const url = iframe.src || "";
-                const html =
-                  iframe.srcdoc?.trim()?.length
-                    ? iframe.srcdoc
-                    : url
-                    ? await fetch(url, { cache: "no-store" }).then(r => r.text()).catch(() => "")
-                    : "";
+                // Get HTML content from the webview using Tauri command
+                const html = await invoke("read_browser") as string;
+                console.log("Retrieved HTML content from webview");
 
-                if (!html) return "No page loaded or cross-origin fetch blocked";
+                if (!html) return "No page loaded";
 
                 const apiKey = await getOpenAIKey();
                 if (!apiKey) {
@@ -79,31 +71,56 @@ export default function useBrowsingTools() {
         },
     }), []);
 
-    const displayTool = useMemo(() => tool({
-        name: "Display Content",
-        description: "Render provided HTML content in the browser view.",
-        parameters: z.object({html: z.string().describe("HTML to display")}).strict(),
+    const renderTool = useMemo(() => tool({
+        name: "Render Content",
+        description: "Create and render an HTML page based on the provided instructions.",
+        parameters: z.object({instructions: z.string().describe("Instructions for creating the HTML page")}).strict(),
         strict: true,
-        execute: async ({html}: { html: string }) => {
+        execute: async ({instructions}: { instructions: string }) => {
             try {
-                // Use srcdoc to render arbitrary HTML
-                if (iframeRef.current) {
-                    iframeRef.current.srcdoc = html;
+                console.log("Creating HTML content from instructions:", instructions);
+
+                const apiKey = await getOpenAIKey();
+                if (!apiKey) {
+                    return "OpenAI API key not set";
                 }
-                return "ok";
+
+                const openai = new OpenAI({apiKey, dangerouslyAllowBrowser: true});
+                const response = await openai.responses.create({
+                    model: "gpt-4.1",
+                    input: [{
+                        role: "user",
+                        content: [{
+                            type: "input_text",
+                            text: "Create a complete, self-contained HTML file based on these instructions: " + instructions + "\n\n" +
+                                "Requirements:\n" +
+                                "- Include all necessary HTML, CSS, and JavaScript in a single file\n" +
+                                "- Use modern, clean styling\n" +
+                                "- Make it responsive and well-designed\n" +
+                                "- Include any inline CSS and JavaScript needed\n" +
+                                "- Return only the HTML content without any explanation or markdown formatting",
+                        }],
+                    }],
+                });
+
+                const html = response.output_text;
+                if (!html) {
+                    return "Failed to generate HTML content";
+                }
+
+                console.log("Generated HTML, now rendering in browser");
+                await invoke("render_browser", {html});
+                console.log("HTML content rendered using Tauri command");
+
+                return "Successfully created and rendered HTML page";
             } catch (err) {
-                console.error("Display content error:", err);
+                console.error("Render content error:", err);
                 return err instanceof Error ? err.message : String(err);
             }
         },
     }), []);
 
-    const setIframe = (iframe: HTMLIFrameElement | null) => {
-        console.log("Setting iframe in browser tools:", iframe);
-        iframeRef.current = iframe;
-    };
+    const tools = useMemo(() => [navigateTool, readTool, renderTool] as const, [navigateTool, readTool, renderTool]);
 
-    const tools = useMemo(() => [navigateTool, readTool, displayTool] as const, [navigateTool, readTool, displayTool]);
-
-    return { tools, setIframe };
+    return {tools};
 }

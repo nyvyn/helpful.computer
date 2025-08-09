@@ -1,10 +1,13 @@
 mod cua;
 mod view;
 
+use crate::view::PageStore;
 use cua::*;
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
-use view::{hide_browser, move_browser, navigate_browser, show_browser};
+use view::{
+    hide_browser, move_browser, navigate_browser, read_browser, render_browser, show_browser,
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct ScreenInfo {
@@ -61,6 +64,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_macos_permissions::init())
         .plugin(tauri_plugin_store::Builder::default().build())
+        .manage(PageStore(std::sync::Arc::new(std::sync::Mutex::new(None))))
         .invoke_handler(tauri::generate_handler![
             run_applescript,
             capture_screenshot,
@@ -76,7 +80,9 @@ pub fn run() {
             show_browser,
             hide_browser,
             move_browser,
-            navigate_browser
+            navigate_browser,
+            read_browser,
+            render_browser
         ])
         .setup(|app| {
             let window = app.get_window("main").unwrap();
@@ -91,6 +97,7 @@ pub fn run() {
                     window.inner_size().unwrap(),
                 )
                 .expect("unable to create webview");
+
             webview.hide().expect("uanble to hide webview");
             Ok(())
         })

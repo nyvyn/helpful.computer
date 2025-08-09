@@ -1,6 +1,5 @@
 "use client";
 
-import useBrowsingTools from "@/hooks/useBrowsingTools.ts";
 import { invoke } from "@tauri-apps/api/core";
 import React, { useCallback, useEffect, useRef } from "react";
 
@@ -9,14 +8,12 @@ interface BrowserViewProps {
 }
 
 export default function BrowserView({isActive}: BrowserViewProps) {
-    const { setIframe } = useBrowsingTools();
-    const iframeRef = useRef<HTMLIFrameElement | null>(null);
+    const divRef = useRef<HTMLDivElement | null>(null);
 
     const updateWebviewPosition = useCallback(() => {
-        if (iframeRef.current) {
-            const rect = iframeRef.current.getBoundingClientRect();
+        if (divRef.current) {
+            const rect = divRef.current.getBoundingClientRect();
             if (rect.width > 0 && rect.height > 0) {
-                console.log("Iframe viewport rect:", {x: rect.x, y: rect.y, width: rect.width, height: rect.height});
 
                 // Send coordinates directly without adjustment
                 invoke("move_browser", {
@@ -33,23 +30,15 @@ export default function BrowserView({isActive}: BrowserViewProps) {
         }
     }, []);
 
-    const setIframeRef = useCallback((node: HTMLIFrameElement | null) => {
-        iframeRef.current = node;
-        setIframe(node);
-    }, [setIframe]);
-
     useEffect(() => {
         let resizeObserver: ResizeObserver | null = null;
         let cleanupResize: (() => void) | null = null;
 
-        if (isActive && iframeRef.current) {
-            const rect = iframeRef.current.getBoundingClientRect();
+        if (isActive && divRef.current) {
+            const rect = divRef.current.getBoundingClientRect();
             if (rect.width > 0 && rect.height > 0) {
                 // Initial show with viewport coordinates
                 const showInitial = () => {
-                    console.log("BrowserView is active - showing webview");
-
-                    console.log("Initial iframe rect:", {x: rect.x, y: rect.y, width: rect.width, height: rect.height});
 
                     // Send coordinates directly without adjustment
                     invoke("show_browser", {
@@ -72,7 +61,7 @@ export default function BrowserView({isActive}: BrowserViewProps) {
                         updateWebviewPosition();
                     }
                 });
-                resizeObserver.observe(iframeRef.current);
+                resizeObserver.observe(divRef.current);
 
                 // Also listen for window resize events that might affect position
                 const handleResize = () => {
@@ -111,26 +100,10 @@ export default function BrowserView({isActive}: BrowserViewProps) {
     }, [isActive, updateWebviewPosition]);
 
     return (
-        <div className="relative w-full h-full bg-gray-900">
-            <iframe
-                ref={setIframeRef}
-                title="Browser View"
-                className="absolute inset-0 w-full h-full border-0"
-                sandbox="
-                    allow-scripts
-                    allow-same-origin
-                    allow-forms
-                    allow-popups
-                    allow-popups-to-escape-sandbox
-                    allow-modals
-                    allow-downloads
-                    allow-top-navigation-by-user-activation"
-                allow="
-                    fullscreen; autoplay; clipboard-read; clipboard-write;
-                    geolocation *; camera *; microphone *; payment *; display-capture *"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                loading="eager"
+        <div className="w-full h-full border border-gray-700 bg-gray-900 flex items-center justify-center">
+            <div
+                ref={divRef}
+                className="w-full h-full box-border"
             />
         </div>
     );
