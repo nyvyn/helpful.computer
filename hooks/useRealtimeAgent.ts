@@ -1,5 +1,4 @@
 import useBrowsingTools from "@/hooks/useBrowsingTools.ts";
-import useComputingTools from "@/hooks/useComputingTools.ts";
 import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
 
@@ -11,7 +10,6 @@ import { toast } from "sonner";
 export enum ViewType {
     DRAWING = "drawing",
     WRITING = "writing",
-    COMPUTING = "computing",
     BROWSING = "browsing",
     SETTINGS = "settings"
 }
@@ -34,26 +32,21 @@ export function useRealtimeAgent() {
 
     const { tools: drawingTools } = useDrawingTools();
     const { tools: writingTools } = useWritingTools();
-    const { tools: computingTools } = useComputingTools();
     const { tools: browserTools } = useBrowsingTools();
 
     const createSession = useCallback(async () => {
         console.log("Creating session");
         console.log("Drawing tools:", drawingTools.length);
         console.log("Writing tools:", writingTools.length);
-        console.log("Computing tools:", computingTools.length);
         console.log("Browser tools:", browserTools.length);
 
-        const allTools = [...drawingTools, ...writingTools, ...computingTools, ...browserTools];
+        const allTools = [...drawingTools, ...writingTools, ...browserTools];
         console.log("Total tools:", allTools.length);
 
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions:
-                "If you are asked to draw something, don't say it; instead use Drawing tools.\n" +
-                "If you are asked to write something, don't say it; instead use the Writing tools.\n" +
-                "If you are asked about the computer, dont say it; instead use the Computing tools.\n" +
-                "When finishing a task, just respond with 'Compliance'",
+                "When finishing a task, just respond with 'Compliance' - and nothing more unless asked. ",
             tools: allTools,
         });
 
@@ -79,7 +72,6 @@ export function useRealtimeAgent() {
 
             if (writingTools.map(t => t.name).includes(tool.name)) setView(ViewType.WRITING);
             else if (drawingTools.map(t => t.name).includes(tool.name)) setView(ViewType.DRAWING);
-            else if (computingTools.map(t => t.name).includes(tool.name)) setView(ViewType.COMPUTING);
             else if (browserTools.map(t => t.name).includes(tool.name)) setView(ViewType.BROWSING);
         });
 
@@ -108,7 +100,7 @@ export function useRealtimeAgent() {
         console.log("Session connected, status:", session.current.transport.status);
         session.current.mute(true);
         console.log("Connected: ", session.current.transport);
-    }, [drawingTools, writingTools, computingTools, browserTools]);
+    }, [drawingTools, writingTools, browserTools]);
 
     /* create once */
     useEffect(() => {
