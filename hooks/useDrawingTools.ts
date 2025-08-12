@@ -4,7 +4,7 @@ import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { z } from "zod";
 
 const schema = z.object({
@@ -109,10 +109,10 @@ export default function useDrawingTools() {
         },
     }), []);
 
-    const setExcalidrawApi = (api: ExcalidrawImperativeAPI | null) => {
+    const setExcalidrawApi = useCallback((api: ExcalidrawImperativeAPI | null) => {
         console.log("Setting Excalidraw API in drawing tools:", api);
         apiRef.current = api;
-    };
+    }, []);
 
     const tools = useMemo(() => [drawCanvasTool, readCanvasTool] as const, [drawCanvasTool, readCanvasTool]);
 
