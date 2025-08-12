@@ -1,6 +1,7 @@
 "use client";
 
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
+import { MODELS } from "@/lib/models.ts";
 import { tool } from "@openai/agents-realtime";
 import { invoke } from "@tauri-apps/api/core";
 import OpenAI from "openai";
@@ -55,7 +56,7 @@ export default function useBrowsingTools() {
                 }
                 const openai = new OpenAI({apiKey, dangerouslyAllowBrowser: true});
                 const response = await openai.responses.create({
-                    model: "gpt-5-nano",
+                    model: MODELS.PLAID,
                     input: [{
                         role: "user",
                         content: [{
@@ -100,7 +101,7 @@ export default function useBrowsingTools() {
                 let response;
                 try {
                     response = await openai.responses.create({
-                        model: "gpt-5-mini",
+                        model: MODELS.FAST,
                         input: [{
                             role: "user",
                             content: [{
@@ -156,7 +157,7 @@ export default function useBrowsingTools() {
 
                 const openai = new OpenAI({apiKey, dangerouslyAllowBrowser: true});
                 const response = await openai.responses.create({
-                    model: "gpt-5",
+                    model: MODELS.CAPABLE,
                     input: [{
                         role: "user",
                         content: [{

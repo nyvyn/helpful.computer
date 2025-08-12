@@ -1,6 +1,7 @@
 "use client";
 
 import { LazyStore } from "@tauri-apps/plugin-store";
+import { MODELS } from "@/lib/models.ts";
 
 const STORE_KEY = "openai_api_key";
 const store = new LazyStore("settings.json");
@@ -32,7 +33,7 @@ export async function getOpenAISessionToken(): Promise<string> {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            model: "gpt-4o-realtime-preview-2025-06-03",
+            model: MODELS.REALTIME,
             voice: "verse",
         }),
     });

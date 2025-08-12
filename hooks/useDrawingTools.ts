@@ -1,6 +1,7 @@
 "use client";
 
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
+import { MODELS } from "@/lib/models.ts";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
@@ -45,7 +46,7 @@ export default function useDrawingTools() {
                     return "OpenAI client not initialized";
                 }
                 const completion = await openai.chat.completions.create({
-                    model: "gpt-4.1",
+                    model: MODELS.FAST,
                     messages: [
                         {
                             role: "system",

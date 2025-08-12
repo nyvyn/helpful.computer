@@ -3,6 +3,7 @@ import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
 
 import { getOpenAIKey, getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
+import { MODELS } from "@/lib/models.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -51,7 +52,7 @@ export function useRealtimeAgent() {
         });
 
         session.current = new RealtimeSession(assistantAgent, {
-            model: "gpt-4o-realtime-preview-2025-06-03",
+            model: MODELS.REALTIME,
             tracingDisabled: true,
             config: {
                 voice: "ash"

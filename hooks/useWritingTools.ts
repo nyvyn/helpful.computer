@@ -1,6 +1,7 @@
 "use client";
 
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
+import { MODELS } from "@/lib/models.ts";
 import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS, } from "@lexical/markdown";
 import { tool } from "@openai/agents-realtime";
 import { $getRoot, LexicalEditor } from "lexical";
@@ -69,7 +70,7 @@ export default function useWritingTools() {
                 }
 
                 const completion = await openai.chat.completions.create({
-                    model: "gpt-4.1",
+                    model: MODELS.FAST,
                     messages: [
                         {
                             role: "system",
