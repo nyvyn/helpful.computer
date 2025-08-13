@@ -29,14 +29,10 @@ fn get_window_frame_offset(_app: &AppHandle) -> Result<LogicalPosition<f64>, Str
 }
 
 #[tauri::command]
-pub fn show_browser(app: AppHandle, rect: WebviewRect) -> Result<(), String> {
+pub fn hide_browser(app: AppHandle) -> Result<(), String> {
     let webviews = app.webviews();
     if let Some(webview) = webviews.get("browser") {
-        // Move the webview first
-        move_browser(app, rect)?;
-
-        // Then show it
-        webview.show().map_err(|e| e.to_string())?;
+        webview.hide().map_err(|e| e.to_string())?;
         Ok(())
     } else {
         Err("Webview 'browser' not found".to_string())
@@ -68,10 +64,11 @@ pub fn move_browser(app: AppHandle, rect: WebviewRect) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn hide_browser(app: AppHandle) -> Result<(), String> {
+pub async fn navigate_browser(app: AppHandle, url: String) -> Result<(), String> {
     let webviews = app.webviews();
     if let Some(webview) = webviews.get("browser") {
-        webview.hide().map_err(|e| e.to_string())?;
+        let parsed_url = url.parse().map_err(|e| format!("{:?}", e))?;
+        webview.navigate(parsed_url).map_err(|e| e.to_string())?;
         Ok(())
     } else {
         Err("Webview 'browser' not found".to_string())
@@ -79,33 +76,13 @@ pub fn hide_browser(app: AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub async fn navigate_browser(
-    app: AppHandle,
-    state: State<'_, PageStore>,
-    url: String,
-) -> Result<(), String> {
-    let webviews = app.webviews();
-    if let Some(webview) = webviews.get("browser") {
-        let parsed_url = url.parse().map_err(|e| format!("{:?}", e))?;
-        webview.navigate(parsed_url).map_err(|e| e.to_string())?;
-
-        // Fetch the URL content in the background and store it
-        let url_clone = url.clone();
-        let state_clone = state.0.clone();
-        tokio::spawn(async move {
-            if let Ok(response) = reqwest::get(&url_clone).await {
-                if let Ok(html) = response.text().await {
-                    if let Ok(mut store) = state_clone.lock() {
-                        *store = Some(html);
-                    }
-                }
-            }
-        });
-
-        Ok(())
-    } else {
-        Err("Webview 'browser' not found".to_string())
-    }
+pub fn read_browser(state: State<PageStore>) -> Result<String, String> {
+    state
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .clone()
+        .ok_or("No page content available yet".to_string())
 }
 
 #[tauri::command]
@@ -122,15 +99,37 @@ pub async fn render_browser(
         base64::engine::general_purpose::STANDARD.encode(html)
     );
 
-    navigate_browser(app, state, data_url).await
+    navigate_browser(app, data_url).await
 }
 
 #[tauri::command]
-pub fn read_browser(state: State<PageStore>) -> Result<String, String> {
-    state
-        .0
-        .lock()
-        .map_err(|e| e.to_string())?
-        .clone()
-        .ok_or("No page content available yet".to_string())
+pub async fn script_browser(app: AppHandle, script: String) -> Result<String, String> {
+    let webviews = app.webviews();
+    if let Some(webview) = webviews.get("browser") {
+        webview.eval(&script).map_err(|e| e.to_string())?;
+        Ok("Script executed successfully".to_string())
+    } else {
+        Err("Webview 'browser' not found".to_string())
+    }
+}
+
+#[tauri::command]
+pub fn set_page_content(state: State<'_, PageStore>, html: String) -> Result<(), String> {
+    *state.0.lock().map_err(|e| e.to_string())? = Some(html);
+    Ok(())
+}
+
+#[tauri::command]
+pub fn show_browser(app: AppHandle, rect: WebviewRect) -> Result<(), String> {
+    let webviews = app.webviews();
+    if let Some(webview) = webviews.get("browser") {
+        // Move the webview first
+        move_browser(app, rect)?;
+
+        // Then show it
+        webview.show().map_err(|e| e.to_string())?;
+        Ok(())
+    } else {
+        Err("Webview 'browser' not found".to_string())
+    }
 }

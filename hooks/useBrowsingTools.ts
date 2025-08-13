@@ -1,6 +1,7 @@
 "use client";
 
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
+import { MODELS } from "@/lib/models.ts";
 import { tool } from "@openai/agents-realtime";
 import { invoke } from "@tauri-apps/api/core";
 import OpenAI from "openai";
@@ -34,12 +35,14 @@ export default function useBrowsingTools() {
 
     const readTool = useMemo(() => tool({
         name: "Read Browser",
-        description: "Read the current browser page and return it as markdown.",
-        parameters: z.object({}).strict(),
+        description: "Read the current browser page and process it according to the provided instructions.",
+        parameters: z.object({
+            instructions: z.string().describe("Instructions for what to extract or analyze from the page content")
+        }).strict(),
         strict: true,
-        execute: async () => {
+        execute: async ({instructions}: { instructions: string }) => {
             try {
-                console.log("Reading browser content");
+                console.log("Reading browser content with instructions:", instructions);
 
                 // Get HTML content from the webview using Tauri command
                 const html = await invoke("read_browser") as string;
@@ -53,12 +56,12 @@ export default function useBrowsingTools() {
                 }
                 const openai = new OpenAI({apiKey, dangerouslyAllowBrowser: true});
                 const response = await openai.responses.create({
-                    model: "gpt-4.1",
+                    model: MODELS.PLAID,
                     input: [{
                         role: "user",
                         content: [{
                             type: "input_text",
-                            text: `Convert the following HTML to Markdown:\n\n${html}`,
+                            text: `${instructions}\n\nHTML content to process:\n\n${html}`,
                         }],
                     }],
                 });
@@ -66,6 +69,73 @@ export default function useBrowsingTools() {
                 return response.output_text;
             } catch (err) {
                 console.error("Read browser error:", err);
+                return err instanceof Error ? err.message : String(err);
+            }
+        },
+    }), []);
+
+    const interactTool = useMemo(() => tool({
+        name: "Interact with Browser",
+        description: "Interact with the current browser page by executing JavaScript based on the provided instructions.",
+        parameters: z.object({
+            instructions: z.string().describe("Instructions for how to interact with the page (e.g., click buttons, fill forms, scroll, etc.)")
+        }).strict(),
+        strict: true,
+        execute: async ({instructions}: { instructions: string }) => {
+            try {
+                console.log("Generating JavaScript for browser interaction:", instructions);
+
+                // Get current page content to understand what we're interacting with
+                const html = await invoke("read_browser") as string;
+                if (!html) {
+                    return "No page loaded - cannot interact with browser";
+                }
+
+                const apiKey = await getOpenAIKey();
+                if (!apiKey) {
+                    return "OpenAI API key not set";
+                }
+
+                const openai = new OpenAI({apiKey, dangerouslyAllowBrowser: true});
+                
+                let response;
+                try {
+                    response = await openai.responses.create({
+                        model: MODELS.FAST,
+                        input: [{
+                            role: "user",
+                            content: [{
+                                type: "input_text",
+                                text: "Generate JavaScript code to interact with the current web page based on these instructions: " + instructions + "\n\n" +
+                                    "Requirements:\n" +
+                                    "- Return ONLY JavaScript code, no explanation or markdown formatting\n" +
+                                    "- Note: Any console.log output or return values will be ignored - this is execute-only\n" +
+                                    "- Be as brief and concise as possible\n" +
+                                    "- Use standard DOM methods (querySelector, click, focus, etc.)\n" +
+                                    "- Base your selectors on the actual HTML structure provided below\n\n" +
+                                    "Instructions: " + instructions + "\n\n" +
+                                    "Current page HTML:\n" + html,
+                            }],
+                        }],
+                    });
+                } catch (apiError) {
+                    console.error("OpenAI API error:", apiError);
+                    return `Failed to generate JavaScript - OpenAI API error: ${apiError instanceof Error ? apiError.message : String(apiError)}`;
+                }
+
+                const javascript = response.output_text;
+                if (!javascript || javascript.trim() === "") {
+                    return "Failed to generate JavaScript code - empty response from AI";
+                }
+
+                console.log("Generated JavaScript:", javascript);
+                console.log("Now executing JavaScript in browser");
+                await invoke("script_browser", {script: javascript});
+                console.log("JavaScript executed successfully");
+
+                return "Browser interaction completed successfully";
+            } catch (err) {
+                console.error("Interact with browser error:", err);
                 return err instanceof Error ? err.message : String(err);
             }
         },
@@ -87,7 +157,7 @@ export default function useBrowsingTools() {
 
                 const openai = new OpenAI({apiKey, dangerouslyAllowBrowser: true});
                 const response = await openai.responses.create({
-                    model: "gpt-4.1",
+                    model: MODELS.CAPABLE,
                     input: [{
                         role: "user",
                         content: [{
@@ -120,7 +190,7 @@ export default function useBrowsingTools() {
         },
     }), []);
 
-    const tools = useMemo(() => [navigateTool, readTool, renderTool] as const, [navigateTool, readTool, renderTool]);
+    const tools = useMemo(() => [navigateTool, readTool, interactTool, renderTool] as const, [navigateTool, readTool, interactTool, renderTool]);
 
     return {tools};
 }

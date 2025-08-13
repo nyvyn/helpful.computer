@@ -1,10 +1,11 @@
 "use client";
 
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
+import { MODELS } from "@/lib/models.ts";
 import { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import { tool } from "@openai/agents-realtime";
 import OpenAI from "openai";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { z } from "zod";
 
 const schema = z.object({
@@ -45,7 +46,7 @@ export default function useDrawingTools() {
                     return "OpenAI client not initialized";
                 }
                 const completion = await openai.chat.completions.create({
-                    model: "gpt-4.1",
+                    model: MODELS.FAST,
                     messages: [
                         {
                             role: "system",
@@ -109,10 +110,10 @@ export default function useDrawingTools() {
         },
     }), []);
 
-    const setExcalidrawApi = (api: ExcalidrawImperativeAPI | null) => {
+    const setExcalidrawApi = useCallback((api: ExcalidrawImperativeAPI | null) => {
         console.log("Setting Excalidraw API in drawing tools:", api);
         apiRef.current = api;
-    };
+    }, []);
 
     const tools = useMemo(() => [drawCanvasTool, readCanvasTool] as const, [drawCanvasTool, readCanvasTool]);
 

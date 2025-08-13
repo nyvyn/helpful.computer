@@ -6,7 +6,8 @@ use cua::*;
 use serde::{Deserialize, Serialize};
 use tauri::Manager;
 use view::{
-    hide_browser, move_browser, navigate_browser, read_browser, render_browser, show_browser,
+    hide_browser, move_browser, navigate_browser, read_browser, render_browser, script_browser,
+    set_page_content, show_browser,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -82,14 +83,53 @@ pub fn run() {
             move_browser,
             navigate_browser,
             read_browser,
-            render_browser
+            render_browser,
+            script_browser,
+            set_page_content
         ])
         .setup(|app| {
             let window = app.get_window("main").unwrap();
+
+            // JavaScript to inject into the browser webview
+            let init_script = r#"
+                (function() {
+                    function sendPageContent() {
+                        try {
+                            const html = document.documentElement.outerHTML;
+                            window.__TAURI_INTERNALS__.invoke('set_page_content', { html });
+                        } catch (error) {
+                            console.error('Failed to send page content:', error);
+                        }
+                    }
+                    
+                    // Send content when page loads
+                    if (document.readyState === 'complete') {
+                        sendPageContent();
+                    } else {
+                        window.addEventListener('load', sendPageContent);
+                    }
+                    
+                    // Also send content when DOM changes (for dynamic content)
+                    const observer = new MutationObserver(() => {
+                        clearTimeout(window.contentUpdateTimeout);
+                        window.contentUpdateTimeout = setTimeout(sendPageContent, 1000);
+                    });
+                    
+                    observer.observe(document.body || document.documentElement, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true,
+                        characterData: true
+                    });
+                })();
+            "#;
+
             let webview_builder = tauri::webview::WebviewBuilder::new(
                 "browser",
                 tauri::WebviewUrl::App("about:blank".into()),
-            );
+            )
+            .initialization_script(init_script);
+
             let webview = window
                 .add_child(
                     webview_builder,
@@ -98,7 +138,7 @@ pub fn run() {
                 )
                 .expect("unable to create webview");
 
-            webview.hide().expect("uanble to hide webview");
+            webview.hide().expect("unable to hide webview");
             Ok(())
         })
         .run(tauri::generate_context!())

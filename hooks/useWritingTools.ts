@@ -1,11 +1,12 @@
 "use client";
 
 import { getOpenAIKey } from "@/lib/manageOpenAIKey.ts";
+import { MODELS } from "@/lib/models.ts";
 import { $convertFromMarkdownString, $convertToMarkdownString, TRANSFORMERS, } from "@lexical/markdown";
 import { tool } from "@openai/agents-realtime";
 import { $getRoot, LexicalEditor } from "lexical";
 import OpenAI from "openai";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { z } from "zod";
 
 /**
@@ -69,7 +70,7 @@ export default function useWritingTools() {
                 }
 
                 const completion = await openai.chat.completions.create({
-                    model: "gpt-4.1",
+                    model: MODELS.FAST,
                     messages: [
                         {
                             role: "system",
@@ -97,10 +98,10 @@ export default function useWritingTools() {
         },
     }), []);
 
-    const setLexicalEditor = (editor: LexicalEditor | null) => {
+    const setLexicalEditor = useCallback((editor: LexicalEditor | null) => {
         console.log("Setting Lexical editor in writing tools:", editor);
         editorRef.current = editor;
-    };
+    }, []);
 
     const tools = useMemo(() => [readMarkdownTool, writeMarkdownTool] as const, [readMarkdownTool, writeMarkdownTool]);
     

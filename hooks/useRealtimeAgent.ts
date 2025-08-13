@@ -3,6 +3,7 @@ import useDrawingTools from "@/hooks/useDrawingTools.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
 
 import { getOpenAIKey, getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
+import { MODELS } from "@/lib/models.ts";
 import { RealtimeAgent, RealtimeSession } from "@openai/agents-realtime";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -51,7 +52,7 @@ export function useRealtimeAgent() {
         });
 
         session.current = new RealtimeSession(assistantAgent, {
-            model: "gpt-4o-realtime-preview-2025-06-03",
+            model: MODELS.REALTIME,
             tracingDisabled: true,
             config: {
                 voice: "ash"
@@ -62,7 +63,9 @@ export function useRealtimeAgent() {
         session.current.on("audio_stopped", () => setSpeaking(false));
         session.current.on("error", (e) => {
             console.error("Session error:", e);
-            toast.error(String(e));
+            // Extract the actual error message from the nested error object
+            const errorMessage = e?.error?.message || e?.message || JSON.stringify(e) || "Unknown session error";
+            toast.error(errorMessage);
         });
         session.current.on("agent_tool_end", () => {
             setWorking(false);
@@ -113,7 +116,8 @@ export function useRealtimeAgent() {
         console.log("Creating new session...");
         createSession().catch((error) => {
             console.error("Session creation failed:", error);
-            toast.error(String(error));
+            const errorMessage = error?.message || JSON.stringify(error) || "Session creation failed";
+            toast.error(errorMessage);
         });
 
         return () => {
@@ -175,7 +179,8 @@ export function useRealtimeAgent() {
             await createSession();
         } catch (error) {
             console.error("Reconnection failed:", error);
-            toast.error(String(error));
+            const errorMessage = error?.message || JSON.stringify(error) || "Reconnection failed";
+            toast.error(errorMessage);
         }
     };
 
