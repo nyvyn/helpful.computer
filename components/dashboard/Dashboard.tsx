@@ -7,6 +7,8 @@ import SettingsView from "@/components/settings/SettingsView.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import { useRealtimeAgent, ViewType } from "@/hooks/useRealtimeAgent.ts";
+import useOrchestratorAgent from "@/hooks/useOrchestratorAgent.ts";
+import ToolLog from "@/components/dashboard/ToolLog.tsx";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -18,7 +20,8 @@ import React, { useEffect, useRef, useState } from "react";
  */
 
 export default function Dashboard() {
-    const {listening, speaking, toggleListening, working, view, selectView, reconnect} = useRealtimeAgent();
+    const {listening, speaking, toggleListening, working, view, selectView, reconnect, toolLog} = useRealtimeAgent();
+    useOrchestratorAgent();
 
     const minSidebar = 100;
     const defaultSidebar = 350;
@@ -44,10 +47,11 @@ export default function Dashboard() {
     return (
         <div className="flex w-screen h-screen bg-black">
             <div
-                className="relative flex items-center justify-center flex-none"
+                className="relative flex flex-col items-center justify-center flex-none"
                 style={{width: `${sidebarWidth}px`}}
             >
                 <AudioVisualizer listening={listening} speaking={speaking} working={working}/>
+                <ToolLog log={toolLog}/>
 
                 <ToggleListeningButton
                     listening={listening}

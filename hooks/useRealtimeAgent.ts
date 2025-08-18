@@ -28,6 +28,7 @@ export function useRealtimeAgent() {
     const [speaking, setSpeaking] = useState(false);
     const [working, setWorking] = useState(false);
     const [view, setView] = useState<ViewType>(ViewType.DRAWING);
+    const [toolLog, setToolLog] = useState<string[]>([]);
 
     const session = useRef<RealtimeSession | null>(null);
 
@@ -67,11 +68,13 @@ export function useRealtimeAgent() {
             const errorMessage = e?.error?.message || e?.message || JSON.stringify(e) || "Unknown session error";
             toast.error(errorMessage);
         });
-        session.current.on("agent_tool_end", () => {
+        session.current.on("agent_tool_end", (_, _agent, tool) => {
             setWorking(false);
+            setToolLog(prev => [...prev, `Finished ${tool.name}`]);
         });
         session.current.on("agent_tool_start", (_, _agent, tool) => {
             setWorking(true);
+            setToolLog(prev => [...prev, `Started ${tool.name}`]);
 
             if (writingTools.map(t => t.name).includes(tool.name)) setView(ViewType.WRITING);
             else if (drawingTools.map(t => t.name).includes(tool.name)) setView(ViewType.DRAWING);
@@ -193,5 +196,6 @@ export function useRealtimeAgent() {
         view,
         selectView,
         reconnect,
+        toolLog,
     };
 }
