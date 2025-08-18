@@ -44,7 +44,7 @@ export default function Dashboard() {
     return (
         <div className="flex w-screen h-screen bg-black">
             <div
-                className="relative flex items-center justify-center flex-none"
+                className="relative flex flex-col items-center justify-center flex-none"
                 style={{width: `${sidebarWidth}px`}}
             >
                 <AudioVisualizer listening={listening} speaking={speaking} working={working}/>
@@ -64,17 +64,20 @@ export default function Dashboard() {
                         className={`px-2 py-1 ${view === ViewType.DRAWING ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.DRAWING)}
                         aria-label="Draw"
-                    >Draw</button>
+                    >Draw
+                    </button>
                     <button
                         className={`px-2 py-1 ${view === ViewType.WRITING ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.WRITING)}
                         aria-label="Write"
-                    >Write</button>
+                    >Write
+                    </button>
                     <button
                         className={`px-2 py-1 ${view === ViewType.BROWSING ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.BROWSING)}
                         aria-label="Browse"
-                    >Browse</button>
+                    >Browse
+                    </button>
                     <button
                         className={`px-2 py-1 ${view === ViewType.SETTINGS ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.SETTINGS)}
@@ -84,16 +87,16 @@ export default function Dashboard() {
                     </button>
                 </div>
                 <div className="flex-1 overflow-hidden relative">
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.DRAWING })}>
-                        <ExcalidrawView />
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", {hidden: view !== ViewType.DRAWING})}>
+                        <ExcalidrawView/>
                     </div>
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.WRITING })}>
-                        <LexicalView />
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", {hidden: view !== ViewType.WRITING})}>
+                        <LexicalView/>
                     </div>
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.BROWSING })}>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", {hidden: view !== ViewType.BROWSING})}>
                         <BrowserView isActive={view === ViewType.BROWSING}/>
                     </div>
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.SETTINGS })}>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", {hidden: view !== ViewType.SETTINGS})}>
                         <SettingsView onKeySaved={reconnect}/>
                     </div>
                 </div>
