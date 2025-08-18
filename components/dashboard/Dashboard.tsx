@@ -7,8 +7,6 @@ import SettingsView from "@/components/settings/SettingsView.tsx";
 import AudioVisualizer from "@/components/speech/AudioVisualizer.tsx";
 import ToggleListeningButton from "@/components/speech/ToggleListeningButton.tsx";
 import { useRealtimeAgent, ViewType } from "@/hooks/useRealtimeAgent.ts";
-import useOrchestratorAgent from "@/hooks/useOrchestratorAgent.ts";
-import ToolLog from "@/components/dashboard/ToolLog.tsx";
 import clsx from "clsx";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -20,8 +18,7 @@ import React, { useEffect, useRef, useState } from "react";
  */
 
 export default function Dashboard() {
-    const {listening, speaking, toggleListening, working, view, selectView, reconnect, toolLog} = useRealtimeAgent();
-    useOrchestratorAgent();
+    const {listening, speaking, toggleListening, working, view, selectView, reconnect} = useRealtimeAgent();
 
     const minSidebar = 100;
     const defaultSidebar = 350;
@@ -51,7 +48,6 @@ export default function Dashboard() {
                 style={{width: `${sidebarWidth}px`}}
             >
                 <AudioVisualizer listening={listening} speaking={speaking} working={working}/>
-                <ToolLog log={toolLog}/>
 
                 <ToggleListeningButton
                     listening={listening}
@@ -68,17 +64,20 @@ export default function Dashboard() {
                         className={`px-2 py-1 ${view === ViewType.DRAWING ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.DRAWING)}
                         aria-label="Draw"
-                    >Draw</button>
+                    >Draw
+                    </button>
                     <button
                         className={`px-2 py-1 ${view === ViewType.WRITING ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.WRITING)}
                         aria-label="Write"
-                    >Write</button>
+                    >Write
+                    </button>
                     <button
                         className={`px-2 py-1 ${view === ViewType.BROWSING ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.BROWSING)}
                         aria-label="Browse"
-                    >Browse</button>
+                    >Browse
+                    </button>
                     <button
                         className={`px-2 py-1 ${view === ViewType.SETTINGS ? "text-white" : "text-gray-500"}`}
                         onClick={() => selectView(ViewType.SETTINGS)}
@@ -88,16 +87,16 @@ export default function Dashboard() {
                     </button>
                 </div>
                 <div className="flex-1 overflow-hidden relative">
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.DRAWING })}>
-                        <ExcalidrawView />
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", {hidden: view !== ViewType.DRAWING})}>
+                        <ExcalidrawView/>
                     </div>
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.WRITING })}>
-                        <LexicalView />
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", {hidden: view !== ViewType.WRITING})}>
+                        <LexicalView/>
                     </div>
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.BROWSING })}>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", {hidden: view !== ViewType.BROWSING})}>
                         <BrowserView isActive={view === ViewType.BROWSING}/>
                     </div>
-                    <div className={clsx("absolute inset-0 pr-3 pb-3", { hidden: view !== ViewType.SETTINGS })}>
+                    <div className={clsx("absolute inset-0 pr-3 pb-3", {hidden: view !== ViewType.SETTINGS})}>
                         <SettingsView onKeySaved={reconnect}/>
                     </div>
                 </div>

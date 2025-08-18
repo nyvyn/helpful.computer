@@ -1,5 +1,6 @@
 import useBrowsingTools from "@/hooks/useBrowsingTools.ts";
 import useDrawingTools from "@/hooks/useDrawingTools.ts";
+import useOrchestratorAgent from "@/hooks/useOrchestratorAgent.ts";
 import useWritingTools from "@/hooks/useWritingTools.ts";
 
 import { getOpenAIKey, getOpenAISessionToken } from "@/lib/manageOpenAIKey.ts";
@@ -28,26 +29,30 @@ export function useRealtimeAgent() {
     const [speaking, setSpeaking] = useState(false);
     const [working, setWorking] = useState(false);
     const [view, setView] = useState<ViewType>(ViewType.DRAWING);
-    const [toolLog, setToolLog] = useState<string[]>([]);
 
     const session = useRef<RealtimeSession | null>(null);
 
     const { tools: drawingTools } = useDrawingTools();
     const { tools: writingTools } = useWritingTools();
     const { tools: browserTools } = useBrowsingTools();
+    const {tools: orchestrationTools} = useOrchestratorAgent();
 
     const createSession = useCallback(async () => {
         console.log("Creating session");
         console.log("Drawing tools:", drawingTools.length);
         console.log("Writing tools:", writingTools.length);
         console.log("Browser tools:", browserTools.length);
-
-        const allTools = [...drawingTools, ...writingTools, ...browserTools];
+        console.log("Orchestration tools:", orchestrationTools.length);
+        const allTools = [...drawingTools, ...writingTools, ...browserTools, ...orchestrationTools];
         console.log("Total tools:", allTools.length);
 
         const assistantAgent = new RealtimeAgent({
             name: "Assistant",
             instructions:
+                "Prefer to use the orchestration agent, which has the following tools: " +
+                drawingTools.map(t => t.name).join(", ") +
+                writingTools.map(t => t.name).join(", ") +
+                browserTools.map(t => t.name).join(", ") +
                 "When finishing a task, just respond with 'Compliance' - and nothing more unless asked. ",
             tools: allTools,
         });
@@ -64,21 +69,20 @@ export function useRealtimeAgent() {
         session.current.on("audio_stopped", () => setSpeaking(false));
         session.current.on("error", (e) => {
             console.error("Session error:", e);
-            // Extract the actual error message from the nested error object
-            const errorMessage = e?.error?.message || e?.message || JSON.stringify(e) || "Unknown session error";
+            // Extract the actual error message from the error object
+            const errorMessage = (e as { error?: { message?: string } })?.error?.message || JSON.stringify(e) || "Unknown session error";
             toast.error(errorMessage);
         });
-        session.current.on("agent_tool_end", (_, _agent, tool) => {
+        session.current.on("agent_tool_end", () => {
             setWorking(false);
-            setToolLog(prev => [...prev, `Finished ${tool.name}`]);
         });
         session.current.on("agent_tool_start", (_, _agent, tool) => {
             setWorking(true);
-            setToolLog(prev => [...prev, `Started ${tool.name}`]);
 
             if (writingTools.map(t => t.name).includes(tool.name)) setView(ViewType.WRITING);
             else if (drawingTools.map(t => t.name).includes(tool.name)) setView(ViewType.DRAWING);
             else if (browserTools.map(t => t.name).includes(tool.name)) setView(ViewType.BROWSING);
+            // Orchestration tools don't change view - they coordinate across multiple views
         });
 
         const openAIKey = await getOpenAIKey();
@@ -106,7 +110,7 @@ export function useRealtimeAgent() {
         console.log("Session connected, status:", session.current.transport.status);
         session.current.mute(true);
         console.log("Connected: ", session.current.transport);
-    }, [drawingTools, writingTools, browserTools]);
+    }, [drawingTools, writingTools, browserTools, orchestrationTools]);
 
     /* create once */
     useEffect(() => {
@@ -119,7 +123,7 @@ export function useRealtimeAgent() {
         console.log("Creating new session...");
         createSession().catch((error) => {
             console.error("Session creation failed:", error);
-            const errorMessage = error?.message || JSON.stringify(error) || "Session creation failed";
+            const errorMessage = (error as Error)?.message || JSON.stringify(error) || "Session creation failed";
             toast.error(errorMessage);
         });
 
@@ -182,7 +186,7 @@ export function useRealtimeAgent() {
             await createSession();
         } catch (error) {
             console.error("Reconnection failed:", error);
-            const errorMessage = error?.message || JSON.stringify(error) || "Reconnection failed";
+            const errorMessage = (error as Error)?.message || JSON.stringify(error) || "Reconnection failed";
             toast.error(errorMessage);
         }
     };
@@ -196,6 +200,5 @@ export function useRealtimeAgent() {
         view,
         selectView,
         reconnect,
-        toolLog,
     };
 }
